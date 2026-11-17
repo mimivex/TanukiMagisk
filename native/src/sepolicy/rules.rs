@@ -1,7 +1,11 @@
 use crate::SePolicy;
 use crate::consts::{SEPOL_FILE_TYPE, SEPOL_LOG_TYPE, SEPOL_PROC_DOMAIN};
 use crate::ffi::Xperm;
-use base::{LogLevel, set_log_level_state};
+use base::{LogLevel, Utf8CStr, cstr, set_log_level_state};
+
+// Carries the HyOS shim grants; magiskinit writes it only when it arms the
+// hyos_spawner preload (see init/rootdir.rs).
+const HYOS_RULES: &Utf8CStr = cstr!("/dev/hyos_sepolicy.rules");
 
 macro_rules! rules {
     (@args all) => {
@@ -131,12 +135,30 @@ impl SePolicy {
             allow(["zygote"], ["fs_type"], ["filesystem"], ["unmount"]);
             allow(["system_server"], ["system_server"], ["process"], ["execmem"]);
 
+            // Allow the MagiskHide/SuList monitor to setns into zygote and
+            // revert the Magisk mounts
+            allow(["zygote"], ["unlabeled"], ["file"], ["read"]);
+            allow(["zygote"], ["unlabeled"], ["file"], ["open"]);
+            allow(["zygote"], ["unlabeled"], ["file"], ["getattr"]);
+            allow(["zygote"], [proc], ["file"], ["read"]);
+            allow(["zygote"], [proc], ["lnk_file"], ["read"]);
+            allow(["zygote"], [proc], ["dir"], ["search"]);
+            allow(["zygote"], ["proc"], ["file"], ["read"]);
+            allow(["zygote"], ["proc"], ["file"], ["open"]);
+            allow(["zygote"], ["zygote"], ["capability"], ["sys_chroot"]);
+
             // Shut llkd up
             dontaudit(["llkd"], [proc], ["process"], ["ptrace"]);
 
             // Keep /data/adb/* context
             deny(["init"], ["adb_data_file"], ["dir"], ["search"]);
             deny(["vendor_init"], ["adb_data_file"], ["dir"], ["search"]);
+        }
+
+        // HyperOS: the shim reads its opt-in marker from /data as the spawner
+        // domain; magiskinit stages these grants when it arms the preload.
+        if HYOS_RULES.exists() {
+            self.load_rule_file(HYOS_RULES);
         }
 
         #[cfg(any())]

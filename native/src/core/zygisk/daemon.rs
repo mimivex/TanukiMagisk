@@ -19,11 +19,13 @@ use std::sync::atomic::Ordering;
 
 const NBPROP: &Utf8CStr = cstr!("ro.dalvik.vm.native.bridge");
 const ZYGISKLDR: &str = "libzygisk.so";
-const UNMOUNT_MASK: u32 =
-    ZygiskStateFlags::ProcessOnDenyList.repr | ZygiskStateFlags::DenyListEnforced.repr;
 
+// Kitsune 27 parity: modules load into every process except the manager,
+// deny targets included; those are hidden by the mount revert
+// (DO_REVERT_UNMOUNT) in the same pass. Upstream v31.1 skipped the deny
+// targets here, which broke PIF/PlaySpoofer/HMA inside MagiskHide.
 pub fn zygisk_should_load_module(flags: u32) -> bool {
-    flags & UNMOUNT_MASK != UNMOUNT_MASK && flags & ZygiskStateFlags::ProcessIsMagiskApp.repr == 0
+    flags & ZygiskStateFlags::ProcessIsMagiskApp.repr == 0
 }
 
 #[allow(unused_variables)]
@@ -180,7 +182,14 @@ impl MagiskD {
     }
 
     fn get_module_fds(&self, is_64_bit: bool) -> Option<Vec<RawFd>> {
-        self.module_list.get().map(|module_list| {
+        // A restarted magiskd never ran the post-fs-data boot stage, so
+        // its module list is still unset. Rebuild it on demand the first
+        // time the Zygisk protocol needs it; the boot that armed Zygisk
+        // already applied the mounts and ran the module scripts.
+        let module_list = self.module_list.get_or_init(|| {
+            crate::module::collect_modules(self.zygisk_enabled.load(Ordering::Acquire), true)
+        });
+        Some(
             module_list
                 .iter()
                 .map(|m| if is_64_bit { m.z64 } else { m.z32 })
@@ -188,8 +197,8 @@ impl MagiskD {
                 // To work around this issue, send over STDOUT_FILENO as an indicator of an
                 // invalid fd as it will always be /dev/null in magiskd.
                 .map(|fd| if fd < 0 { STDOUT_FILENO } else { fd })
-                .collect()
-        })
+                .collect(),
+        )
     }
 
     fn get_process_info(&self, mut client: UnixStream) -> LoggedResult<()> {

@@ -1,0 +1,115 @@
+package com.topjohnwu.magisk.ui.settings
+
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.view.View
+import android.widget.Toast
+import androidx.lifecycle.viewModelScope
+import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.core.AppContext
+import com.topjohnwu.magisk.core.BuildConfig
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.R
+import com.topjohnwu.magisk.core.ktx.activity
+import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.tasks.AppMigration
+import com.topjohnwu.magisk.core.utils.LocaleSetting
+import com.topjohnwu.magisk.core.utils.RootUtils
+import com.topjohnwu.magisk.databinding.bindExtra
+import com.topjohnwu.magisk.events.AuthEvent
+import kotlinx.coroutines.launch
+
+class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
+
+    val items = createItems()
+    val extraBindings = bindExtra {
+        it.put(BR.handler, this)
+    }
+
+    private fun createItems(): List<BaseSettingsItem> {
+        val context = AppContext
+        val hidden = context.packageName != BuildConfig.APP_PACKAGE_NAME
+
+        // Customization
+        val list = mutableListOf(
+            Customization,
+            Theme, if (LocaleSetting.useLocaleManager) LanguageSystem else Language
+        )
+
+        // Manager
+        list.addAll(listOf(
+            AppSettings,
+            DoHToggle, DownloadPath, RandNameToggle
+        ))
+        if (Info.env.isActive && Const.USER_ID == 0) {
+            if (hidden) list.add(Restore) else list.add(Hide)
+        }
+
+        // Magisk
+        if (Info.env.isActive) {
+            list.addAll(listOf(
+                Magisk,
+                SystemlessHosts
+            ))
+            if (Const.Version.atLeast_24_0()) {
+                list.addAll(listOf(Zygisk, DenyList, SuList, DenyListConfig))
+            }
+        }
+
+        // Superuser
+        if (Info.showSuperUser) {
+            list.addAll(listOf(
+                Superuser,
+                Tapjack, Authentication, AccessMode, MultiuserMode, MountNamespaceMode,
+                AutomaticResponse, RequestTimeout, SUNotification
+            ))
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                // Re-authenticate is not feasible on 8.0+
+                list.add(Reauthenticate)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // Can hide overlay windows on 12.0+
+                list.remove(Tapjack)
+            }
+            if (Const.Version.atLeast_30_1()) {
+                list.add(Restrict)
+            }
+        }
+
+        return list
+    }
+
+    override fun onItemPressed(view: View, item: BaseSettingsItem, doAction: () -> Unit) {
+        when (item) {
+            DownloadPath -> withExternalRW(doAction)
+            Authentication -> AuthEvent(doAction).publish()
+            AutomaticResponse -> if (Config.suAuth) AuthEvent(doAction).publish() else doAction()
+            else -> doAction()
+        }
+    }
+
+    override fun onItemAction(view: View, item: BaseSettingsItem) {
+        when (item) {
+            Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
+            LanguageSystem -> view.activity.startActivity(LocaleSetting.localeSettingsIntent)
+            SystemlessHosts -> createHosts()
+            DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
+            is Hide -> viewModelScope.launch { AppMigration.hide(view.activity, item.value) }
+            Restore -> viewModelScope.launch { AppMigration.restore(view.activity) }
+            else -> Unit
+        }
+    }
+
+    private fun createHosts() {
+        viewModelScope.launch {
+            RootUtils.addSystemlessHosts()
+            AppContext.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
+        }
+    }
+}

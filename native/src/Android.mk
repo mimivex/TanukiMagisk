@@ -27,6 +27,8 @@ LOCAL_SRC_FILES := \
     core/zygisk/hook.cpp \
     core/deny/cli.cpp \
     core/deny/utils.cpp \
+    core/deny/ptrace.cpp \
+    core/deny/revert.cpp \
     core/deny/logcat.cpp
 
 LOCAL_LDLIBS := -llog
@@ -41,6 +43,17 @@ ifdef B_PRELOAD
 include $(CLEAR_VARS)
 LOCAL_MODULE := init-ld
 LOCAL_SRC_FILES := init/preload.c
+LOCAL_LDFLAGS := -Wl,--strip-all
+include $(BUILD_SHARED_LIBRARY)
+
+endif
+
+ifdef B_HYOS
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := hyos
+LOCAL_SRC_FILES := hyos_shim.c
+LOCAL_LDLIBS := -llog
 LOCAL_LDFLAGS := -Wl,--strip-all
 include $(BUILD_SHARED_LIBRARY)
 

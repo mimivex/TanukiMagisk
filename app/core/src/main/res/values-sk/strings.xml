@@ -2,7 +2,7 @@
 
     <!--Sections-->
     <string name="modules">Moduly</string>
-    <string name="superuser">Superužívateľ</string>
+    <string name="superuser">Superuser</string>
     <string name="logs">Záznamy</string>
     <string name="settings">Nastavenia</string>
     <string name="install">Inštalovať</string>
@@ -16,15 +16,16 @@
     <string name="loading">Načítava sa…</string>
     <string name="update">Aktualizovať</string>
     <string name="not_available">N/A</string>
+    <string name="not_installed">Nie je nainštalovaný</string>
     <string name="hide">Skryť</string>
     <string name="home_package">Balíček</string>
     <string name="home_app_title">App</string>
 
-    <string name="home_notice_content">Magisk sťahujte IBA z oficiálnej stránky na GitHube. Súbory z neznámych zdrojov môžu byť škodlivé!</string>
-    <string name="home_support_title">Podporte nás</string>
+    <string name="home_notice_content">Aktívne neudržiavaný fork Magisk. Ak ste za túto aplikáciu zaplatili, boli ste podvedení: je zadarmo a s otvoreným zdrojovým kódom. Experimentálny build poskytovaný tak, ako je, bez záruky; používajte na vlastné riziko.</string>
+    <string name="home_support_title">Podporte pôvodných autorov</string>
     <string name="home_follow_title">Sledujte nás</string>
     <string name="home_item_source">Zdroj</string>
-    <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Môžete nám však dať najavo, že vám na nás záleží, tým, že nám prispejete.</string>
+    <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Toto je fork Magisku, ktorý nebude dostávať aktívnu podporu. Môžete nám však dať najavo, že vám na nás záleží, tým, že nám prispejete. Príspevky idú pôvodným autorom Magisku.</string>
     <string name="home_installed_version">Nainštalované</string>
     <string name="home_latest_version">Posledná</string>
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
@@ -94,6 +95,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">Zobraziť systémové aplikácie</string>
     <string name="show_os_app">Zobraziť aplikácie OS</string>
+    <string name="add_recommended">Pridať odporúčané</string>
     <string name="hide_filter_hint">Filtrovať podľa názvu</string>
     <string name="hide_search">Vyhľadávanie</string>
 
@@ -110,8 +112,6 @@
     <string name="module_state_restore">Obnoviť</string>
     <string name="module_action_install_external">Inštalácia z úložiska</string>
     <string name="update_available">Dostupná aktualizácia</string>
-    <string name="suspend_text_riru">Modul bol pozastavený, lebo %1$s je povolené</string>
-    <string name="suspend_text_zygisk">Modul bol pozastavený, lebo %1$s nie je povolené</string>
     <string name="zygisk_module_unloaded">Modul Zygisk sa nenačítal z dôvodu nekompatibility</string>
     <string name="module_empty">Nie je nainštalovaný žiadny modul</string>
     <string name="confirm_install">Nainštalovať modul %1$s?</string>
@@ -212,4 +212,62 @@
     <string name="install_unknown_denied">Povoľte "inštaláciu neznámych aplikácii" na povolenie tejto funkcie</string>
     <string name="app_not_found">Nenašla sa žiadna aplikácia, ktorá dokáže spracovať túto akciu</string>
     <string name="reboot_apply_change">Reštartovať počítač, aby sa použili zmeny</string>
+    <string name="auto_response">Automatická odpoveď</string>
+    <string name="patch_file_msg">Vyberte raw súbor (*.img) alebo tar súbor ODIN (*.tar) alebo payload.bin (*.bin)</string>
+    <string name="prompt">Výzva</string>
+    <string name="request_timeout">Časový limit na odpoveď</string>
+    <string name="restore_app_confirmation">Týmto obnovíte skrytú aplikáciu späť na pôvodnú aplikáciu. Naozaj to chcete urobiť?</string>
+    <string name="select_patch_file">Vybrať a zaplátať súbor</string>
+    <string name="settings_app_name_error">Neplatný formát</string>
+    <string name="settings_app_name_helper">Aplikácia bude prebalená s týmto názvom</string>
+    <string name="settings_app_name_hint">Nový názov</string>
+    <string name="settings_hide_app_summary">Inštalovať proxy aplikáciu s náhodným ID balíčka a vlastným názvom aplikácie</string>
+    <string name="settings_hide_app_title">Skryť aplikáciu Magisk</string>
+    <string name="settings_restore_app_summary">Odkryť aplikáciu a obnoviť pôvodný súbor APK</string>
+    <string name="settings_restore_app_title">Obnoviť aplikáciu Magisk</string>
+    <string name="settings_su_adb">Iba ADB</string>
+    <string name="settings_su_app">Iba aplikácie</string>
+    <string name="settings_su_app_adb">Aplikácie a ADB</string>
+    <string name="settings_su_disable">Zakázané</string>
+    <string name="settings_su_reauth_summary">Opätovne vyzve na udelenie oprávnení Superužívateľa po upgrade aplikácie</string>
+    <string name="settings_su_reauth_title">Overenie autentifikácie po upgrade</string>
+    <string name="settings_su_request_10">10 sekúnd</string>
+    <string name="settings_su_request_15">15 sekúnd</string>
+    <string name="settings_su_request_20">20 sekúnd</string>
+    <string name="settings_su_request_30">30 sekúnd</string>
+    <string name="settings_su_request_45">45 sekúnd</string>
+    <string name="settings_su_request_60">60 sekúnd</string>
+    <string name="settings_su_tapjack_summary">Dialógové okno superužívateľa nebude reagovať na zadanie, ak je zakryté alebo prekryté iným oknom</string>
+    <string name="settings_su_tapjack_title">Ochrana pred tapjackingom</string>
+    <string name="su_request_title">Požiadavka superužívateľa</string>
+    <string name="superuser_access">Prístup Superužívateľa</string>
+    <string name="tanuki_notice">Neoficiálny build forku Tanuki</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide nie je možné vypnúť, kým je SuList zapnutý.</string>
+    <string name="settings_magiskhide_summary">Úpravy Magisk sa pre procesy v hidelist vracajú späť</string>
+    <string name="settings_hidelist_config_title">Nastaviť HideList</string>
+    <string name="settings_hidelist_config_summary">Vyberte procesy, ktoré sa majú zahrnúť do hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">Uplatniť SuList</string>
+    <string name="settings_sulist_summary">Iba procesy v sulist môžu získať root prístup Magisk</string>
+    <string name="settings_sulist_config_title">Nastaviť SuList</string>
+    <string name="settings_sulist_config_summary">Vyberte procesy, ktoré sa majú zahrnúť do sulist</string>
+    <string name="settings_sulist_enforced">SuList je uplatnený</string>
+    <string name="settings_sulist_error_magiskhide">Táto funkcia vyžaduje zapnutý MagiskHide</string>
+    <string name="sulist_empty_warning">SuList je whitelist rootu: iba aplikácie v zozname môžu získať root Magisk. Správca a systémové komponenty sú vždy vyňaté.</string>
+    <string name="zygisk_provider_missing">Nie je nainštalovaný žiadny poskytovateľ Zygisk. Povoľte vstavaný Zygisk v nastaveniach alebo pre moduly Zygisk nainštalujte ZygiskNext (alebo kompatibilného poskytovateľa). MagiskHide/SuList fungujú bez Zygisk.</string>
+    <string name="zygisk_provider_disabled">Poskytovateľ Zygisk je nainštalovaný, ale zakázaný.</string>
+    <string name="zygisk_provider_not_injected">Poskytovateľ Zygisk je nainštalovaný; injekcia nebola zistená.</string>
+    <string name="settings_material_you">Dynamické farby</string>
+    <string name="settings_material_you_summary">Prispôsobiť farby tapete</string>
+    <string name="forever">Navždy</string>
+    <string name="once">Raz</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_warning">Udeľuje plný prístup k vášmu zariadeniu.\nAk si nie ste istí, zamietnite!</string>
+    <string name="touch_filtered_warning">Keďže aplikácia zakrýva požiadavku Superuser, Magisk nemôže overiť vašu odpoveď.</string>
+    <string name="superuser_grant">Povoliť Superuser</string>
+    <string name="su_legacy_cmd">Upozornenie: zistený nepodporovaný príkazový riadok</string>
 </resources>

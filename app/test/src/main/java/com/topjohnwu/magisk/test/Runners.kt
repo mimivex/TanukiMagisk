@@ -6,11 +6,14 @@ import androidx.test.runner.AndroidJUnitRunner
 
 open class TestRunner : AndroidJUnitRunner() {
     override fun onCreate(arguments: Bundle) {
-        // Support short-hand ".ClassName"
+        // Support short-hand ".ClassName" against the package hosting
+        // this runner: the APK is renamed along with the manager, and
+        // the target context points at the manager, not at the APK
+        val prefix = context.packageName
         arguments.getString("class")?.let {
             val classArg = it.split(",").joinToString(separator = ",") { clz ->
                 if (clz.startsWith(".")) {
-                    "com.topjohnwu.magisk.test$clz"
+                    "$prefix$clz"
                 } else {
                     clz
                 }

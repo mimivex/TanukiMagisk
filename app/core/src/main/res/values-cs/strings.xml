@@ -16,13 +16,14 @@
     <string name="loading">Načítání…</string>
     <string name="update">Aktualizovat</string>
     <string name="not_available">N/A</string>
+    <string name="not_installed">Není nainstalován</string>
     <string name="hide">Skrýt</string>    <string name="home_package">Balíček</string>
     <string name="home_app_title">Aplikace</string>    <string name="reinstall">Přeinstalovat</string>
-    <string name="home_notice_content">Stahujte Magisk POUZE z oficiální stránky na GitHubu. Soubory z neznámých zdrojů mohou být škodlivé!</string>
-    <string name="home_support_title">Podpořte nás</string>
+    <string name="home_notice_content">Aktivně neudržovaný fork Magisk. Pokud jste za tuto aplikaci zaplatili, byli jste podvedeni: je zdarma a s otevřeným zdrojovým kódem. Experimentální build poskytovaný tak, jak je, bez záruky; používejte na vlastní riziko.</string>
+    <string name="home_support_title">Podpořte původní autory</string>
     <string name="home_follow_title">Sledujte nás</string>
     <string name="home_item_source">Zdroj</string>
-    <string name="home_support_content">Magisk je a vždy bude zdarma a s otevřeným zdrojovým kódem. Projevit svou podporu nám však můžete přispěním finančního daru.</string>    <string name="home_installed_version">Nainstalováno</string>
+    <string name="home_support_content">Magisk je a vždy bude zdarma a s otevřeným zdrojovým kódem. Toto je fork Magisku, který nebude dostávat aktivní podporu. Projevit svou podporu nám však můžete přispěním finančního daru původním autorům Magisku.</string>    <string name="home_installed_version">Nainstalováno</string>
     <string name="home_latest_version">Nejnovější</string>
     <string name="invalid_update_channel">Neplatný kanál aktualizace</string>    <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
     <string name="uninstall_magisk_msg">Všechny moduly budou deaktivovány/odstraněny!\nOprávnění root budou odebrána!\nVeškeré interní úložiště, které nebylo zašifrováno pomocí Magisku, bude znovu zašifrováno!</string>
@@ -81,6 +82,8 @@
     <string name="menuSaveLog">Uložit protokol</string>
     <string name="menuClearLog">Smazat protokol</string>
     <string name="logs_cleared">Protokol byl smazán</string>    <string name="back">Zpět</string>    <string name="enabled">Zapnuto</string>
+    <string name="provided">Poskytnuto</string>
+    <string name="yes_provided">Ano (Poskytnuto)</string>
     <string name="disabled">Vypnuto</string>
     <string name="pid">PID:%1$d</string>
     <string name="target_uid">Cílové UID: %1$d</string>
@@ -91,6 +94,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">Zobrazit systémové aplikace</string>
     <string name="show_os_app">Zobrazit OS aplikace</string>
+    <string name="add_recommended">Přidat doporučené</string>
     <string name="hide_filter_hint">Filtrovat dle názvu</string>
     <string name="sort_by_name">Seřadit dle jména</string>
     <string name="sort_by_package_name">Seřadit dle názvu balíčku</string>
@@ -114,8 +118,6 @@
     <string name="module_state_restore">Obnovit</string>
     <string name="module_action_install_external">Instalace z úložiště</string>
     <string name="update_available">Dostupná aktualizace</string>
-    <string name="suspend_text_riru">Modul byl pozastaven, protože je povolen %1$s</string>
-    <string name="suspend_text_zygisk">Modul byl pozastaven, protože %1$s není povoleno</string>
     <string name="zygisk_module_unloaded">Modul Zygisk nebyl načten z důvodu nekompatibility</string>
     <string name="module_empty">Není nainstalován žádný modul</string>
     <string name="confirm_install">Instalovat modul %1$s?</string>
@@ -136,7 +138,7 @@
     <string name="settings_update_channel_title">Kanál aktualizace</string>
     <string name="settings_update_stable">Stabilní</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_update_debug">Debug</string>
+    <string name="settings_update_canary">Canary</string>
     <string name="settings_update_custom">Vlastní</string>
     <string name="settings_update_custom_msg">Vložte vlastní URL</string>
     <string name="settings_zygisk_summary">Spustí části Magisku v démonu Zygote</string>
@@ -225,4 +227,62 @@
     <string name="install_unknown_denied">Pro povolení této funkce, povolte "instalovat aplikace z neznámých zdrojů"</string>
     <string name="app_not_found">Nebyla nalezena žádná aplikace, která by tuto akci provedla</string>
     <string name="reboot_apply_change">Pro použití změn restartujte zařízení</string>
+    <string name="auto_response">Automatická odezva</string>
+    <string name="patch_file_msg">Vyberte soubor RAW (*.img), soubor TAR pro ODIN (*.tar), nebo payload.bin (*.bin)</string>
+    <string name="prompt">Zeptat se</string>
+    <string name="request_timeout">Časový limit požadavku</string>
+    <string name="restore_app_confirmation">Tímto skrytou aplikaci obnovíte zpět na původní aplikaci. Opravdu to chcete udělat?</string>
+    <string name="select_patch_file">Vybrat a opravit soubor</string>
+    <string name="settings_app_name_error">Neplatný formát</string>
+    <string name="settings_app_name_helper">Název aplikace bude nahrazen tímto názvem</string>
+    <string name="settings_app_name_hint">Nový název</string>
+    <string name="settings_hide_app_summary">Skryje aplikaci náhodným ID balíčku a vlastním názvem aplikace</string>
+    <string name="settings_hide_app_title">Skrýt aplikaci Magisk</string>
+    <string name="settings_restore_app_summary">Obnoví aplikaci zpět do původního APK</string>
+    <string name="settings_restore_app_title">Obnovit aplikaci Magisk</string>
+    <string name="settings_su_adb">Pouze ADB</string>
+    <string name="settings_su_app">Pouze aplikace</string>
+    <string name="settings_su_app_adb">Aplikace a ADB</string>
+    <string name="settings_su_disable">Zakázat</string>
+    <string name="settings_su_reauth_summary">Opětovné ověření oprávnění SuperUsera po aktualizaci aplikace</string>
+    <string name="settings_su_reauth_title">Opětovné ověření po aktualizaci</string>
+    <string name="settings_su_request_10">10 sekund</string>
+    <string name="settings_su_request_15">15 sekund</string>
+    <string name="settings_su_request_20">20 sekund</string>
+    <string name="settings_su_request_30">30 sekund</string>
+    <string name="settings_su_request_45">45 sekund</string>
+    <string name="settings_su_request_60">60 sekund</string>
+    <string name="settings_su_tapjack_summary">Okno dialogu SuperUsera nebude reagovat na kliknutí v případě, že je zavřené nebo překryté jiným oknem</string>
+    <string name="settings_su_tapjack_title">Povolit ochranu před TapJack</string>
+    <string name="su_request_title">Požadavek SuperUsera</string>
+    <string name="superuser_access">Přístup SuperUsera</string>
+    <string name="tanuki_notice">Neoficiální build forku Tanuki</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide nelze vypnout, dokud je SuList zapnutý.</string>
+    <string name="settings_magiskhide_summary">Úpravy Magisk se pro procesy v hidelist vrací zpět</string>
+    <string name="settings_hidelist_config_title">Nastavit HideList</string>
+    <string name="settings_hidelist_config_summary">Vyberte procesy, které se mají zahrnout do hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">Uplatnit SuList</string>
+    <string name="settings_sulist_summary">Pouze procesy v sulist mohou získat root přístup Magisk</string>
+    <string name="settings_sulist_config_title">Nastavit SuList</string>
+    <string name="settings_sulist_config_summary">Vyberte procesy, které se mají zahrnout do sulist</string>
+    <string name="settings_sulist_enforced">SuList je uplatněn</string>
+    <string name="settings_sulist_error_magiskhide">Tato funkce vyžaduje zapnutý MagiskHide</string>
+    <string name="sulist_empty_warning">SuList je whitelist rootu: pouze aplikace v seznamu mohou získat root Magisk. Správce a systémové komponenty jsou vždy vyjmuty.</string>
+    <string name="zygisk_provider_missing">Není nainstalován žádný poskytovatel Zygisk. Povolte vestavěný Zygisk v nastavení nebo pro moduly Zygisk nainstalujte ZygiskNext (nebo kompatibilního poskytovatele). MagiskHide/SuList fungují bez Zygisk.</string>
+    <string name="zygisk_provider_disabled">Poskytovatel Zygisk je nainstalován, ale zakázán.</string>
+    <string name="zygisk_provider_not_injected">Poskytovatel Zygisk je nainstalován; injekce nebyla zjištěna.</string>
+    <string name="settings_material_you">Dynamické barvy</string>
+    <string name="settings_material_you_summary">Přizpůsobit barvy tapetě</string>
+    <string name="forever">Navždy</string>
+    <string name="once">Jednou</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_warning">Uděluje plný přístup k vašemu zařízení.\nPokud si nejste jisti, zamítněte!</string>
+    <string name="touch_filtered_warning">Protože aplikace zakrývá požadavek Superuser, Magisk nemůže ověřit vaši odpověď.</string>
+    <string name="superuser_grant">Povolit Superuser</string>
+    <string name="su_legacy_cmd">Upozornění: zjištěn nepodporovaný příkazový řádek</string>
 </resources>

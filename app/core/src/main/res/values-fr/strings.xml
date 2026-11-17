@@ -2,7 +2,7 @@
 
     <!--Sections-->
     <string name="modules">Modules</string>
-    <string name="superuser">Super‑utilisateur</string>
+    <string name="superuser">Superuser</string>
     <string name="logs">Journaux</string>
     <string name="settings">Paramètres</string>
     <string name="install">Installer</string>
@@ -16,15 +16,16 @@
     <string name="loading">Chargement…</string>
     <string name="update">Mettre à jour</string>
     <string name="not_available">Non disponible</string>
+    <string name="not_installed">Non installé</string>
     <string name="hide">Masquer</string>
     <string name="home_package">Paquet</string>
     <string name="home_app_title">Application</string>
 
-    <string name="home_notice_content">Ne téléchargez Magisk qu’uniquement depuis la page GitHub officielle. Les fichiers provenant de sources inconnues peuvent être malveillants !</string>
-    <string name="home_support_title">Soutenez‑nous</string>
+    <string name="home_notice_content">Fork de Magisk non activement maintenu. Si vous avez payé pour cette application, vous avez été trompé : elle est gratuite et open source. Build expérimental fourni tel quel, sans garantie ; utilisez-le à vos propres risques.</string>
+    <string name="home_support_title">Soutenez les auteurs originaux</string>
     <string name="home_follow_title">Suivez-nous</string>
     <string name="home_item_source">Sources</string>
-    <string name="home_support_content">Magisk est, et sera toujours, libre et open source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
+    <string name="home_support_content">Magisk est, et sera toujours, libre et open source. Ceci est un fork de Magisk qui ne recevra aucun support actif. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don. Les dons vont aux auteurs originaux de Magisk.</string>
     <string name="home_installed_version">Version installée</string>
     <string name="home_latest_version">Dernière version</string>
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
@@ -94,6 +95,7 @@
     <!-- MagiskHide -->
     <string name="show_system_app">Afficher les applications système</string>
     <string name="show_os_app">Afficher les applications intégrées au système</string>
+    <string name="add_recommended">Ajouter les recommandées</string>
     <string name="hide_filter_hint">Filtrer par nom</string>
     <string name="hide_search">Rechercher</string>
 
@@ -110,8 +112,6 @@
     <string name="module_state_restore">Restaurer</string>
     <string name="module_action_install_external">Installer depuis le stockage</string>
     <string name="update_available">Mise à jour disponible</string>
-    <string name="suspend_text_riru">Module suspendu car %1$s est actif</string>
-    <string name="suspend_text_zygisk">Module suspendu car %1$s n’est pas actif</string>
     <string name="zygisk_module_unloaded">Module Zygisk non chargé en raison d’une incompatibilité</string>
     <string name="module_empty">Aucun module installé</string>
     <string name="confirm_install">Installer le module %1$s?</string>
@@ -212,4 +212,62 @@
     <string name="install_unknown_denied">Autoriser "installation d’applications inconnues" pour activer cette fonctionnalité</string>
     <string name="app_not_found">Aucune application n’a été trouvée pour gérer cette action</string>
     <string name="reboot_apply_change">Redémarrer pour appliquer les changements</string>
+    <string name="auto_response">Réponse automatique</string>
+    <string name="patch_file_msg">Sélectionnez une image brute (*.img) ou une archive TAR ODIN (*.tar) ou un fichier payload.bin (*.bin)</string>
+    <string name="prompt">Demander</string>
+    <string name="request_timeout">Délai d’expiration de la demande</string>
+    <string name="restore_app_confirmation">Cela restaurera l’application cachée en application originale. Vous voulez vraiment faire ça ?</string>
+    <string name="select_patch_file">Sélectionnez le fichier cible du correctif</string>
+    <string name="settings_app_name_error">Format incorrect</string>
+    <string name="settings_app_name_helper">L’application sera réempaquetée sous ce nom</string>
+    <string name="settings_app_name_hint">Nouveau nom</string>
+    <string name="settings_hide_app_summary">Installer une application intermédiaire avec un identifiant de paquet aléatoire et un nom personnalisé</string>
+    <string name="settings_hide_app_title">Masquer l’application Magisk</string>
+    <string name="settings_restore_app_summary">Démasquer l’application et la restaurer comme son APK d’origine.</string>
+    <string name="settings_restore_app_title">Restaurer l’application Magisk</string>
+    <string name="settings_su_adb">ADB uniquement</string>
+    <string name="settings_su_app">Applications uniquement</string>
+    <string name="settings_su_app_adb">Applications et ADB</string>
+    <string name="settings_su_disable">Désactivé</string>
+    <string name="settings_su_reauth_summary">Redemander une authentification pour autoriser l’accès en super‑utilisateur après une mise à jour de l’application</string>
+    <string name="settings_su_reauth_title">S’authentifier à nouveau après la mise à niveau</string>
+    <string name="settings_su_request_10">10 secondes</string>
+    <string name="settings_su_request_15">15 secondes</string>
+    <string name="settings_su_request_20">20 secondes</string>
+    <string name="settings_su_request_30">30 secondes</string>
+    <string name="settings_su_request_45">45 secondes</string>
+    <string name="settings_su_request_60">60 secondes</string>
+    <string name="settings_su_tapjack_summary">Le dialogue d’invite du super‑utilisateur ne répondra pas à la saisie lorsqu’il est masqué par une autre fenêtre ou une surcouche</string>
+    <string name="settings_su_tapjack_title">Activer la protection contre le détournement du tapotement</string>
+    <string name="su_request_title">Demande d’accès super‑utilisateur</string>
+    <string name="superuser_access">Accès super‑utilisateur</string>
+    <string name="tanuki_notice">Build non officiel du fork Tanuki</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide ne peut pas être désactivé tant que SuList est activé.</string>
+    <string name="settings_magiskhide_summary">Les modifications de Magisk sont annulées pour les processus de la hidelist</string>
+    <string name="settings_hidelist_config_title">Configurer HideList</string>
+    <string name="settings_hidelist_config_summary">Sélectionnez les processus à inclure dans la hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">Appliquer SuList</string>
+    <string name="settings_sulist_summary">Seuls les processus de la sulist peuvent obtenir l\'accès root de Magisk</string>
+    <string name="settings_sulist_config_title">Configurer SuList</string>
+    <string name="settings_sulist_config_summary">Sélectionnez les processus à inclure dans la sulist</string>
+    <string name="settings_sulist_enforced">SuList est appliquée</string>
+    <string name="settings_sulist_error_magiskhide">Cette fonctionnalité nécessite que MagiskHide soit activé</string>
+    <string name="sulist_empty_warning">SuList est une liste blanche root : seules les applications de la liste peuvent obtenir le root de Magisk. Le gestionnaire et les composants système en sont toujours exemptés.</string>
+    <string name="zygisk_provider_missing">Aucun fournisseur Zygisk n\'est installé. Activez le Zygisk intégré dans les paramètres, ou installez ZygiskNext (ou un fournisseur compatible) pour les modules Zygisk. MagiskHide/SuList fonctionnent sans Zygisk.</string>
+    <string name="zygisk_provider_disabled">Un fournisseur Zygisk est installé mais désactivé.</string>
+    <string name="zygisk_provider_not_injected">Fournisseur Zygisk installé ; injection non détectée.</string>
+    <string name="settings_material_you">Couleurs dynamiques</string>
+    <string name="settings_material_you_summary">Adaptez les couleurs au fond d\'écran</string>
+    <string name="forever">Toujours</string>
+    <string name="once">Une fois</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_warning">Accorde un accès complet à votre appareil.\nRefusez si vous n\'êtes pas sûr !</string>
+    <string name="touch_filtered_warning">Une application masque une demande Superuser : Magisk ne peut pas vérifier votre réponse.</string>
+    <string name="superuser_grant">Accorder Superuser</string>
+    <string name="su_legacy_cmd">Avertissement : ligne de commande non prise en charge détectée</string>
 </resources>

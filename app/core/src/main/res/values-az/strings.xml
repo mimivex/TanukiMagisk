@@ -2,7 +2,7 @@
 
     <!--Sections-->
     <string name="modules">Modullar</string>
-    <string name="superuser">Super İstifadəçi</string>
+    <string name="superuser">Superuser</string>
     <string name="logs">Qeydlər</string>
     <string name="settings">Ayarlar</string>
     <string name="install">Quraşdır</string>
@@ -16,15 +16,16 @@
     <string name="loading">Yüklənir…</string>
     <string name="update">Yenilə</string>
     <string name="not_available">Yüklü deyil</string>
+    <string name="not_installed">Quraşdırılmayıb</string>
     <string name="hide">Gizlə</string>
     <string name="home_package">Paket</string>
     <string name="home_app_title">Tətbiq</string>
 
-    <string name="home_notice_content">Magiski YALNIZ rəsmi GitHub səhifəsindən endirin. Bilinməyən mənbələrdəki fayllar zərərli ola bilər!</string>
-    <string name="home_support_title">Bizə Dəstək ol</string>
+    <string name="home_notice_content">Magisk-in aktiv saxlanılmayan fork-u. Bu tətbiq üçün pul ödəmisinizsə, aldanmısınız: o, pulsuz və açıq mənbəlidir. Eksperimental buraxılış olduğu kimi, heç bir zəmanət olmadan təqdim olunur; öz riskinizlə istifadə edin.</string>
+    <string name="home_support_title">Əsl müəllifləri dəstəklə</string>
     <string name="home_follow_title">Bizi İzləyin</string>
     <string name="home_item_source">Mənbə</string>
-    <string name="home_support_content">Magisk pulsuzdur və həmişə belə qalacaq. Amma istəsən bizə dəstək ola bilərsən.</string>
+    <string name="home_support_content">Magisk pulsuzdur və həmişə belə qalacaq. Bu, Magisk-in forkudur və aktiv dəstək almayacaq. Amma istəsən bizə dəstək ola bilərsən. İanələr Magisk-in əsl müəlliflərinə gedir.</string>
     <string name="home_installed_version">Qurulan</string>
     <string name="home_latest_version">Ən son versiya</string>
     <string name="invalid_update_channel">Keçərsiz yeniləmə kanalı</string>
@@ -93,6 +94,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">Sistem tətbiqlərini göstər</string>
     <string name="show_os_app">Əməliyyat sistemi tətbiqlərini göstər</string>
+    <string name="add_recommended">Tövsiyə olunanları əlavə et</string>
     <string name="hide_filter_hint">Adla sırala</string>
     <string name="hide_search">Axtar</string>
 
@@ -108,8 +110,6 @@
     <string name="module_state_restore">Bərpa et</string>
     <string name="module_action_install_external">Yaddaşdan yüklə</string>
     <string name="update_available">Yeniləmə Mövcuddur</string>
-    <string name="suspend_text_riru">%1$s açıq olduğundan Magisk modulu dayandırıldı</string>
-    <string name="suspend_text_zygisk">%1$s qapalı olduğu üçün Magisk modulu dayandırıldı</string>
     <string name="zygisk_module_unloaded">Zygisk modulu uyğunsuzluq səbəbindən açılmadı</string>
     <string name="module_empty">Yüklü modul yoxdur</string>
     <string name="confirm_install">%1$s modulu yüklənsin?</string>
@@ -204,4 +204,62 @@
     <string name="install_unknown_denied">"bilinməyən tətbiqləri quraşdır"\ı açsanız bu funksiya işə düşəcək</string>
     <string name="app_not_found">Bu işi görəcək heçbir tətbiq yoxdur</string>
     <string name="reboot_apply_change">Dəyişikliklər təkrar başladıqdan sonra olacaq</string>
+    <string name="auto_response">Avtomatik Cavab</string>
+    <string name="patch_file_msg">(*.img) yaxud ODIN (*.tar) seç</string>
+    <string name="prompt">İstək</string>
+    <string name="request_timeout">İstək Vaxtaşımı</string>
+    <string name="restore_app_confirmation">Gizli tətbiq əvvəlki halına qayıdacaq. Davam edilsin?</string>
+    <string name="select_patch_file">Fayl seç və yamaqla</string>
+    <string name="settings_app_name_error">Keçərsiz Format</string>
+    <string name="settings_app_name_helper">Tətbiq bu adla yenidən paketlənəcək</string>
+    <string name="settings_app_name_hint">Yeni Ad</string>
+    <string name="settings_hide_app_summary">Təsadüfi paket ID\'si ilə proxy yüklə və özəl tətbiq adı yaz</string>
+    <string name="settings_hide_app_title">Magisk tətbiqini gizlət</string>
+    <string name="settings_restore_app_summary">Tətbiqi üzə çıxar və orijinal APKnı bərpa et</string>
+    <string name="settings_restore_app_title">Magisk tətbiqini bərpa et</string>
+    <string name="settings_su_adb">Yalnız ADB</string>
+    <string name="settings_su_app">Yalmız Tətbiqlər</string>
+    <string name="settings_su_app_adb">Tətbiqlər və ADB</string>
+    <string name="settings_su_disable">Heç Biri</string>
+    <string name="settings_su_reauth_summary">Tətbiqləri yüksəltdikdən sonra Super İstifadəçi icazəsi istə</string>
+    <string name="settings_su_reauth_title">Yüksəltdikdən sonra yenidən səlahiyətləndir</string>
+    <string name="settings_su_request_10">10 saniyə</string>
+    <string name="settings_su_request_15">15 saniyə</string>
+    <string name="settings_su_request_20">20 saniyə</string>
+    <string name="settings_su_request_30">30 saniyə</string>
+    <string name="settings_su_request_45">45 saniyə</string>
+    <string name="settings_su_request_60">60 saniyə</string>
+    <string name="settings_su_tapjack_summary">Super İstifadəçi icazə pəncərəsi digər pəncərələr tərəfindən əngəlləndikdə heçbir girişə cavab verməyəcək</string>
+    <string name="settings_su_tapjack_title">Saxta Ekran (Tapjacking) Qoruması</string>
+    <string name="su_request_title">Super İstifadəçi İcazəsi</string>
+    <string name="superuser_access">Super istifadəçi İcazəsi</string>
+    <string name="tanuki_notice">Tanuki fork-unun rəsmi olmayan buraxılışı</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">SuList aktiv olduqda MagiskHide deaktiv edilə bilməz.</string>
+    <string name="settings_magiskhide_summary">hidelist-dəki proseslər üçün Magisk dəyişiklikləri geri qaytarılır</string>
+    <string name="settings_hidelist_config_title">HideList-i konfiqurasiya et</string>
+    <string name="settings_hidelist_config_summary">hidelist-ə daxil ediləcək prosesləri seç</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">SuList-i tətbiq et</string>
+    <string name="settings_sulist_summary">Yalnız sulist-dəki proseslər Magisk root girişini ala bilər</string>
+    <string name="settings_sulist_config_title">SuList-i konfiqurasiya et</string>
+    <string name="settings_sulist_config_summary">sulist-ə daxil ediləcək prosesləri seç</string>
+    <string name="settings_sulist_enforced">SuList tətbiq olunur</string>
+    <string name="settings_sulist_error_magiskhide">Bu funksiya üçün MagiskHide aktiv olmalıdır</string>
+    <string name="sulist_empty_warning">SuList root ağ siyahısıdır: yalnız siyahıdakı tətbiqlər Magisk rootunu ala bilər. Menecer və sistem komponentləri həmişə azaddır.</string>
+    <string name="zygisk_provider_missing">Quraşdırılmış Zygisk provayderi yoxdur. Tənzimləmələrdə daxili Zygiski aktivləşdirin və ya Zygisk modulları üçün ZygiskNext (və ya uyğun provayder) quraşdırın. MagiskHide/SuList Zygisk olmadan işləyir.</string>
+    <string name="zygisk_provider_disabled">Zygisk provayderi quraşdırılıb, lakin deaktivdir.</string>
+    <string name="zygisk_provider_not_injected">Zygisk provayderi quraşdırılıb; inyeksiya aşkar edilmədi.</string>
+    <string name="settings_material_you">Dinamik rənglər</string>
+    <string name="settings_material_you_summary">Rəngləri divar kağızına uyğunlaşdırın</string>
+    <string name="forever">Həmişəlik</string>
+    <string name="once">Bir dəfə</string>
+    <string name="tenmin">10 dəq</string>
+    <string name="twentymin">20 dəq</string>
+    <string name="thirtymin">30 dəq</string>
+    <string name="sixtymin">60 dəq</string>
+    <string name="su_warning">Cihazınıza tam giriş icazəsi verir.\nƏmin deyilsinizsə, rədd edin!</string>
+    <string name="touch_filtered_warning">Bir tətbiq Superuser sorğusunu gizlətdiyi üçün Magisk cavabınızı yoxlaya bilmir.</string>
+    <string name="superuser_grant">Superuser icazəsi ver</string>
+    <string name="su_legacy_cmd">Xəbərdarlıq: dəstəklənməyən əmr sətri aşkarlandı</string>
 </resources>

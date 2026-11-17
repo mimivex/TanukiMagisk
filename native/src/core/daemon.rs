@@ -5,12 +5,12 @@ use crate::consts::{
 };
 use crate::db::Sqlite3;
 use crate::ffi::{
-    ModuleInfo, RequestCode, RespondCode, denylist_handler, fork_dont_care, get_magisk_tmp,
-    scan_deny_apps, set_nice_name,
+    DbEntryKey, ModuleInfo, RequestCode, RespondCode, denylist_handler, fork_dont_care,
+    get_magisk_tmp, hide_handler, scan_deny_apps, set_nice_name,
 };
 use crate::logging::{android_logging, magisk_logging, setup_logfile, start_log_daemon};
 use crate::module::remove_modules;
-use crate::package::TrackedFile;
+use crate::package::ManagerInfo;
 use crate::resetprop::{get_prop, set_prop};
 use crate::selinux::restore_tmpcon;
 use crate::socket::{IpcRead, IpcWrite};
@@ -20,11 +20,11 @@ use crate::zygisk::ZygiskState;
 use base::const_format::concatcp;
 use base::{
     AtomicArc, BufReadExt, FileAttr, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStr,
-    Utf8CStrBuf, WriteExt, cstr, info, libc, log_err,
+    Utf8CStrBuf, WriteExt, cstr, debug, info, libc, log_err, warn,
 };
 use nix::fcntl::OFlag;
 use nix::mount::MsFlags;
-use nix::sys::signal::SigSet;
+use nix::sys::signal::{SigSet, Signal};
 use nix::unistd::{dup2_stderr, dup2_stdin, dup2_stdout, getpid, getuid, setsid};
 use num_traits::AsPrimitive;
 use std::fmt::Write as _;
@@ -41,6 +41,7 @@ use std::time::Duration;
 pub static MAGISKD: OnceLock<MagiskD> = OnceLock::new();
 
 pub const AID_ROOT: i32 = 0;
+pub const AID_SHELL: i32 = 2000;
 pub const AID_APP_START: i32 = 10000;
 pub const AID_APP_END: i32 = 19999;
 pub const AID_USER_OFFSET: i32 = 100000;
@@ -53,10 +54,36 @@ pub const fn to_user_id(uid: i32) -> i32 {
     uid / AID_USER_OFFSET
 }
 
+// Waydroid and other SELinux-less environments never mount selinuxfs, so no
+// client carries the zygote context and every request would be refused.
+// Mirror Kitsune Magisk 27's daemon: an unreadable enforce node or a '0'
+// means "not enforced" and lets every client through the zygote gate. On
+// enforcing devices this never triggers.
+fn is_selinux_enforced() -> bool {
+    std::fs::read("/sys/fs/selinux/enforce")
+        .map(|v| v.first().is_some_and(|c| *c != b'0'))
+        .unwrap_or(false)
+}
+
+// When the HyperOS shim is installed, magiskinit records the SELinux context
+// init runs /system_ext/bin/hyos_spawner in (/dev/hyos_seclabel). Children
+// forked by the spawner reach the daemon before transitioning to their app
+// domain, so they carry that context instead of the zygote one and must be
+// treated alike.
+fn hyos_spawner_context() -> Option<&'static str> {
+    static CON: OnceLock<Option<String>> = OnceLock::new();
+    CON.get_or_init(|| -> Option<String> {
+        let con = std::fs::read_to_string("/dev/hyos_seclabel").ok()?;
+        let con = con.trim();
+        (!con.is_empty()).then(|| con.to_string())
+    })
+    .as_deref()
+}
+
 #[derive(Default)]
 pub struct MagiskD {
     pub sql_connection: Mutex<Option<Sqlite3>>,
-    pub manager_info: Mutex<TrackedFile>,
+    pub manager_info: Mutex<ManagerInfo>,
     pub boot_stage_lock: Mutex<BootState>,
     pub module_list: OnceLock<Vec<ModuleInfo>>,
     pub zygisk_enabled: AtomicBool,
@@ -115,6 +142,9 @@ impl MagiskD {
             RequestCode::DENYLIST => {
                 denylist_handler(client.into_raw_fd());
             }
+            RequestCode::HIDE => {
+                hide_handler(client.into_raw_fd());
+            }
             RequestCode::SUPERUSER => {
                 self.su_daemon_handler(client, cred);
             }
@@ -137,8 +167,22 @@ impl MagiskD {
                     self.reboot();
                 }
             }
+            // The internal ZYGISK protocol only exists while Zygisk is
+            // enabled; with the flag off the connection is dropped.
             RequestCode::ZYGISK => {
-                self.zygisk_handler(client);
+                // A restarted magiskd never ran post-fs-data, the only other
+                // place that latches the flag. By the time any Zygisk client
+                // connects the boot stage has run (safe mode included, and it
+                // zeroes the setting), so the DB is authoritative; a boot that
+                // armed Zygisk never reads it.
+                if !self.zygisk_enabled.load(Ordering::Relaxed)
+                    && self.get_db_setting(DbEntryKey::ZygiskConfig) != 0
+                {
+                    self.zygisk_enabled.store(true, Ordering::Release);
+                }
+                if self.zygisk_enabled.load(Ordering::Relaxed) {
+                    self.zygisk_handler(client);
+                }
             }
             _ => {}
         }
@@ -191,10 +235,15 @@ impl MagiskD {
 
         let is_root = cred.uid == 0;
         let is_shell = cred.uid == 2000;
-        let is_zygote = &context == "u:r:zygote:s0";
+        let is_zygote = &context == "u:r:zygote:s0"
+            || !is_selinux_enforced()
+            || hyos_spawner_context().is_some_and(|con| context.as_str() == con);
 
         if !is_root && !is_zygote && !self.is_client(cred.pid.unwrap_or(-1)) {
             // Unsupported client state
+            // Trace the rejected peer; the HyperOS bring-up keys its
+            // allowlist on the context reported here.
+            debug!("Deny connection from pid {} context [{}]", cred.pid.unwrap_or(-1), context);
             client.write_pod(&RespondCode::ACCESS_DENIED.repr).log_ok();
             return;
         }
@@ -219,9 +268,18 @@ impl MagiskD {
             | RequestCode::ZYGOTE_RESTART
             | RequestCode::SQLITE_CMD
             | RequestCode::DENYLIST
+            | RequestCode::HIDE
             | RequestCode::STOP_DAEMON
                 if !is_root =>
             {
+                // Surface the silent ROOT_REQUIRED rejection so a degraded
+                // manager shell is visible in /cache/magisk.log.
+                debug!(
+                    "Reject non-root request {} from uid {} pid {}",
+                    code.repr,
+                    cred.uid,
+                    cred.pid.unwrap_or(-1)
+                );
                 client.write_pod(&RespondCode::ROOT_REQUIRED.repr).log_ok();
                 return;
             }
@@ -232,6 +290,8 @@ impl MagiskD {
             }
             RequestCode::ZYGISK if !is_zygote => {
                 // Invalid client context
+                // Log it; on HyperOS the spawner must match /dev/hyos_seclabel
+                debug!("Reject zygisk request from context [{}]", context);
                 client.write_pod(&RespondCode::ACCESS_DENIED.repr).log_ok();
                 return;
             }
@@ -244,7 +304,11 @@ impl MagiskD {
 
         if code.repr < RequestCode::_SYNC_BARRIER_.repr {
             self.handle_request_sync(client, code)
-        } else if code.repr < RequestCode::_STAGE_BARRIER_.repr {
+        } else if code.repr < RequestCode::_STAGE_BARRIER_.repr
+            || code.repr == RequestCode::HIDE.repr
+        {
+            // Services past the barrier keep their stock wire values; they
+            // are not boot stages.
             ThreadPool::exec_task(move || {
                 self.handle_request_async(client, code, cred);
             })
@@ -276,6 +340,11 @@ fn daemon_entry() {
 
     // Block all signals
     SigSet::all().thread_set_mask().log_ok();
+    // Keep fatal signals deliverable so the deny engine crash handler can
+    // leave its marker; masks are inherited by every spawned thread.
+    SigSet::from_iter([Signal::SIGSEGV, Signal::SIGABRT, Signal::SIGBUS])
+        .thread_unblock()
+        .log_ok();
 
     // Swap out the original stdio
     if let Ok(null) = cstr!("/dev/null").open(OFlag::O_WRONLY).log() {

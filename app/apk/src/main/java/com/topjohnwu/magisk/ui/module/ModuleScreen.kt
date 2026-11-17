@@ -9,6 +9,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -79,15 +81,23 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadEngine
+import com.topjohnwu.magisk.core.model.ColorMode
 import com.topjohnwu.magisk.core.model.module.OnlineModule
+import com.topjohnwu.magisk.core.ui.webui.ModuleWebUIActivity
 import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.ui.ThemeState
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.MagiskDialog
 import com.topjohnwu.magisk.ui.component.MarkdownTextAsync
 import com.topjohnwu.magisk.ui.component.onlyHorizontal
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
-import com.topjohnwu.magisk.utils.textHolder
+import com.topjohnwu.magisk.ui.actionColors
+import com.topjohnwu.magisk.ui.fabColors
+import com.topjohnwu.magisk.ui.moduleActionColors
+import com.topjohnwu.magisk.ui.moduleRemoveColors
+import com.topjohnwu.magisk.ui.removeColors
+import com.topjohnwu.magisk.ui.updateColors
 import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 
@@ -103,6 +113,7 @@ fun ModuleScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val colorScheme = MaterialTheme.colorScheme
+    val isDarkTheme = ColorMode.fromValue(ThemeState.colorMode).isDark(isSystemInDarkTheme())
     val context = LocalContext.current
     val resources = LocalResources.current
     val scope = rememberCoroutineScope()
@@ -168,10 +179,11 @@ fun ModuleScreen(
         },
         floatingActionButton = {
             if (onRegisterFab == null) {
+                val (containerColor, contentColor) = fabColors(colorScheme, isDarkTheme)
                 FloatingActionButton(
                     onClick = { filePicker.launch("application/zip") },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    containerColor = containerColor,
+                    contentColor = contentColor,
                     content = {
                         Icon(
                             imageVector = Icons.Default.Add,
@@ -253,6 +265,24 @@ fun ModuleScreen(
             verticalItemSpacing = 8.dp,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            if (Info.zygiskStatus == Info.ZygiskStatus.ABSENT) {
+                item(span = StaggeredGridItemSpan.FullLine) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = colorScheme.secondaryContainer
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(CoreR.string.zygisk_provider_missing),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = colorScheme.onSecondaryContainer,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+            }
             items(
                 items = uiState.modules,
                 // Module ids come from module.prop and can be duplicated, directory names can't
@@ -288,6 +318,8 @@ private fun ModuleCard(
     val infoAlpha = if (!item.isRemoved && item.isEnabled && !item.showNotice) 1f else 0.5f
     val strikeThrough = if (item.isRemoved) TextDecoration.LineThrough else TextDecoration.None
     val colorScheme = MaterialTheme.colorScheme
+    val isDarkTheme = ColorMode.fromValue(ThemeState.colorMode).isDark(isSystemInDarkTheme())
+    val context = LocalContext.current
     var expanded by rememberSaveable(item.module.base.name) { mutableStateOf(false) }
     val hasDescription = item.module.description.isNotBlank()
 
@@ -359,8 +391,20 @@ private fun ModuleCard(
 
                 if (item.showNotice) {
                     Spacer(Modifier.height(6.dp))
+                    item.noticeRes?.let { notice ->
+                        Text(
+                            text = stringResource(notice),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            color = colorScheme.primary,
+                        )
+                    }
+                }
+                // Updates and enable/disable changes wait for the next reboot
+                if ((item.isUpdated || item.isToggled) && !item.isRemoved) {
+                    Spacer(Modifier.height(6.dp))
                     Text(
-                        text = textHolder(item.noticeText),
+                        text = stringResource(CoreR.string.reboot_apply_change),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = colorScheme.primary,
@@ -372,13 +416,18 @@ private fun ModuleCard(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AnimatedVisibility(
-                    visible = item.isEnabled && !item.isRemoved,
+                    visible = item.isEnabled,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         if (item.showAction) {
+                            val (containerColor, contentColor) = moduleActionColors(colorScheme, isDarkTheme)
                             FilledTonalButton(
+                                colors = ButtonDefaults.filledTonalButtonColors(
+                                    containerColor = containerColor,
+                                    contentColor = contentColor
+                                ),
                                 contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
                                 // Drop taps while a screen transition runs, so a quick
                                 // second tap can't open another screen
@@ -395,10 +444,46 @@ private fun ModuleCard(
                                         imageVector = Icons.Default.PlayArrow,
                                         contentDescription = null
                                     )
-                                    Text(
-                                        text = stringResource(CoreR.string.module_action),
-                                        style = MaterialTheme.typography.labelLarge,
+                                    if (!item.iconOnlyActions) {
+                                        Text(
+                                            text = stringResource(CoreR.string.module_action),
+                                            style = MaterialTheme.typography.labelLarge,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        if (item.showWebUI) {
+                            val (containerColor, contentColor) = moduleActionColors(colorScheme, isDarkTheme)
+                            FilledTonalButton(
+                                colors = ButtonDefaults.filledTonalButtonColors(
+                                    containerColor = containerColor,
+                                    contentColor = contentColor
+                                ),
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                                onClick = {
+                                    context.startActivity(
+                                        ModuleWebUIActivity.intent(
+                                            context, item.module.id, item.module.name
+                                        )
                                     )
+                                },
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.size(18.dp),
+                                        painter = painterResource(CoreR.drawable.ic_extension),
+                                        contentDescription = stringResource(CoreR.string.webui)
+                                    )
+                                    if (!item.iconOnlyActions) {
+                                        Text(
+                                            text = stringResource(CoreR.string.webui),
+                                            style = MaterialTheme.typography.labelLarge,
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -412,11 +497,12 @@ private fun ModuleCard(
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
+                    val (containerColor, contentColor) = updateColors(colorScheme, isDarkTheme)
                     FilledTonalButton(
                         modifier = Modifier.padding(end = 8.dp),
                         colors = ButtonDefaults.filledTonalButtonColors(
-                            containerColor = colorScheme.tertiaryContainer,
-                            contentColor = colorScheme.onTertiaryContainer
+                            containerColor = containerColor,
+                            contentColor = contentColor
                         ),
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
                         onClick = { onUpdateClick(item.module.updateInfo) },
@@ -438,18 +524,17 @@ private fun ModuleCard(
                     }
                 }
 
+                val (containerColor, contentColor) = moduleRemoveColors(colorScheme, isDarkTheme)
                 FilledTonalButton(
-                    colors = if (item.isRemoved) {
-                        ButtonDefaults.filledTonalButtonColors()
-                    } else {
-                        ButtonDefaults.filledTonalButtonColors(
-                            containerColor = colorScheme.errorContainer,
-                            contentColor = colorScheme.onErrorContainer
-                        )
-                    },
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = containerColor,
+                        contentColor = contentColor
+                    ),
                     contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                    // A pending update does not lock the Remove button - the
+                    // daemon drops the module at the next boot instead of
+                    // upgrading it (LocalModule.kt: remove semantics).
                     onClick = { viewModel.toggleRemove(item) },
-                    enabled = !item.isUpdated
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

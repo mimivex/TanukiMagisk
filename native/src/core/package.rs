@@ -1,24 +1,29 @@
-use crate::consts::{APP_DATA_DIR, APP_PACKAGE_NAME, MAGISK_VER_CODE, TRUSTED_CERT};
+use crate::consts::{APP_DATA_DIR, APP_PACKAGE_NAME, DATABIN, MAGISK_VER_CODE, TRUSTED_CERT};
 use crate::daemon::{AID_APP_END, AID_APP_START, MagiskD, to_app_id};
+use crate::ffi::{DbEntryKey, install_apk};
 #[cfg(all(feature = "check-signature", not(debug_assertions)))]
 use crate::ffi::uninstall_pkg;
 use base::WalkResult::{Abort, Continue, Skip};
 use base::const_format::concatcp;
 use base::{
     BufReadExt, Directory, FsPathBuilder, LoggedResult, ReadExt, ResultExt, Utf8CStrBuf,
-    Utf8CString, cstr, error, pre_order_walk,
+    Utf8CString, cstr, error, info, pre_order_walk,
 };
 use bit_set::BitSet;
 use nix::fcntl::OFlag;
+use std::collections::BTreeMap;
 use std::fs::File;
 use std::io;
 use std::io::{Cursor, Read, Seek, SeekFrom};
+use std::os::unix::fs::MetadataExt;
 use std::time::Duration;
 
 const EOCD_MAGIC: u32 = 0x06054B50;
 const APK_SIGNING_BLOCK_MAGIC: [u8; 16] = *b"APK Sig Block 42";
 const SIGNATURE_SCHEME_V2_MAGIC: u32 = 0x7109871A;
 const PACKAGES_XML: &str = "/data/system/packages.xml";
+const MANAGER_APK: &str = concatcp!(DATABIN, "/manager.apk");
+const MANAGER_IMPRINT: &str = concatcp!(DATABIN, "/manager.imprint");
 
 macro_rules! bad_apk {
     ($msg:literal) => {
@@ -48,7 +53,7 @@ macro_rules! bad_apk {
  * This method extracts the first certificate of the first signer
  * within the APK v2 signature block.
  */
-fn read_certificate(apk: &mut File) -> Vec<u8> {
+fn read_certificate(apk: &mut File, version: i32) -> Option<Vec<u8>> {
     let res = || -> io::Result<Vec<u8>> {
         let mut u32_val = 0u32;
         let mut u64_val = 0u64;
@@ -79,22 +84,24 @@ fn read_certificate(apk: &mut File) -> Vec<u8> {
         apk.read_pod(&mut central_dir_off)?;
 
         // Code for parse APK comment to get version code
-        let mut comment_sz = 0u16;
-        apk.read_pod(&mut comment_sz)?;
-        let mut comment = vec![0u8; comment_sz as usize];
-        apk.read_exact(&mut comment)?;
-        let mut comment = Cursor::new(&comment);
-        let mut apk_ver = 0;
-        comment.for_each_prop(|k, v| {
-            if k == "versionCode" {
-                apk_ver = v.parse::<i32>().unwrap_or(0);
-                false
-            } else {
-                true
+        if version >= 0 {
+            let mut comment_sz = 0u16;
+            apk.read_pod(&mut comment_sz)?;
+            let mut comment = vec![0u8; comment_sz as usize];
+            apk.read_exact(&mut comment)?;
+            let mut comment = Cursor::new(&comment);
+            let mut apk_ver = 0;
+            comment.for_each_prop(|k, v| {
+                if k == "versionCode" {
+                    apk_ver = v.parse::<i32>().unwrap_or(0);
+                    false
+                } else {
+                    true
+                }
+            });
+            if version > apk_ver {
+                Err(bad_apk!("APK version too low"))?;
             }
-        });
-        if MAGISK_VER_CODE > apk_ver {
-            Err(bad_apk!("APK version too low"))?;
         }
 
         // Next, find the start of the APK signing block
@@ -144,17 +151,17 @@ fn read_certificate(apk: &mut File) -> Vec<u8> {
             }
         }
     }();
-    res.log().unwrap_or(vec![])
+    res.log().ok()
 }
 
-fn find_apk_path() -> Option<Utf8CString> {
+fn find_apk_path(pkg: &str) -> Option<Utf8CString> {
     let mut buf = Utf8CString::default();
     pre_order_walk(cstr!("/data/app"), |e, path| {
         if !e.is_dir() {
             return Ok(Skip);
         }
         let name = e.name();
-        if name.starts_with(concatcp!(APP_PACKAGE_NAME, "-")) {
+        if name.starts_with(pkg) && name.as_bytes()[pkg.len()] == b'-' {
             // Found the APK path, we can abort now
             buf.append_path(path).append_path("base.apk");
             return Ok(Abort);
@@ -178,8 +185,30 @@ fn get_package_uid(user: i32, pkg: &str) -> i32 {
         .unwrap_or(-1)
 }
 
+enum Status {
+    Installed,
+    NotInstalled,
+    CertMismatch,
+}
+
+pub struct ManagerInfo {
+    repackaged_pkg: String,
+    repackaged_cert: Vec<u8>,
+    tracked_files: BTreeMap<i32, TrackedFile>,
+}
+
+impl Default for ManagerInfo {
+    fn default() -> Self {
+        ManagerInfo {
+            repackaged_pkg: String::new(),
+            repackaged_cert: Vec::new(),
+            tracked_files: BTreeMap::new(),
+        }
+    }
+}
+
 #[derive(Default)]
-pub struct TrackedFile {
+struct TrackedFile {
     path: Utf8CString,
     timestamp: Duration,
 }
@@ -207,49 +236,225 @@ impl TrackedFile {
     }
 }
 
-fn check_apk(tracked: &mut TrackedFile) -> bool {
-    let Some(apk) = find_apk_path() else {
-        return false;
-    };
+impl ManagerInfo {
+    fn check_stub(&mut self, user: i32, pkg: &str) -> Status {
+        let Some(apk) = find_apk_path(pkg) else {
+            return Status::NotInstalled;
+        };
 
-    let cert = match apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
-        Ok(mut fd) => read_certificate(&mut fd),
-        Err(_) => return false,
-    };
+        let cert = match apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
+            Ok(mut fd) => read_certificate(&mut fd, -1),
+            Err(_) => return Status::NotInstalled,
+        };
+        // A read failure is a transient I/O error, not a foreign signature:
+        // never uninstall an APK that could not be inspected.
+        let Some(cert) = cert else {
+            return Status::NotInstalled;
+        };
 
-    if cert.is_empty() || (!TRUSTED_CERT.is_empty() && cert != TRUSTED_CERT) {
-        error!("pkg: APK signature mismatch: {}", apk);
-        #[cfg(all(feature = "check-signature", not(debug_assertions)))]
-        {
-            uninstall_pkg(cstr!(APP_PACKAGE_NAME));
-            return false;
+        if pkg == self.repackaged_pkg && cert != self.repackaged_cert {
+            error!("pkg: repackaged APK signature invalid: {}", apk);
+            #[cfg(all(feature = "check-signature", not(debug_assertions)))]
+            {
+                // uninstall_pkg takes the package name, not the APK path
+                uninstall_pkg(&Utf8CString::from(pkg));
+            }
+            return Status::CertMismatch;
+        }
+
+        self.repackaged_pkg.clear();
+        self.repackaged_pkg.push_str(pkg);
+        self.repackaged_cert = cert;
+        self.tracked_files.insert(user, TrackedFile::new(apk));
+        Status::Installed
+    }
+
+    fn check_orig(&mut self, user: i32) -> Status {
+        let Some(apk) = find_apk_path(APP_PACKAGE_NAME) else {
+            return Status::NotInstalled;
+        };
+
+        let cert = match apk.open(OFlag::O_RDONLY | OFlag::O_CLOEXEC) {
+            Ok(mut fd) => read_certificate(&mut fd, MAGISK_VER_CODE),
+            Err(_) => return Status::NotInstalled,
+        };
+        // Unreadable APK (I/O error, or EOCD version below MAGISK_VER_CODE):
+        // report it missing instead of uninstalling what we cannot verify.
+        let Some(cert) = cert else {
+            return Status::NotInstalled;
+        };
+
+        if !TRUSTED_CERT.is_empty() && cert != TRUSTED_CERT {
+            error!("pkg: APK signature mismatch: {}", apk);
+            #[cfg(all(feature = "check-signature", not(debug_assertions)))]
+            {
+                uninstall_pkg(cstr!(APP_PACKAGE_NAME));
+                return Status::CertMismatch;
+            }
+        }
+
+        self.tracked_files.insert(user, TrackedFile::new(apk));
+        Status::Installed
+    }
+
+    // Prefer the full manager APK bundled by the installer: it can be
+    // installed offline, while the stub still needs a network download.
+    fn install_bundled_manager(&self) {
+        let manager_apk = cstr!(MANAGER_APK);
+        if manager_apk.exists() {
+            install_apk(manager_apk);
         }
     }
 
-    *tracked = TrackedFile::new(apk);
-    true
+    fn get_manager(&mut self, daemon: &MagiskD, user: i32, mut install: bool) -> (i32, &str) {
+        let db_pkg = daemon.get_db_string(DbEntryKey::SuManager);
+
+        // If database changed, always re-check files
+        if db_pkg != self.repackaged_pkg {
+            self.tracked_files.remove(&user);
+        }
+
+        if let Some(file) = self.tracked_files.get(&user)
+            && file.is_same()
+        {
+            // no APK
+            if &file.path == PACKAGES_XML {
+                if install && !daemon.is_emulator {
+                    self.install_bundled_manager();
+                }
+                return (-1, "");
+            }
+            // installed APK is still the same
+            if !self.repackaged_pkg.is_empty() {
+                let pkg = self.repackaged_pkg.clone();
+                let uid = get_package_uid(user, &pkg);
+                return if uid < 0 {
+                    (-1, "")
+                } else {
+                    (uid, &self.repackaged_pkg)
+                };
+            }
+            // orig APK is still the same
+            let uid = get_package_uid(user, APP_PACKAGE_NAME);
+            return if uid < 0 {
+                (-1, "")
+            } else {
+                (uid, APP_PACKAGE_NAME)
+            };
+        }
+
+        if !db_pkg.is_empty() {
+            match self.check_stub(user, &db_pkg) {
+                Status::Installed => {
+                    let uid = get_package_uid(user, &db_pkg);
+                    return if uid < 0 {
+                        (-1, "")
+                    } else {
+                        (uid, &self.repackaged_pkg)
+                    };
+                }
+                Status::NotInstalled => {
+                    // Never forget the configured manager on a transient
+                    // failure (e.g. an APK mid-install): check_orig below
+                    // still finds a trusted original, and every reader of a
+                    // stale entry falls back or purges safely.
+                }
+                Status::CertMismatch => {
+                    install = true;
+                    daemon.rm_db_string(DbEntryKey::SuManager).ok();
+                }
+            }
+        }
+
+        self.repackaged_pkg.clear();
+        self.repackaged_cert.clear();
+
+        match self.check_orig(user) {
+            Status::Installed => {
+                let uid = get_package_uid(user, APP_PACKAGE_NAME);
+                return if uid < 0 {
+                    (-1, "")
+                } else {
+                    (uid, APP_PACKAGE_NAME)
+                };
+            }
+            Status::CertMismatch => install = true,
+            Status::NotInstalled => {}
+        }
+
+        // If we cannot find any manager, track packages.xml for new package installs
+        self.tracked_files
+            .insert(user, TrackedFile::new(PACKAGES_XML.into()));
+
+        if install && !daemon.is_emulator {
+            self.install_bundled_manager();
+        }
+        (-1, "")
+    }
 }
 
 impl MagiskD {
     pub fn get_manager_uid(&self, user: i32) -> i32 {
-        let mut tracked = self.manager_info.lock();
-        if tracked.is_same() {
-            return if &tracked.path == PACKAGES_XML {
-                // no APK
-                -1
-            } else {
-                // APK is still the same
-                get_package_uid(user, APP_PACKAGE_NAME)
+        let mut info = self.manager_info.lock();
+        let (uid, _) = info.get_manager(self, user, false);
+        uid
+    }
+
+    pub fn get_manager_package(&self, user: i32) -> String {
+        let mut info = self.manager_info.lock();
+        let (_, pkg) = info.get_manager(self, user, false);
+        pkg.to_string()
+    }
+
+    pub fn get_manager(&self, user: i32, install: bool) -> (i32, String) {
+        let mut info = self.manager_info.lock();
+        let (uid, pkg) = info.get_manager(self, user, install);
+        (uid, pkg.to_string())
+    }
+
+    // The installer leaves a full manager APK in $MAGISKBIN. Install it
+    // when no manager is installed yet: the stub alone needs a network
+    // download. The imprint (size:mtime) is written only after a successful
+    // `pm install`, so a failed attempt is retried on the next boot.
+    pub fn ensure_bundled_manager(&self) -> bool {
+        // patchAndHide overwrites $MAGISKBIN/manager.apk with the patched
+        // one but does not touch the imprint, so reinstalling here would
+        // bring the original package back next to the hidden manager (a
+        // duplicate in the launcher and a window that defeats the hide).
+        // While the configured manager is not the original package, leave
+        // it alone. A stale entry whose package is gone must not block the
+        // heal.
+        let configured = self.get_db_string(DbEntryKey::SuManager);
+        if !configured.is_empty()
+            && configured != APP_PACKAGE_NAME
+            && find_apk_path(&configured).is_some()
+        {
+            return false;
+        }
+        // Heal the original package when it has disappeared (e.g. a build
+        // swap made check_orig uninstall it). A deliberate uninstall wipes
+        // manager.apk itself, so the metadata check below keeps this heal
+        // from bringing the app back in that case.
+        if find_apk_path(APP_PACKAGE_NAME).is_none() {
+            let Ok(_meta) = std::fs::metadata(MANAGER_APK) else {
+                return false;
             };
+            info!("* Reinstalling bundled manager (original package missing): {}", MANAGER_APK);
+            install_apk(cstr!(MANAGER_APK));
+            return true;
         }
-
-        if check_apk(&mut tracked) {
-            return get_package_uid(user, APP_PACKAGE_NAME);
+        let Ok(meta) = std::fs::metadata(MANAGER_APK) else {
+            return false;
+        };
+        let fingerprint = format!("{}:{}", meta.len(), meta.mtime());
+        if let Ok(stored) = std::fs::read_to_string(MANAGER_IMPRINT)
+            && stored.trim() == fingerprint
+        {
+            return false;
         }
-
-        // If we cannot find any manager, track packages.xml for new package installs
-        *tracked = TrackedFile::new(PACKAGES_XML.into());
-        -1
+        info!("* Installing bundled manager: {}", MANAGER_APK);
+        install_apk(cstr!(MANAGER_APK));
+        true
     }
 
     // app_id = app_no + AID_APP_START
@@ -319,4 +524,3 @@ impl MagiskD {
         0
     }
 }
-

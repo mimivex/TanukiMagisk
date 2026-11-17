@@ -9,12 +9,11 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.core.utils.TextHolder
-import com.topjohnwu.magisk.core.utils.asText
 import com.topjohnwu.magisk.ui.flash.FlashUtils
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.utils.asFlow
 import com.topjohnwu.magisk.view.Notifications
+import com.topjohnwu.magisk.core.R as CoreR
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,36 +22,36 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
-import com.topjohnwu.magisk.core.R as CoreR
 
 data class ModuleItem(
     val module: LocalModule,
     val isEnabled: Boolean = module.enable,
     val isRemoved: Boolean = module.remove,
     val showUpdate: Boolean = module.updateInfo != null,
+    // Enable state at the first load of this session. Modules are only
+    // applied at boot, so the reboot notice shows while the switch differs from
+    // this; a constructor param so copy() preserves it across UI updates.
+    val originalEnabled: Boolean = module.enable,
 ) {
-    val showNotice: Boolean
-    val showAction: Boolean
-    val noticeText: TextHolder
+    // Computed on read, so toggling back to the original state clears
+    // the reboot notice; a stored latch would keep it forever.
+    val isToggled get() = isEnabled != originalEnabled
+    // No built-in Zygisk: a Zygisk module needs an external provider.
+    val noticeRes: Int? = when {
+        !module.isZygisk -> null
+        Info.zygiskStatus == Info.ZygiskStatus.ACTIVE -> null
+        Info.zygiskStatus == Info.ZygiskStatus.ABSENT -> CoreR.string.zygisk_provider_missing
+        Info.zygiskStatus == Info.ZygiskStatus.DISABLED -> CoreR.string.zygisk_provider_disabled
+        else -> CoreR.string.zygisk_provider_not_injected
+    }
+    val showNotice = noticeRes != null
+
+    // The notice does not gate the action button.
+    val showAction = module.hasAction
+    val showWebUI = module.hasWebUI
     val isUpdated = module.updated
     val updateReady get() = module.outdated && !isRemoved && isEnabled
-
-    init {
-        val isZygisk = module.isZygisk
-        val isRiru = module.isRiru
-        val zygiskUnloaded = isZygisk && module.zygiskUnloaded
-
-        showNotice = zygiskUnloaded ||
-            (Info.isZygiskEnabled && isRiru) ||
-            (!Info.isZygiskEnabled && isZygisk)
-        showAction = module.hasAction && !showNotice
-        noticeText =
-            when {
-                zygiskUnloaded -> CoreR.string.zygisk_module_unloaded.asText()
-                isRiru -> CoreR.string.suspend_text_riru.asText(CoreR.string.zygisk.asText())
-                else -> CoreR.string.suspend_text_zygisk.asText(CoreR.string.zygisk.asText())
-            }
-    }
+    val iconOnlyActions get() = showAction && showWebUI && showUpdate && updateReady
 }
 
 @Parcelize
@@ -99,7 +98,10 @@ class ModuleViewModel : AsyncLoadViewModel() {
                             module.updateInfo = it.updateInfo
                             module.outdated = it.outdated
                         }
-                    ModuleItem(module)
+                    ModuleItem(
+                        module,
+                        originalEnabled = previous[module.base.name]?.originalEnabled ?: module.enable
+                    )
                 }
             }
             _uiState.update { it.copy(loading = false, modules = modules) }
@@ -139,7 +141,9 @@ class ModuleViewModel : AsyncLoadViewModel() {
         _uiState.update { state ->
             state.copy(
                 modules = state.modules.map {
-                    if (it.module.base.name == item.module.base.name) it.copy(isEnabled = newEnabled) else it
+                    if (it.module.base.name == item.module.base.name)
+                        it.copy(isEnabled = newEnabled)
+                    else it
                 }
             )
         }

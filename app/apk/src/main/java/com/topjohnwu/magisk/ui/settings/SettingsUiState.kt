@@ -26,6 +26,7 @@ data class SettingsUiState(
     val selectedLanguageIndex: Int = 0,
     val selectedColorModeIndex: Int = 0,
     val isDynamicColorSupported: Boolean = false,
+    val dynamicColorEnabled: Boolean = false,
 
     // App Settings Section
     val selectedUpdateChannelIndex: Int = 0,
@@ -41,6 +42,13 @@ data class SettingsUiState(
     val zygiskEnabled: Boolean = false,
     val isZygiskPendingReboot: Boolean = false,
     val denyListEnabled: Boolean = false,
+    // Requested MagiskHide state differs from the armed one: applied at reboot
+    val isDenyListPendingReboot: Boolean = false,
+    val suListEnabled: Boolean = false,
+    // Armed SuList state (Info.sulist). The MagiskHide lock follows the
+    // requested mode (suListEnabled); this field drives the armed-mode
+    // summaries and config-entry titles.
+    val suListArmed: Boolean = false,
 
     // Superuser Section
     val suAuthEnabled: Boolean = false,

@@ -60,7 +60,10 @@ data class Release(
 ) {
     val versionCode: Int get() {
         return if (tag[0] == 'v') {
-            (tag.drop(1).toFloat() * 1000).toInt()
+            // Only the numeric prefix carries the code: a fork tag appends its
+            // revision ("v31.1-tanuki1") after the version.
+            val base = tag.drop(1).takeWhile { it.isDigit() || it == '.' }
+            (base.toFloat() * 1000).toInt()
         } else {
             tag.drop(7).toInt()
         }

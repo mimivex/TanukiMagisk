@@ -3,7 +3,7 @@
 
     <!--Sections-->
     <string name="modules">Moduli</string>
-    <string name="superuser">Super-korisnik</string>
+    <string name="superuser">Superuser</string>
     <string name="logs">Logovi</string>
     <string name="settings">Podešavanja</string>
     <string name="install">Instalacija</string>
@@ -17,13 +17,14 @@
     <string name="loading">Učitavanje…</string>
     <string name="update">Ažuriranje</string>
     <string name="not_available">N/A</string>
+    <string name="not_installed">Nije instaliran</string>
     <string name="hide">Sakrij</string>    <string name="home_package">Paket</string>
     <string name="home_app_title">Apl.</string>    <string name="reinstall">Ponovo instaliraj</string>
-    <string name="home_notice_content">Preuzmite Magisk SAMO sa zvanične GitHub stranice. Fajlovi iz nepoznatih izvora mogu biti maliciozni!</string>
-    <string name="home_support_title">Podržite nas</string>
+    <string name="home_notice_content">Fork Magisk-a koji se aktivno ne održava. Ako ste platili za ovu aplikaciju, prevareni ste: besplatna je i otvorenog koda. Eksperimentalna izgradnja se pruža takva kakva jeste, bez ikakve garancije; koristite na sopstveni rizik.</string>
+    <string name="home_support_title">Podrži originalne autore</string>
     <string name="home_follow_title">Zapratite nas</string>
     <string name="home_item_source">Izvor</string>
-    <string name="home_support_content">Magisk jeste i uvek će biti besplatan i open source. Međutim, možete pokazati da Vam je stalo svojom donacijom.</string>    <string name="home_installed_version">Instalirano</string>
+    <string name="home_support_content">Magisk jeste i uvek će biti besplatan i open source. Ovo je fork Magiska koji neće dobijati aktivnu podršku. Međutim, možete pokazati da Vam je stalo svojom donacijom originalnim autorima Magiska.</string>    <string name="home_installed_version">Instalirano</string>
     <string name="home_latest_version">Najnovije</string>
     <string name="invalid_update_channel">Nevalidan kanal ažuriranja</string>    <string name="uninstall_magisk_title">Deinstaliraj Magisk</string>
     <string name="uninstall_magisk_msg">Svi moduli će biti onemogućeni/uklonjeni!\nKoren će biti uklonjen!\nSvako neenkriptovano interno skladište će upotrebom Magisk-a biti ponovo enkriptovano!</string>
@@ -84,6 +85,8 @@
     <string name="menuSaveLog">Sačuvaj log</string>
     <string name="menuClearLog">Ukloni log</string>
     <string name="logs_cleared">Log uspešno uklonjen</string>    <string name="back">Nazad</string>    <string name="enabled">Omogućeno</string>
+    <string name="provided">Obezbeđeno</string>
+    <string name="yes_provided">Da (Obezbeđeno)</string>
     <string name="disabled">Onemogućeno</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Ciljani UID: %1$d</string>
@@ -96,6 +99,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">Prikaži sistemske apl.</string>
     <string name="show_os_app">Prikaži apl. OS-a</string>
+    <string name="add_recommended">Dodaj preporučene</string>
     <string name="hide_filter_hint">Filtriraj po imenu</string>
     <string name="sort_by_name">Sortiraj po imenu</string>
     <string name="sort_by_package_name">Sortiraj po imenu paketa</string>
@@ -119,8 +123,6 @@
     <string name="module_state_restore">Povrati</string>
     <string name="module_action_install_external">Instaliraj iz skladišta</string>
     <string name="update_available">Ažuriranje dostupno</string>
-    <string name="suspend_text_riru">Modul je suspendovan jer je %1$s omogućeno</string>
-    <string name="suspend_text_zygisk">Modul je suspendovan jer %1$s nije omogućeno</string>
     <string name="zygisk_module_unloaded">Zygisk modul nije učitan zbog nekompatibilnosti</string>
     <string name="module_empty">Nijedan modul nije instaliran</string>
     <string name="confirm_install">Instaliraj modul %1$s?</string>
@@ -141,7 +143,7 @@
     <string name="settings_update_channel_title">Kanal ažuriranja</string>
     <string name="settings_update_stable">Stabilno</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_update_debug">Debug</string>
+    <string name="settings_update_canary">Canary</string>
     <string name="settings_update_custom">Prilagođeno</string>
     <string name="settings_update_custom_msg">Unesi prilagođeni URL kanala</string>
     <string name="settings_zygisk_summary">Pokreni delove Magisk-a u Zygote daemon-u</string>
@@ -230,4 +232,63 @@
     <string name="install_unknown_denied">Dozvolite \"instaliranje nepoznatih aplikacija\" da biste omogućili ovu funkcionalnost</string>
     <string name="app_not_found">Nije pronađena aplikacija za ovu akciju</string>
     <string name="reboot_apply_change">Ponovo pokreni da primeniš izmene</string>
+    <string name="auto_response">Automatski odgovor</string>
+    <string name="download_patch_file">Preuzmi i patch-uj fajl</string>
+    <string name="patch_file_msg">Izaberi sliku (*.img) ili ODIN tarfile (*.tar) ili payload.bin (*.bin)</string>
+    <string name="prompt">Zahtev</string>
+    <string name="request_timeout">Istek zahteva</string>
+    <string name="restore_app_confirmation">Ovo će vratiti skrivenu aplikaciju na originalnu. Da li stvarno to želite?</string>
+    <string name="select_patch_file">Izaberi fajl</string>
+    <string name="settings_app_name_error">Nevalidan format</string>
+    <string name="settings_app_name_helper">Apl. će biti spakovana pod ovim imenom</string>
+    <string name="settings_app_name_hint">Novo ime</string>
+    <string name="settings_hide_app_summary">Instaliraj proxy aplikaciju sa nasumičnim ID-jem paketa i prilagođenom labelom</string>
+    <string name="settings_hide_app_title">Sakrij Magisk apl.</string>
+    <string name="settings_restore_app_summary">Otkrij apl. i povrati originalni APK</string>
+    <string name="settings_restore_app_title">Povrati Magisk apl.</string>
+    <string name="settings_su_adb">Samo ADB</string>
+    <string name="settings_su_app">Samo aplikacije</string>
+    <string name="settings_su_app_adb">Aplikacije i ADB</string>
+    <string name="settings_su_disable">Onemogućeno</string>
+    <string name="settings_su_reauth_summary">Ponovo traži permisije super-korisnika nakon ažuriranja aplikacija</string>
+    <string name="settings_su_reauth_title">Ponovo odobri nakon ažuriranja</string>
+    <string name="settings_su_request_10">10 sekundi</string>
+    <string name="settings_su_request_15">15 sekundi</string>
+    <string name="settings_su_request_20">20 sekundi</string>
+    <string name="settings_su_request_30">30 sekundi</string>
+    <string name="settings_su_request_45">45 sekundi</string>
+    <string name="settings_su_request_60">60 sekundi</string>
+    <string name="settings_su_tapjack_summary">Prompt dijalog super-korisnika neće reagovati dok je prikriven drugim prozorom ili overlay-em</string>
+    <string name="settings_su_tapjack_title">Zaštita od tapjacking-a</string>
+    <string name="su_request_title">Ova aplikacija zahteva korensku permisiju. Pruža potpun pristup Vašem uređaju. Zabranite ako niste sigurni!</string>
+    <string name="superuser_access">Pristup super-korisnika</string>
+    <string name="tanuki_notice">Neslužbena izgradnja Tanuki forka</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide se ne može onemogućiti dok je SuList omogućen.</string>
+    <string name="settings_magiskhide_summary">Promene Magisk-a se vraćaju za procese u hidelist-u</string>
+    <string name="settings_hidelist_config_title">Konfiguriši HideList</string>
+    <string name="settings_hidelist_config_summary">Izaberi procese koji će biti uključeni u hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">Primeni SuList</string>
+    <string name="settings_sulist_summary">Samo procesi u sulist-u mogu dobiti root pristup od Magisk-a</string>
+    <string name="settings_sulist_config_title">Konfiguriši SuList</string>
+    <string name="settings_sulist_config_summary">Izaberi procese koji će biti uključeni u sulist</string>
+    <string name="settings_sulist_enforced">SuList je primenjen</string>
+    <string name="settings_sulist_error_magiskhide">Ova funkcija zahteva omogućen MagiskHide</string>
+    <string name="sulist_empty_warning">SuList je bela lista za root: samo aplikacije na listi mogu dobiti Magisk root. Menadžer i sistemske komponente su uvek izuzete.</string>
+    <string name="zygisk_provider_missing">Nije instaliran Zygisk provajder. Uključite ugrađeni Zygisk u podešavanjima ili instalirajte ZygiskNext (ili kompatibilnog provajdera) za Zygisk module. MagiskHide/SuList rade bez Zygisk-a.</string>
+    <string name="zygisk_provider_disabled">Zygisk provajder je instaliran, ali onemogućen.</string>
+    <string name="zygisk_provider_not_injected">Zygisk provajder je instaliran; ubrizgavanje nije otkriveno.</string>
+    <string name="settings_material_you">Dinamične boje</string>
+    <string name="settings_material_you_summary">Prilagodite boje pozadini</string>
+    <string name="forever">Zauvek</string>
+    <string name="once">Jednom</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_warning">Daje puni pristup vašem uređaju.\nOdbijte ako niste sigurni!</string>
+    <string name="touch_filtered_warning">Pošto aplikacija sakriva zahtev za superkorisničkim pristupom, Magisk ne može da potvrdi vaš odgovor.</string>
+    <string name="superuser_grant">Dozvoli superkorisnika</string>
+    <string name="su_legacy_cmd">Upozorenje: otkrivena je nepodržana komandna linija</string>
 </resources>

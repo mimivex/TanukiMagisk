@@ -267,6 +267,22 @@ string resolve_preinit_dir(const char *base_dir) {
     return dir;
 }
 
+// Companion of resolve_preinit_dir: the early mount directory lives on the
+// same partition, as a sibling of the preinit directory.
+string resolve_early_mount_dir(const char *base_dir) {
+    string dir = base_dir;
+    if (access((dir + "/unencrypted").data(), F_OK) == 0) {
+        dir += "/unencrypted/early-mount.d";
+    } else if (access((dir + "/adb").data(), F_OK) == 0) {
+        dir += "/adb/early-mount.d";
+    } else if (access((dir + "/watchdog").data(), F_OK) == 0) {
+        dir += "/watchdog/early-mount.d";
+    } else {
+        dir += "/early-mount.d";
+    }
+    return dir;
+}
+
 // FFI for Utf8CStr
 
 extern "C" void cxx$utf8str$new(Utf8CStr *self, const void *s, size_t len);

@@ -38,7 +38,8 @@
         android:allowBackup="false"
         android:enableOnBackInvokedCallback="true"
         android:icon="@drawable/ic_launcher"
-        android:label="Magisk"
+        android:label="Tanuki Mask"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Translucent.NoTitleBar"
@@ -51,7 +52,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
                 <action android:name="android.intent.action.UID_REMOVED" />
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
@@ -77,6 +77,12 @@
             android:directBootAware="true"
             android:exported="false"
             android:grantUriPermissions="true" />
+
+        <activity
+            android:name=".ui.webui.ModuleWebUIActivity"
+            android:configChanges="density|orientation|screenSize|screenLayout|smallestScreenSize|uiMode|locale|layoutDirection|fontScale|keyboard|keyboardHidden"
+            android:exported="false"
+            android:theme="@style/ModuleWebUI" />
 
         <!-- We don't invalidate Room -->
         <service

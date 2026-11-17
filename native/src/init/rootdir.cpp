@@ -174,13 +174,13 @@ void MagiskInit::patch_fissiond(const char *tmp_path) noexcept {
     }
 }
 
-static void load_overlay_rc(const char *overlay) {
+static void load_overlay_rc(const char *overlay, bool should_unlink = true) {
     auto dir = open_dir(overlay);
     if (!dir) return;
 
     int dfd = dirfd(dir.get());
     // Do not allow overwrite init.rc
-    unlinkat(dfd, INIT_RC, 0);
+    if (should_unlink) unlinkat(dfd, INIT_RC, 0);
 
     // '/' + name + '\0'
     char buf[NAME_MAX + 2];
@@ -190,14 +190,14 @@ static void load_overlay_rc(const char *overlay) {
             continue;
         }
         strscpy(buf + 1, entry->d_name, sizeof(buf) - 1);
-        if (access(buf, F_OK) == 0) {
+        if (access(buf, F_OK) == 0 && should_unlink) {
             LOGD("Replace rc script [%s]\n", entry->d_name);
         } else {
             LOGD("Found rc script [%s]\n", entry->d_name);
             int rc = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
             rc_list.push_back(full_read(rc));
             close(rc);
-            unlinkat(dfd, entry->d_name, 0);
+            if (should_unlink) unlinkat(dfd, entry->d_name, 0);
         }
     }
 }
@@ -234,6 +234,8 @@ static void recreate_sbin(const char *mirror, bool use_bind_mount) {
 static void extract_files(bool sbin) {
     const char *magisk_xz = sbin ? "/sbin/magisk.xz" : "magisk.xz";
     const char *init_ld_xz = sbin ? "/sbin/init-ld.xz" : "init-ld.xz";
+    // HyperOS spawner shim, only used by patch_ro_root
+    const char *hyos_xz = sbin ? "/sbin/hyos.xz" : "hyos.xz";
 
     if (access(magisk_xz, F_OK) == 0) {
         mmap_data magisk(magisk_xz);
@@ -247,6 +249,13 @@ static void extract_files(bool sbin) {
         unlink(init_ld_xz);
         int fd = xopen("init-ld", O_WRONLY | O_CREAT, 0);
         unxz(fd, init_ld);
+        close(fd);
+    }
+    if (access(hyos_xz, F_OK) == 0) {
+        mmap_data hyos(hyos_xz);
+        unlink(hyos_xz);
+        int fd = xopen("hyos", O_WRONLY | O_CREAT, 0644);
+        unxz(fd, hyos);
         close(fd);
     }
 }
@@ -299,6 +308,9 @@ void MagiskInit::patch_ro_root() noexcept {
     }
 
     load_overlay_rc(ROOTOVL);
+    // Module rc snippets injected through the early mount; they live on the
+    // preinit partition and must never be unlinked (should_unlink = false).
+    load_overlay_rc(INTLROOT "/early-mount.d/initrc.d", false);
     if (access(ROOTOVL "/sbin", F_OK) == 0) {
         // Move files in overlay.d/sbin into tmp_dir
         mv_path(ROOTOVL "/sbin", ".");
@@ -316,6 +328,9 @@ void MagiskInit::patch_ro_root() noexcept {
 
     // Extract overlay archives
     extract_files(false);
+
+    // Stage the HyOS spawner shim; the opt-in is enforced by the shim itself
+    install_hyos_shim();
 
     handle_sepolicy();
     unlink("init-ld");
@@ -353,6 +368,9 @@ void MagiskInit::patch_rw_root() noexcept {
     xmkdir(PRE_TMPDIR, 0);
     setup_tmp(PRE_TMPDIR);
     chdir(PRE_TMPDIR);
+
+    // Same early mount rc injection as in patch_ro_root
+    load_overlay_rc(INTLROOT "/early-mount.d/initrc.d", false);
 
     // Extract overlay archives
     extract_files(true);

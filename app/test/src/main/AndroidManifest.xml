@@ -12,8 +12,15 @@
         <uses-library android:name="android.test.runner" />
     </application>
 
+    <!-- Orchestrates the hide/restore flow in the test APK process,
+         which survives the manager being uninstalled -->
+    <instrumentation
+        android:name="com.topjohnwu.magisk.test.TestRunner"
+        android:targetPackage="com.topjohnwu.magisk.test" />
+
+    <!-- Runs Environment inside the manager process -->
     <instrumentation
         android:name="com.topjohnwu.magisk.test.AppTestRunner"
-        android:targetPackage="com.topjohnwu.magisk" />
+        android:targetPackage="io.github.mimivex.tanuki" />
 
 </manifest>

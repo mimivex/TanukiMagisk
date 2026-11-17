@@ -1,6 +1,4 @@
 package com.topjohnwu.magisk.ui
-
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -111,13 +109,6 @@ class MainActivity : ComponentActivity(), SplashScreenHost {
     @SuppressLint("InlinedApi")
     override fun onCreateUi(savedInstanceState: Bundle?) {
         showUnsupportedMessage()
-
-        // Only ask on startup, not every time the activity is recreated
-        if (savedInstanceState == null && Config.checkUpdate) {
-            extension.withPermission(Manifest.permission.POST_NOTIFICATIONS) {
-                Config.checkUpdate = it
-            }
-        }
 
         val initialTab = getRequestedTab(intent) ?: Tab.HOME.ordinal
 

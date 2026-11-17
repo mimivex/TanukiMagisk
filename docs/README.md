@@ -14,3 +14,10 @@
 - [Magisk Tools](tools.md)
 - [Internal Details](details.md)
 - [Android Booting Shenanigans](boot.md)
+
+## Tanuki Magisk
+
+- [Building Tanuki Magisk](tanuki-build.md) (what the fork adds on top of the upstream build)
+- [Tanuki Magisk modules](tanuki-modules.md) (the Kitsune module contract, `SULISTMODE`, `sepolicy.rule`, the Module WebUI bridge)
+- [Tanuki Magisk CLI](tanuki-cli.md) (`magiskhide`, stock `--denylist`, rescue commands)
+- [HyperOS `hyos_spawner` shim](hyos_spawner.md)

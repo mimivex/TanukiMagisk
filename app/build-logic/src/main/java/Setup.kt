@@ -132,7 +132,10 @@ fun Project.setupCoreLib() {
                 for (abi in abiList) {
                     into(abi) {
                         from(rootFile("native/out/$abi")) {
-                            include("magiskboot", "magiskinit", "magiskpolicy", "magisk", "libinit-ld.so")
+                            include(
+                                "magiskboot", "magiskinit", "magiskpolicy", "magisk",
+                                "libinit-ld.so", "libhyos.so"
+                            )
                             rename { if (it.endsWith(".so")) it else "lib$it.so" }
                         }
                     }
@@ -142,7 +145,7 @@ fun Project.setupCoreLib() {
                 from(zipTree(downloadFile(BOOTCTL_DOWNLOAD_URL, BOOTCTL_ZIP_CHECKSUM)))
                 include(abiList.map { "$it/libbootctl.so" })
                 onlyIf {
-                    if (inputs.sourceFiles.files.size != abiList.size * 7)
+                    if (inputs.sourceFiles.files.size != abiList.size * 8)
                         throw StopExecutionException("Please build binaries first! (./build.py binary)")
                     true
                 }
@@ -272,7 +275,7 @@ fun Project.setupMainApk() {
         namespace = "com.topjohnwu.magisk"
 
         defaultConfig {
-            applicationId = "com.topjohnwu.magisk"
+            applicationId = "io.github.mimivex.tanuki"
             versionName = Config.version
             versionCode = Config.versionCode
             ndk {

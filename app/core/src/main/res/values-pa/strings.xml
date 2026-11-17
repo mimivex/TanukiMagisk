@@ -15,12 +15,13 @@
     <string name="loading">ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ</string>
     <string name="update">ਅੱਪਡੇਟ</string>
     <string name="not_available">N/A</string>
+    <string name="not_installed">ਇੰਸਟਾਲ ਨਹੀਂ ਹੈ</string>
     <string name="hide">ਓਹਲੇ</string>
     <string name="home_package">ਪੈਕੇਜ</string>
 
-    <string name="home_support_title">ਸਾਡਾ ਸਮਰਥਨ ਕਰੋ</string>
+    <string name="home_support_title">ਅਸਲ ਲੇਖਕਾਂ ਦਾ ਸਮਰਥਨ ਕਰੋ</string>
     <string name="home_item_source">ਸਰੋਤ</string>
-    <string name="home_support_content">ਮੈਜਿਸਕ ਮੁਫਤ ਅਤੇ ਖੁੱਲਾ ਸਰੋਤ ਹੈ, ਅਤੇ ਹਮੇਸ਼ਾਂ ਰਹੇਗਾ। ਹਾਲਾਂਕਿ, ਤੁਸੀਂ ਦਿਖਾ ਸਕਦੇ ਹੋ ਕਿ ਤੁਸੀਂ ਇੱਕ ਛੋਟਾ ਜਿਹਾ ਦਾਨ ਭੇਜ ਕੇ ਦੇਖਭਾਲ ਕਰਦੇ ਹੋ।</string>
+    <string name="home_support_content">ਮੈਜਿਸਕ ਮੁਫਤ ਅਤੇ ਖੁੱਲਾ ਸਰੋਤ ਹੈ, ਅਤੇ ਹਮੇਸ਼ਾਂ ਰਹੇਗਾ। ਇਹ Magisk ਦਾ ਇੱਕ fork ਹੈ, ਜਿਸਨੂੰ ਕੋਈ ਸਰਗਰਮ ਸਹਾਇਤਾ ਨਹੀਂ ਮਿਲੇਗੀ। ਹਾਲਾਂਕਿ, ਤੁਸੀਂ ਦਿਖਾ ਸਕਦੇ ਹੋ ਕਿ ਤੁਸੀਂ ਇੱਕ ਛੋਟਾ ਜਿਹਾ ਦਾਨ ਭੇਜ ਕੇ ਦੇਖਭਾਲ ਕਰਦੇ ਹੋ। ਦਾਨ Magisk ਦੇ ਅਸਲ ਲੇਖਕਾਂ ਨੂੰ ਜਾਂਦਾ ਹੈ।</string>
     <string name="home_installed_version">ਇੰਸਟਾਲਡ</string>
     <string name="home_latest_version">ਨਵੀਨਤਮ</string>
     <string name="invalid_update_channel">ਅਵੈਧ ਅਪਡੇਟ ਚੈਨਲ</string>
@@ -86,6 +87,7 @@
     <!-- MagiskHide -->
     <string name="show_system_app">ਸਿਸਟਮ ਐਪਸ ਦਿਖਾਓ</string>
     <string name="show_os_app">OS ਐਪਲੀਕੇਸ਼ਨ ਦਿਖਾਓ</string>
+    <string name="add_recommended">ਸਿਫ਼ਾਰਸ਼ ਕੀਤੇ ਸ਼ਾਮਲ ਕਰੋ</string>
     <string name="hide_filter_hint">ਨਾਮ ਦੁਆਰਾ ਫਿਲਟਰ ਕਰੋ</string>
     <string name="hide_search">ਖੋਜੋ</string>
 
@@ -173,4 +175,55 @@
     <string name="external_rw_permission_denied">ਇਸ ਦੀ ਵਰਤੋਂ ਕਰਨ ਲਈ ਸਟੋਰੇਜ ਦੀ ਆਗਿਆ ਦਿਓ</string>
     <string name="app_not_found">ਇਸ ਐਕਸ਼ਨ ਨੂੰ ਸੰਭਾਲਣ ਲਈ ਕੋਈ ਐਪਲੀਕੇਸ਼ਨ ਨਹੀਂ ਮਿਲੀ</string>
 
+    <string name="auto_response">ਆਟੋਮੈਟਿਕ ਜਵਾਬ</string>
+    <string name="patch_file_msg">ਇੱਕ ਰੋ ਛੱਞੀ ਨੂੰ (* .img) ਜਾਂ ਇੱਕ Odin tarfile (* .tar) ਦੀ ਚੋਣ ਕਰੋ</string>
+    <string name="prompt">ਸੰਕੇਤ ਦਿਖਾਓ</string>
+    <string name="request_timeout">ਬੇਨਤੀ ਦਾ ਸਮਾਂ ਸਮਾਪਤ</string>
+    <string name="select_patch_file">ਇੱਕ ਫਾਈਲ ਚੁਣੋ ਅਤੇ ਪੈਚ ਕਰੋ</string>
+    <string name="settings_app_name_error">ਗਲਤ ਫਾਰਮੈਟ</string>
+    <string name="settings_app_name_helper">ਇਸ ਨਾਮ ਨਾਲ ਐਪ ਦੁਬਾਰਾ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਵੇਗਾ</string>
+    <string name="settings_app_name_hint">ਨਵਾਂ ਨਾਮ</string>
+    <string name="settings_su_adb">ਸਿਰਫ ਐਡਬੀ</string>
+    <string name="settings_su_app">ਸਿਰਫ ਐਪਸ</string>
+    <string name="settings_su_app_adb">ਐਪਸ ਅਤੇ ਐਡਬੀ</string>
+    <string name="settings_su_disable">ਬੰਦ ਹੈ</string>
+    <string name="settings_su_reauth_summary">ਇੱਕ ਐਪ ਦੇ ਅਪਡੇਟ ਹੋਣ ਤੋਂ ਬਾਅਦ ਸੁਪਰਯੂਜ਼ਰ ਆਗਿਆ ਪ੍ਰਮਾਣਿਤ ਕਰੋ</string>
+    <string name="settings_su_reauth_title">ਅਪਗ੍ਰੇਡ ਹੋਣ ਤੋਂ ਬਾਅਦ ਪ੍ਰਮਾਣਿਕਤਾ</string>
+    <string name="settings_su_request_10">10 ਸਕਿੰਟ</string>
+    <string name="settings_su_request_15">15 ਸਕਿੰਟ</string>
+    <string name="settings_su_request_20">20 ਸਕਿੰਟ</string>
+    <string name="settings_su_request_30">30 ਸਕਿੰਟ</string>
+    <string name="settings_su_request_45">45 ਸਕਿੰਟ</string>
+    <string name="settings_su_request_60">60 ਸਕਿੰਟ</string>
+    <string name="su_request_title">ਸੁਪਰਯੂਜ਼ਰ ਮੰਗ</string>
+    <string name="superuser_access">ਸੁਪਰਯੂਜ਼ਰ ਐਕਸੈਸ</string>
+    <string name="tanuki_notice">Tanuki fork ਦਾ ਗੈਰ-ਅਧਿਕਾਰਤ ਬਿਲਡ</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">SuList ਸਮਰੱਥ ਹੋਣ ਵੇਲੇ MagiskHide ਅਸਮਰੱਥ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਦਾ।</string>
+    <string name="settings_magiskhide_summary">hidelist ਦੀਆਂ ਪ੍ਰਕਿਰਿਆਵਾਂ ਲਈ Magisk ਤਬਦੀਲੀਆਂ ਵਾਪਸ ਲਈਆਂ ਜਾਂਦੀਆਂ ਹਨ</string>
+    <string name="settings_hidelist_config_title">HideList ਸੰਰਚਿਤ ਕਰੋ</string>
+    <string name="settings_hidelist_config_summary">hidelist ਵਿੱਚ ਸ਼ਾਮਲ ਕਰਨ ਲਈ ਪ੍ਰਕਿਰਿਆਵਾਂ ਚੁਣੋ</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">SuList ਲਾਗੂ ਕਰੋ</string>
+    <string name="settings_sulist_summary">ਸਿਰਫ਼ sulist ਦੀਆਂ ਪ੍ਰਕਿਰਿਆਵਾਂ ਹੀ Magisk ਰੂਟ ਪਹੁੰਚ ਪ੍ਰਾਪਤ ਕਰ ਸਕਦੀਆਂ ਹਨ</string>
+    <string name="settings_sulist_config_title">SuList ਸੰਰਚਿਤ ਕਰੋ</string>
+    <string name="settings_sulist_config_summary">sulist ਵਿੱਚ ਸ਼ਾਮਲ ਕਰਨ ਲਈ ਪ੍ਰਕਿਰਿਆਵਾਂ ਚੁਣੋ</string>
+    <string name="settings_sulist_enforced">SuList ਲਾਗੂ ਹੈ</string>
+    <string name="settings_sulist_error_magiskhide">ਇਸ ਵਿਸ਼ੇਸ਼ਤਾ ਲਈ MagiskHide ਸਮਰੱਥ ਹੋਣਾ ਲਾਜ਼ਮੀ ਹੈ</string>
+    <string name="sulist_empty_warning">SuList ਇੱਕ ਰੂਟ ਵ੍ਹਾਈਟਲਿਸਟ ਹੈ: ਸਿਰਫ਼ ਸੂਚੀ ਵਿੱਚਲੀਆਂ ਐਪਾਂ ਹੀ Magisk ਰੂਟ ਪ੍ਰਾਪਤ ਕਰ ਸਕਦੀਆਂ ਹਨ। ਮੈਨੇਜਰ ਅਤੇ ਸਿਸਟਮ ਕੰਪੋਨੈਂਟ ਹਮੇਸ਼ਾ ਛੋਟ ਪ੍ਰਾਪਤ ਹਨ।</string>
+    <string name="zygisk_provider_missing">ਕੋਈ Zygisk ਪ੍ਰੋਵਾਈਡਰ ਸਥਾਪਿਤ ਨਹੀਂ ਹੈ। ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਬਿਲਟ-ਇਨ Zygisk ਚਾਲੂ ਕਰੋ, ਜਾਂ Zygisk ਮੌਡਿਊਲਾਂ ਲਈ ZygiskNext (ਜਾਂ ਅਨੁਕੂਲ ਪ੍ਰੋਵਾਈਡਰ) ਸਥਾਪਿਤ ਕਰੋ। MagiskHide/SuList Zygisk ਤੋਂ ਬਿਨਾਂ ਕੰਮ ਕਰਦੇ ਹਨ।</string>
+    <string name="zygisk_provider_disabled">ਇੱਕ Zygisk ਪ੍ਰੋਵਾਈਡਰ ਸਥਾਪਿਤ ਹੈ ਪਰ ਅਸਮਰੱਥ ਹੈ।</string>
+    <string name="zygisk_provider_not_injected">Zygisk ਪ੍ਰੋਵਾਈਡਰ ਸਥਾਪਿਤ ਹੈ; ਇੰਜੈਕਸ਼ਨ ਨਹੀਂ ਮਿਲਿਆ।</string>
+    <string name="settings_material_you">ਗਤੀਸ਼ੀਲ ਰੰਗ</string>
+    <string name="settings_material_you_summary">ਆਪਣੀ ਡਿਵਾਈਸ ਵੱਲੋਂ ਦਿੱਤੇ ਰੰਗਾਂ ਦੀ ਵਰਤੋਂ ਕਰੋ</string>
+    <string name="forever">ਹਮੇਸ਼ਾ ਲਈ</string>
+    <string name="once">ਇੱਕ ਵਾਰ</string>
+    <string name="tenmin">10 ਮਿੰਟ</string>
+    <string name="twentymin">20 ਮਿੰਟ</string>
+    <string name="thirtymin">30 ਮਿੰਟ</string>
+    <string name="sixtymin">60 ਮਿੰਟ</string>
+    <string name="su_warning">ਤੁਹਾਡੀ ਡੀਵਾਈਸ ਤੱਕ ਪੂਰੀ ਪਹੁੰਚ ਦਿੰਦਾ ਹੈ।\nਜੇ ਤੁਸੀਂ ਪੱਕਾ ਨਹੀਂ ਤਾਂ ਇਨਕਾਰ ਕਰੋ!</string>
+    <string name="touch_filtered_warning">ਕਿਉਂਕਿ ਇੱਕ ਐਪ Superuser ਬੇਨਤੀ ਨੂੰ ਢਕ ਰਹੀ ਹੈ, Magisk ਤੁਹਾਡੇ ਜਵਾਬ ਦੀ ਪੁਸ਼ਟੀ ਨਹੀਂ ਕਰ ਸਕਦਾ।</string>
+    <string name="superuser_grant">Superuser ਦਿਓ</string>
+    <string name="su_legacy_cmd">ਚੇਤਾਵਨੀ: ਅਸਮਰਥਿਤ ਕਮਾਂਡ ਲਾਈਨ ਲੱਭੀ ਗਈ</string>
 </resources>

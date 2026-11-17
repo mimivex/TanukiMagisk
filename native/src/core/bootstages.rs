@@ -3,11 +3,11 @@ use crate::daemon::MagiskD;
 use crate::db::MultiuserMode;
 use crate::ffi::{
     DbEntryKey, RequestCode, check_key_combo, exec_common_scripts, exec_module_scripts,
-    get_magisk_tmp, initialize_denylist,
+    get_magisk_tmp, initialize_denylist, scan_deny_apps,
 };
 use crate::logging::setup_logfile;
 use crate::module::disable_modules;
-use crate::mount::{clean_mounts, setup_preinit_dir};
+use crate::mount::{clean_mounts, recover_preinit_rules, setup_preinit_dir};
 use crate::resetprop::get_prop;
 use crate::selinux::restorecon;
 use base::const_format::concatcp;
@@ -146,6 +146,11 @@ impl MagiskD {
 
         if safe_mode {
             info!("* Safe mode triggered");
+            // Disable MagiskHide/SuList via the stock key; `magiskhide` mirrors it.
+            self.set_db_setting(DbEntryKey::DenylistConfig, 0).log().ok();
+            self.set_db_setting(DbEntryKey::MagiskHideConfig, 0)
+                .log()
+                .ok();
             // Disable all modules and zygisk so next boot will be clean
             disable_modules();
             self.set_db_setting(DbEntryKey::ZygiskConfig, 0).log_ok();
@@ -178,23 +183,39 @@ impl MagiskD {
         setup_logfile();
         info!("** boot-complete triggered");
 
+        // Module boot-completed scripts: modules only, after the system is
+        // fully up, as in Kitsune 27.
+        if let Some(module_list) = self.module_list.get() {
+            exec_module_scripts(cstr!("boot-completed"), module_list);
+        }
+
+        // Reset the bootloop counter once we have boot-complete
+        self.set_db_setting(DbEntryKey::BootloopCount, 0).log_ok();
+
+        // User 0 is decrypted now: refresh the deny engine's app-id map.
+        scan_deny_apps();
+
         // At this point it's safe to create the folder
         let secure_dir = cstr!(SECURE_DIR);
         if !secure_dir.exists() {
             secure_dir.mkdir(0o700).log_ok();
         }
 
-        // Reset the bootloop counter once we have boot-complete
-        self.set_db_setting(DbEntryKey::BootloopCount, 0).log_ok();
         if self.is_headless {
             self.set_db_setting(DbEntryKey::SuMultiuserMode, MultiuserMode::User as i32)
                 .log_ok();
         }
 
         setup_preinit_dir();
+        // The installer cannot write here without a daemon
+        recover_preinit_rules();
         if self.zygisk_enabled.load(Ordering::Relaxed) {
             self.zygisk.lock().reset(true);
         }
+        // Install the full manager bundled by the zip installer (recovery
+        // flash has no patched ramdisk stub). Retries every boot until the
+        // install script records a successful install imprint.
+        self.ensure_bundled_manager();
     }
 
     pub fn boot_stage_handler(&self, client: UnixStream, code: RequestCode) {
@@ -220,7 +241,10 @@ impl MagiskD {
             }
             RequestCode::BOOT_COMPLETE => {
                 drop(client);
-                if state.contains(BootState::PostFsDataDone) {
+                // Do not gate the manager bootstrap on post-fs-data: a
+                // recovery install has no ramdisk stub and must still get the
+                // full manager. The bootloop counter is reset here as usual.
+                if !state.contains(BootState::BootComplete) {
                     state.insert(BootState::BootComplete);
                     self.boot_complete()
                 }

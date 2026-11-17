@@ -29,13 +29,12 @@ data class LocalModule(
     private val removeFile = base.getChildFile("remove")
     private val disableFile = base.getChildFile("disable")
     private val updateFile = base.getChildFile("update")
-    val zygiskFolder = base.getChildFile("zygisk")
 
     val updated get() = updateFile.exists()
     val isRiru = (id == "riru-core") || base.getChildFile("riru").exists()
-    val isZygisk = zygiskFolder.exists()
-    val zygiskUnloaded = zygiskFolder.getChildFile("unloaded").exists()
+    val isZygisk = base.getChildFile("zygisk").exists()
     val hasAction = base.getChildFile("action.sh").exists()
+    val hasWebUI = base.getChildFile("webroot").isDirectory
 
     var enable: Boolean
         get() = !disableFile.exists()
@@ -53,7 +52,8 @@ data class LocalModule(
         get() = removeFile.exists()
         set(remove) {
             if (remove) {
-                if (updateFile.exists()) return
+                // A pending update does not block removal: the daemon drops
+                // the module at the next boot instead of upgrading it.
                 removeFile.createNewFile()
                 Shell.cmd("copy_preinit_files").submit()
             } else {

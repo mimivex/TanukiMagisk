@@ -72,6 +72,9 @@ pub mod ffi {
         LATE_START,
         BOOT_COMPLETE,
 
+        // Added after all stock codes so their wire values stay unchanged.
+        HIDE,
+
         END,
     }
 
@@ -85,11 +88,19 @@ pub mod ffi {
     }
 
     enum DbEntryKey {
+        RootAccess,
         SuMultiuserMode,
         SuMntNs,
         DenylistConfig,
         ZygiskConfig,
         BootloopCount,
+        SuManager,
+        MagiskHideConfig,
+        SulistConfig,
+        // Set once the recommended rows have been seeded by a user action
+        // (mode switch or the `recommended` CLI action), so the MagiskHide
+        // enable path never seeds twice nor at boot.
+        RecommendedSeeded,
     }
 
     #[repr(i32)]
@@ -126,6 +137,11 @@ pub mod ffi {
         ProcessOnDenyList = 0x00000002,
         DenyListEnforced = 0x40000000,
         ProcessIsMagiskApp = 0x80000000,
+        // Not part of the public Zygisk StateFlag API. update_deny_flags
+        // sets it for non-listed processes under SuList; module.cpp turns
+        // it into DO_REVERT_UNMOUNT while still loading modules. Free bit:
+        // UNMOUNT_MASK is 0x40000002 and PRIVATE_MASK is 0xC0000000.
+        HideMounts = 0x20000000,
     }
 
     #[derive(Decodable)]
@@ -149,6 +165,8 @@ pub mod ffi {
         fn get_magisk_tmp() -> Utf8CStrRef<'static>;
         #[cxx_name = "resolve_preinit_dir_rs"]
         fn resolve_preinit_dir(base_dir: Utf8CStrRef) -> String;
+        #[cxx_name = "resolve_early_mount_dir_rs"]
+        fn resolve_early_mount_dir(base_dir: Utf8CStrRef) -> String;
         fn check_key_combo() -> bool;
         fn unlock_blocks();
         fn fork_dont_care() -> i32;
@@ -163,11 +181,14 @@ pub mod ffi {
         fn exec_common_scripts(stage: Utf8CStrRef);
         fn exec_module_scripts(state: Utf8CStrRef, modules: &Vec<ModuleInfo>);
         fn uninstall_pkg(apk: Utf8CStrRef);
+        fn install_apk(apk: Utf8CStrRef);
         fn install_module(zip: Utf8CStrRef);
 
         // Denylist
         fn denylist_cli(args: &mut Vec<String>) -> i32;
+        fn magiskhide_cli(args: &mut Vec<String>) -> i32;
         fn denylist_handler(client: i32);
+        fn hide_handler(client: i32);
         fn scan_deny_apps();
 
         include!("include/sqlite.hpp");
@@ -225,6 +246,8 @@ pub mod ffi {
         #[cxx_name = "set_db_setting"]
         fn set_db_setting_for_cxx(&self, key: DbEntryKey, value: i32) -> bool;
         fn get_app_id(&self, pkg: &str) -> i32;
+        fn get_manager_uid(&self, user: i32) -> i32;
+        fn get_manager_package(&self, user: i32) -> String;
 
         #[Self = MagiskD]
         #[cxx_name = "Get"]

@@ -567,8 +567,31 @@ run_migrations() {
 }
 
 copy_preinit_files() {
+  # In recovery there is no running daemon, so $MAGISKTMP/.magisk/preinit was
+  # never created and the module rules were silently dropped. Resolve the
+  # runtime dir first, then fall back to the persistent preinit dir itself.
+  local MAGISKTMP=${MAGISKTMP:-$(magisk --path 2>/dev/null)}
   local PREINITDIR=$MAGISKTMP/.magisk/preinit
-  if [ ! -d $PREINITDIR ]; then
+  if [ ! -d "$PREINITDIR" ] && [ -n "$MAGISKTMP" ]; then
+    # Ask the daemon's resolver to recreate the runtime link (it also
+    # repairs installs where setup_preinit_dir failed at boot)
+    MAGISKTMP="$MAGISKTMP" magisk --preinit-device >/dev/null 2>&1
+  fi
+  if [ ! -d "$PREINITDIR" ]; then
+    # Recovery: write the persistent rules file directly into the partition
+    # the daemon would have picked. /data/adb is not in this list:
+    # magiskinit only ever reads the canonical <preinit>/sepolicy.rule, so a
+    # copy there would silence the warning below without loading a single
+    # rule.
+    for dir in /data/unencrypted/magisk /metadata/watchdog/magisk /cache/magisk \
+      /persist/magisk /mnt/vendor/persist/magisk; do
+      if [ -d "$dir" ]; then
+        PREINITDIR=$dir
+        break
+      fi
+    done
+  fi
+  if [ ! -d "$PREINITDIR" ]; then
     ui_print "- Unable to find preinit dir"
     return 1
   fi
@@ -583,6 +606,22 @@ copy_preinit_files() {
     cat $r
     echo
   done > $PREINITDIR/sepolicy.rule
+
+  # Copy all enabled early-mount trees. magiskinit merges
+  # <preinit>/<module>/early-mount into its early mount tmpfs at boot, so
+  # the copy is refreshed from scratch: a disabled or updated module must
+  # not keep injecting files left over by a previous flash.
+  for e in /data/adb/modules*/*/early-mount; do
+    [ -d "$e" ] || continue
+    local MODDIR=${e%/*}
+    [ -f $MODDIR/disable ] && continue
+    [ -f $MODDIR/remove ] && continue
+    [ -f $MODDIR/update ] && continue
+    local MODNAME=${MODDIR##*/}
+    mkdir -p "$PREINITDIR/$MODNAME"
+    rm -rf "$PREINITDIR/$MODNAME/early-mount"
+    cp -afc "$e" "$PREINITDIR/$MODNAME/early-mount"
+  done
 }
 
 #################
@@ -646,6 +685,22 @@ install_module() {
   else
     recovery_actions
   fi
+
+  # Export SuList status so module installers can adapt their behavior
+  local MAGISK_BIN=$MAGISKTMP/magisk
+  [ -x $MAGISK_BIN ] || MAGISK_BIN=magisk
+  SULISTMODE=false
+  $MAGISK_BIN --magiskhide sulist >/dev/null 2>&1 && SULISTMODE=true
+  export SULISTMODE
+
+  # Modules written for Kitsune check MAGISK_VER against *-kitsune* in
+  # their installer, so the install shell exposes both markers; nothing
+  # outside module installation sees the appended suffix. Such modules
+  # may rely only on the Kitsune 27.2 feature set the engine provides.
+  case "$MAGISK_VER" in
+    *-kitsune*) ;;  # already carries the legacy marker
+    *-tanuki*) MAGISK_VER="$MAGISK_VER-kitsune"; export MAGISK_VER ;;
+  esac
 
   # Extract prop file
   unzip -o "$ZIPFILE" module.prop -d $TMPDIR >&2

@@ -8,7 +8,7 @@ set -o pipefail
 # These variables can be modified as needed
 CONFIG=config.prop
 NOTES=notes.md
-APK_CERT=b4cb83b4dad99f997dbe872f013aa16c14eec41d167021f371f7e1330f273ee6
+APK_CERT=f4022b8d638f9e47db0ccb57c1545797458418019e64163e38bf61e663d5c0c4
 
 # These are constants, do not modify
 GCONFIG=app/gradle.properties
@@ -131,6 +131,7 @@ build() {
   $build_cmd clean
   $build_cmd all
   $build_cmd -r all
+  $build_cmd -r app-legacy
   verify_apks
 }
 
@@ -144,7 +145,7 @@ upload() {
 
   verify_apks
 
-  if [ ! -f "out/app-release.apk" ] || [ ! -f "out/app-debug.apk" ]; then
+  if [ ! -f "out/app-release.apk" ] || [ ! -f "out/app-legacy-release.apk" ] || [ ! -f "out/app-debug.apk" ]; then
     echo "Error: Required APKs missing in out" >&2
     exit 1
   fi
@@ -160,10 +161,12 @@ upload() {
 
   # Publish release
   local release_apk="Magisk-v${ver}.apk"
+  local legacy_apk="Magisk-v${ver}-legacy.apk"
   cp "out/app-release.apk" "$release_apk"
-  gh release create --verify-tag "$tag" -d -t "$title" -F "$NOTES" "$release_apk" "out/app-debug.apk"
+  cp "out/app-legacy-release.apk" "$legacy_apk"
+  gh release create --verify-tag "$tag" -d -t "$title" -F "$NOTES" "$release_apk" "$legacy_apk" "out/app-debug.apk"
 
-  rm -f "$release_apk"
+  rm -f "$release_apk" "$legacy_apk"
 }
 
 usage() {

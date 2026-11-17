@@ -4,17 +4,20 @@ import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Config.Value.BETA_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.CUSTOM_CHANNEL
-import com.topjohnwu.magisk.core.Config.Value.DEBUG_CHANNEL
+import com.topjohnwu.magisk.core.Config.Value.CANARY_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.DEFAULT_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.STABLE_CHANNEL
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.ManagerFlavor
 import com.topjohnwu.magisk.core.data.GithubApiServices
 import com.topjohnwu.magisk.core.data.RawUrl
+import com.topjohnwu.magisk.core.isOlderVersion
 import com.topjohnwu.magisk.core.ktx.dateFormat
 import com.topjohnwu.magisk.core.model.GooglebookRecoveryJson
 import com.topjohnwu.magisk.core.model.Release
 import com.topjohnwu.magisk.core.model.ReleaseAssets
+import com.topjohnwu.magisk.core.model.UpdateAssets
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import retrofit2.HttpException
 import timber.log.Timber
@@ -26,14 +29,14 @@ class NetworkService(
 ) {
     suspend fun fetchUpdate() = safe {
         var info = when (Config.updateChannel) {
-            DEFAULT_CHANNEL -> if (BuildConfig.DEBUG) fetchDebugUpdate() else fetchStableUpdate()
+            DEFAULT_CHANNEL -> if (BuildConfig.DEBUG) fetchCanaryUpdate() else fetchStableUpdate()
             STABLE_CHANNEL -> fetchStableUpdate()
             BETA_CHANNEL -> fetchBetaUpdate()
-            DEBUG_CHANNEL -> fetchDebugUpdate()
+            CANARY_CHANNEL -> fetchCanaryUpdate()
             CUSTOM_CHANNEL -> fetchCustomUpdate(Config.customChannelUrl)
             else -> throw IllegalArgumentException()
         }
-        if (info.versionCode < Info.env.versionCode &&
+        if (isOlderVersion(info.versionCode, info.version, Info.env.versionCode, Info.env.versionString) &&
             Config.updateChannel == DEFAULT_CHANNEL &&
             !BuildConfig.DEBUG
         ) {
@@ -43,8 +46,12 @@ class NetworkService(
         info
     }
 
-    suspend fun fetchUpdate(version: Int) = safe {
-        findRelease { it.versionCode == version }.asInfo()
+    suspend fun fetchUpdate(versionCode: Int, version: String) = safe {
+        // The exact build first: several revisions share a version code, and
+        // each one has its own changelog. A build that predates the first
+        // release of its revision falls back to any release of the code.
+        findRelease { it.versionCode == versionCode && it.tag.drop(1) == version }?.asInfo()
+            ?: findRelease { it.versionCode == versionCode }?.asInfo()
     }
 
     suspend fun fetchGooglebookRecovery() = safe {
@@ -106,14 +113,23 @@ class NetworkService(
 
     // Version number: debug == beta >= stable
 
+    // One release carries an APK per flavor: the channel picks the release
+    // (and, as upstream, release vs debug), the installed manager picks its own.
+    private fun updateAsset(debug: Boolean): (ReleaseAssets) -> Boolean {
+        val legacy = ManagerFlavor.isLegacy
+        return { UpdateAssets.isUpdateAsset(it.name, legacy, debug) }
+    }
+
     // Find the latest non-prerelease
-    private suspend fun fetchStableUpdate() = api.fetchLatestRelease().asInfo()
+    private suspend fun fetchStableUpdate() =
+        api.fetchLatestRelease().asInfo(updateAsset(debug = false))
 
     // Find the latest release, regardless whether it's prerelease
-    private suspend fun fetchBetaUpdate() = findRelease { true }.asInfo()
+    private suspend fun fetchBetaUpdate() =
+        findRelease { true }.asInfo(updateAsset(debug = false))
 
-    private suspend fun fetchDebugUpdate() =
-        findRelease { true }.asInfo { it.name == "app-debug.apk" }
+    private suspend fun fetchCanaryUpdate() =
+        findRelease { true }.asInfo(updateAsset(debug = true))
 
     private suspend fun fetchCustomUpdate(url: String): UpdateInfo {
         val info = raw.fetchUpdateJson(url).magisk
@@ -126,6 +142,17 @@ class NetworkService(
                 factory()
             else
                 null
+        } catch (e: HttpException) {
+            // A 404 on the update endpoints means "nothing published yet"
+            // (empty or private repo). Keep upstream's error level, but log
+            // one short line instead of the full stack every refresh.
+            if (e.code() == 404) {
+                Timber.e("update check: HTTP 404, no release on this channel")
+                null
+            } else {
+                Timber.e(e)
+                null
+            }
         } catch (e: Exception) {
             Timber.e(e)
             null

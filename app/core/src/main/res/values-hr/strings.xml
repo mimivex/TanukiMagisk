@@ -4,7 +4,7 @@
     <!--Welcome Activity-->
     <string name="modules">Moduli</string>
     <string name="superuser">Superuser</string>
-    <string name="logs">Zapisnik događaja</string>
+    <string name="logs">Zapisnik</string>
     <string name="settings">Postavke</string>
     <string name="install">Instaliranje</string>
     <string name="section_home">Početna</string>
@@ -16,12 +16,13 @@
     <string name="loading">Učitavanje…</string>
     <string name="update">Ažuriraj</string>
     <string name="not_available">N/A</string>
+    <string name="not_installed">Nije instaliran</string>
     <string name="hide">Sakrij</string>
     <string name="home_package">Paket</string>
 
-    <string name="home_support_title">Podržite nas</string>
+    <string name="home_support_title">Podrži izvorne autore</string>
     <string name="home_item_source">Izvor</string>
-    <string name="home_support_content">Magisk je i uvijek će biti besplatan i otvoren. Međutim, možete nam pokazati da vam je stalo slanjem male donacije.</string>
+    <string name="home_support_content">Magisk je i uvijek će biti besplatan i otvoren. Ovo je fork Magiska koji neće dobivati aktivnu podršku. Međutim, možete nam pokazati da vam je stalo slanjem male donacije izvornim autorima Magiska.</string>
     <string name="home_installed_version">Instalirana</string>
     <string name="home_latest_version">Najnovija</string>
     <string name="invalid_update_channel">Nevažeći kanal ažuriranja</string>
@@ -87,6 +88,7 @@
     <!-- MagiskHide -->
     <string name="show_system_app">Prikaži sistemske aplikacije</string>
     <string name="hide_filter_hint">Filtriraj prema nazivu</string>
+    <string name="add_recommended">Dodaj preporučene</string>
     <string name="hide_search">Traži</string>
 
     <!--Module -->
@@ -171,4 +173,55 @@
     <string name="unsupport_magisk_title">Nepodržana Magisk verzija</string>
     <string name="external_rw_permission_denied">Odobrite dopuštenje za pohranu da biste omogućili ovu funkciju</string>
     <string name="app_not_found">Nije pronađena nijedna aplikacijaza obradu ove radnju</string>
+    <string name="auto_response">Automatski odgovor</string>
+    <string name="patch_file_msg">Odaberite raw (*.img) ili ODIN tarfile (*.tar)</string>
+    <string name="prompt">Upit</string>
+    <string name="request_timeout">Vremensko ograničenje zahtjeva</string>
+    <string name="select_patch_file">Odaberite patch datoteku</string>
+    <string name="settings_app_name_error">Nevažeći format</string>
+    <string name="settings_app_name_helper">Aplikacija će se prepakirati na ovaj naziv</string>
+    <string name="settings_app_name_hint">Novi naziv</string>
+    <string name="settings_su_adb">Samo ADB</string>
+    <string name="settings_su_app">Samo aplikacije</string>
+    <string name="settings_su_app_adb">Aplikacije i ADB</string>
+    <string name="settings_su_disable">Onemogućeno</string>
+    <string name="settings_su_reauth_summary">Ponovno provjerite autentičnost Superuser-a dopuštenja nakon ažuriranja aplikacije</string>
+    <string name="settings_su_reauth_title">Ponovno provjerite autentičnost nakon ažuriranja</string>
+    <string name="settings_su_request_10">10 sekundi</string>
+    <string name="settings_su_request_15">15 sekundi</string>
+    <string name="settings_su_request_20">20 sekundi</string>
+    <string name="settings_su_request_30">30 sekundi</string>
+    <string name="settings_su_request_45">45 sekundi</string>
+    <string name="settings_su_request_60">60 sekundi</string>
+    <string name="su_request_title">Superuser zahtjev</string>
+    <string name="superuser_access">Superuser pristup</string>
+    <string name="tanuki_notice">Neslužbena izrada Tanuki forka</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide se ne može onemogućiti dok je SuList omogućen.</string>
+    <string name="settings_magiskhide_summary">Magiskove izmjene vraćaju se za procese u hidelistu</string>
+    <string name="settings_hidelist_config_title">Konfiguriraj HideList</string>
+    <string name="settings_hidelist_config_summary">Odaberi procese koje treba uključiti u hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">Primijeni SuList</string>
+    <string name="settings_sulist_summary">Samo procesi u sulistu mogu dobiti Magisk root pristup</string>
+    <string name="settings_sulist_config_title">Konfiguriraj SuList</string>
+    <string name="settings_sulist_config_summary">Odaberi procese koje treba uključiti u sulist</string>
+    <string name="settings_sulist_enforced">SuList je primijenjen</string>
+    <string name="settings_sulist_error_magiskhide">Ova značajka zahtijeva omogućen MagiskHide</string>
+    <string name="sulist_empty_warning">SuList je root popis dopuštenih: samo aplikacije na popisu mogu dobiti Magisk root. Upravitelj i sistemske komponente uvijek su izuzeti.</string>
+    <string name="zygisk_provider_missing">Nema instaliranog Zygisk pružatelja. Omogućite ugrađeni Zygisk u postavkama ili instalirajte ZygiskNext (ili kompatibilnog pružatelja) za Zygisk module. MagiskHide/SuList rade bez Zygiska.</string>
+    <string name="zygisk_provider_disabled">Zygisk pružatelj je instaliran, ali onemogućen.</string>
+    <string name="zygisk_provider_not_injected">Zygisk pružatelj instaliran; ubrizgavanje nije otkriveno.</string>
+    <string name="settings_material_you">Dinamičke boje</string>
+    <string name="settings_material_you_summary">Koristite boje koje pruža vaš uređaj</string>
+    <string name="forever">Zauvijek</string>
+    <string name="once">Jednom</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_warning">Daje puni pristup vašem uređaju.\nOdbijte ako niste sigurni!</string>
+    <string name="touch_filtered_warning">Budući da aplikacija skriva zahtjev za Superuser, Magisk ne može potvrditi vaš odgovor.</string>
+    <string name="superuser_grant">Odobri Superuser</string>
+    <string name="su_legacy_cmd">Upozorenje: otkrivena je nepodržana naredbena linija</string>
 </resources>

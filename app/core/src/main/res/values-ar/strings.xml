@@ -16,13 +16,14 @@
     <string name="loading">جارٍ التحميل…</string>
     <string name="update">تحديث</string>
     <string name="not_available">غير متاح</string>
+    <string name="not_installed">غير مثبت</string>
     <string name="hide">إخفاء</string>    <string name="home_package">الحزمة</string>
     <string name="home_app_title">التطبيق</string>    <string name="reinstall">إعادة التثبيت</string>
-    <string name="home_notice_content">قم بتنزيل Magisk من صفحة GitHub الرسمية فقط. الملفات من مصادر مجهولة قد تكون ضارة!</string>
-    <string name="home_support_title">ادعمنا</string>
+    <string name="home_notice_content">نسخة غير مُصانة بنشاط من Magisk. إذا دفعت مقابل هذا التطبيق فقد تعرضت للاحتيال: فهو مجاني ومفتوح المصدر. نسخة تجريبية تُقدَّم كما هي، دون أي ضمان؛ استخدمها على مسؤوليتك.</string>
+    <string name="home_support_title">ادعم المؤلفين الأصليين</string>
     <string name="home_follow_title">تابعنا</string>
     <string name="home_item_source">المصدر</string>
-    <string name="home_support_content">Magisk مجاني ومفتوح المصدر، وسيظل كذلك دائمًا. غير أنك تستطيع التعبير عن اهتمامك بالتبرع.</string>    <string name="home_installed_version">المثبّت</string>
+    <string name="home_support_content">Magisk مجاني ومفتوح المصدر، وسيظل كذلك دائمًا. هذه نسخة من Magisk ولن تتلقى دعمًا نشطًا. غير أنك تستطيع التعبير عن اهتمامك بالتبرع إلى المؤلفين الأصليين لـ Magisk.</string>    <string name="home_installed_version">المثبّت</string>
     <string name="home_latest_version">الأحدث</string>
     <string name="invalid_update_channel">قناة التحديث غير صالحة</string>    <string name="uninstall_magisk_title">إلغاء تثبيت Magisk</string>
     <string name="uninstall_magisk_msg">سيتم تعطيل/إزالة جميع الإضافات!\nسيتم إزالة الوصول الجذري!\nسيتم إعادة تشفير أي تخزين داخلي تم فك تشفيره باستخدام Magisk!</string>
@@ -83,6 +84,8 @@
     <string name="menuSaveLog">حفظ السجل</string>
     <string name="menuClearLog">مسح السجل الآن</string>
     <string name="logs_cleared">تم مسح السجل بنجاح</string>    <string name="back">رجوع</string>    <string name="enabled">مفعّل</string>
+    <string name="provided">مقدَّم</string>
+    <string name="yes_provided">نعم (مقدَّم)</string>
     <string name="disabled">معطّل</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID المستهدف: %1$d</string>
@@ -95,6 +98,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">إظهار تطبيقات النظام</string>
     <string name="show_os_app">إظهار تطبيقات نظام التشغيل</string>
+    <string name="add_recommended">إضافة التطبيقات الموصى بها</string>
     <string name="hide_filter_hint">البحث بالاسم</string>
     <string name="sort_by_name">ترتيب حسب الاسم</string>
     <string name="sort_by_package_name">ترتيب حسب اسم الحزمة</string>
@@ -118,8 +122,6 @@
     <string name="module_state_restore">استعادة</string>
     <string name="module_action_install_external">تثبيت من التخزين</string>
     <string name="update_available">يتوفر تحديث</string>
-    <string name="suspend_text_riru">الإضافة معلّقة لأن %1$s مفعّل</string>
-    <string name="suspend_text_zygisk">الإضافة معلّقة لأن %1$s غير مفعّل</string>
     <string name="zygisk_module_unloaded">لم يتم تحميل إضافة Zygisk بسبب عدم التوافق</string>
     <string name="module_empty">لا توجد إضافات مثبّتة</string>
     <string name="confirm_install">تثبيت الإضافة %1$s؟</string>
@@ -140,7 +142,7 @@
     <string name="settings_update_channel_title">قناة التحديث</string>
     <string name="settings_update_stable">مستقر</string>
     <string name="settings_update_beta">تجريبي</string>
-    <string name="settings_update_debug">تصحيح أخطاء</string>
+    <string name="settings_update_canary">Canary</string>
     <string name="settings_update_custom">مخصص</string>
     <string name="settings_update_custom_msg">أدخل رابط قناة مخصصة</string>
     <string name="settings_zygisk_summary">تشغيل أجزاء من Magisk داخل عملية Zygote</string>
@@ -229,4 +231,63 @@
     <string name="install_unknown_denied">اسمح بـ«تثبيت تطبيقات غير معروفة» لتفعيل هذه الميزة</string>
     <string name="app_not_found">لا يوجد تطبيق للتعامل مع هذا الإجراء</string>
     <string name="reboot_apply_change">أعد التشغيل لتطبيق التغييرات</string>
+    <string name="auto_response">الاستجابة التلقائية</string>
+    <string name="download_patch_file">تنزيل ملف وتعديله</string>
+    <string name="patch_file_msg">حدد ملف خام (‎*.img) أو ملف ODIN tar (‎*.tar) أو ملف payload.bin (‎*.bin)</string>
+    <string name="prompt">اسأل</string>
+    <string name="request_timeout">مهلة الطلب</string>
+    <string name="restore_app_confirmation">سيتم استعادة التطبيق المخفي إلى حالته الأصلية. هل أنت متأكد؟</string>
+    <string name="select_patch_file">تحديد ملف وتصحيحه</string>
+    <string name="settings_app_name_error">صيغة غير صالحة</string>
+    <string name="settings_app_name_helper">سيتم إعادة تعبئة التطبيق بهذا الاسم</string>
+    <string name="settings_app_name_hint">الاسم الجديد</string>
+    <string name="settings_hide_app_summary">تثبيت تطبيق وسيط برقم حزمة عشوائي واسم مخصص</string>
+    <string name="settings_hide_app_title">إخفاء تطبيق Magisk</string>
+    <string name="settings_restore_app_summary">إظهار التطبيق واستعادة ملف APK الأصلي</string>
+    <string name="settings_restore_app_title">استعادة تطبيق Magisk</string>
+    <string name="settings_su_adb">ADB فقط</string>
+    <string name="settings_su_app">التطبيقات فقط</string>
+    <string name="settings_su_app_adb">التطبيقات و ADB</string>
+    <string name="settings_su_disable">معطّل</string>
+    <string name="settings_su_reauth_summary">طلب صلاحيات صلاحية الروت مجددًا بعد ترقية التطبيقات</string>
+    <string name="settings_su_reauth_title">إعادة المصادقة بعد الترقية</string>
+    <string name="settings_su_request_10">10 ثوانٍ</string>
+    <string name="settings_su_request_15">15 ثانية</string>
+    <string name="settings_su_request_20">20 ثانية</string>
+    <string name="settings_su_request_30">30 ثانية</string>
+    <string name="settings_su_request_45">45 ثانية</string>
+    <string name="settings_su_request_60">60 ثانية</string>
+    <string name="settings_su_tapjack_summary">لن يستجيب مربع حوار طلب صلاحية الروت للمدخلات إذا كان محجوبًا بأي نافذة أو طبقة عرض أخرى</string>
+    <string name="settings_su_tapjack_title">الحماية من اختطاف النقرات</string>
+    <string name="su_request_title">يطلب هذا التطبيق صلاحية الروت، يمنح وصولًا كاملًا إلى جهازك. ارفض إن لم تكن متأكدًا!</string>
+    <string name="superuser_access">صلاحية الروت</string>
+    <string name="tanuki_notice">بناء غير رسمي من fork Tanuki</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">لا يمكن تعطيل MagiskHide أثناء تفعيل SuList.</string>
+    <string name="settings_magiskhide_summary">تُلغى تعديلات Magisk للعمليات الموجودة في hidelist</string>
+    <string name="settings_hidelist_config_title">إعداد HideList</string>
+    <string name="settings_hidelist_config_summary">اختر العمليات التي ستُضاف إلى hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">تفعيل SuList</string>
+    <string name="settings_sulist_summary">فقط العمليات الموجودة في sulist يمكنها الحصول على صلاحيات root من Magisk</string>
+    <string name="settings_sulist_config_title">إعداد SuList</string>
+    <string name="settings_sulist_config_summary">اختر العمليات التي ستُضاف إلى sulist</string>
+    <string name="settings_sulist_enforced">SuList مفعّلة</string>
+    <string name="settings_sulist_error_magiskhide">هذه الميزة تحتاج إلى تفعيل MagiskHide</string>
+    <string name="sulist_empty_warning">SuList هي قائمة بيضاء للـ root: فقط التطبيقات الموجودة في القائمة يمكنها الحصول على root من Magisk. المدير ومكونات النظام معفاة دائمًا.</string>
+    <string name="zygisk_provider_missing">لا يوجد مزوّد Zygisk مثبّت. فعّل Zygisk المدمج من الإعدادات، أو ثبّت ZygiskNext (أو مزوّدًا متوافقًا) لوحدات Zygisk. يعمل MagiskHide/SuList بدون Zygisk.</string>
+    <string name="zygisk_provider_disabled">يوجد مزوّد Zygisk مثبّت لكنه معطّل.</string>
+    <string name="zygisk_provider_not_injected">مزوّد Zygisk مثبّت؛ لم يتم اكتشاف الحقن.</string>
+    <string name="settings_material_you">ألوان ديناميكية</string>
+    <string name="settings_material_you_summary">تكييف الألوان مع خلفية الشاشة</string>
+    <string name="forever">دائمًا</string>
+    <string name="once">مرة واحدة</string>
+    <string name="tenmin">10 دقائق</string>
+    <string name="twentymin">20 دقيقة</string>
+    <string name="thirtymin">30 دقيقة</string>
+    <string name="sixtymin">60 دقيقة</string>
+    <string name="su_warning">يمنح وصولاً كاملاً إلى جهازك.\nارفض إذا لم تكن متأكدًا!</string>
+    <string name="touch_filtered_warning">لأن تطبيقًا يحجب طلب Superuser، لا يمكن لـ Magisk التحقق من ردك.</string>
+    <string name="superuser_grant">منح صلاحية Superuser</string>
+    <string name="su_legacy_cmd">تحذير: تم اكتشاف سطر أوامر غير مدعوم</string>
 </resources>

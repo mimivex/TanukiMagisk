@@ -1,0 +1,19 @@
+# example.rc — injected into init.rc at boot, comments only.
+#
+# Every *.rc file under early-mount/initrc.d/ is read by magiskinit from
+# the preinit partition and appended to the patched init.rc, so init
+# parses it like a built-in rc file. ${MAGISKTMP} is replaced with the
+# Magisk tmp directory before injection.
+#
+# A syntax error here can break the boot: test with Safe Mode at hand.
+#
+# Example service definition:
+#
+# service example_tanuki /system/bin/true
+#     class late_start
+#     user root
+#     group root
+#     oneshot
+#
+# on property:sys.boot_completed=1
+#     start example_tanuki

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig.APP_VERSION_CODE
+import com.topjohnwu.magisk.core.BuildConfig.APP_VERSION_NAME
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.repository.FirmwareCrawler
@@ -56,11 +57,11 @@ class InstallViewModel(
         }
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val noteFile = File(AppContext.cacheDir, "${APP_VERSION_CODE}.md")
+                val noteFile = File(AppContext.cacheDir, "${APP_VERSION_NAME}.md")
                 val noteText = when {
                     noteFile.exists() -> noteFile.readText()
                     else -> {
-                        val note = svc.fetchUpdate(APP_VERSION_CODE)?.note.orEmpty()
+                        val note = svc.fetchUpdate(APP_VERSION_CODE, APP_VERSION_NAME)?.note.orEmpty()
                         if (note.isEmpty()) return@launch
                         noteFile.writeText(note)
                         note

@@ -1,22 +1,35 @@
 use crate::daemon::{
-    AID_APP_END, AID_APP_START, AID_ROOT, MagiskD, to_app_id, to_user_id,
+    AID_APP_END, AID_APP_START, AID_ROOT, AID_SHELL, MagiskD, to_app_id, to_user_id,
 };
 use crate::db::DbArg::Integer;
-use crate::db::{MultiuserMode, SqlTable, SqliteResult, SqliteReturn};
+use crate::db::{MultiuserMode, RootAccess, SqlTable, SqliteResult, SqliteReturn};
 use crate::ffi::{DbValues, SuPolicy};
 use base::ResultExt;
+use std::sync::Arc;
+
+use super::SuInfo;
 
 impl Default for SuPolicy {
     fn default() -> Self {
-        SuPolicy::Deny
+        SuPolicy::Query
     }
 }
 
-#[derive(Copy, Clone, Default)]
+#[derive(Copy, Clone)]
 pub struct RootSettings {
     pub policy: SuPolicy,
     pub log: bool,
     pub notify: bool,
+}
+
+impl Default for RootSettings {
+    fn default() -> Self {
+        RootSettings {
+            policy: SuPolicy::Query,
+            log: true,
+            notify: true,
+        }
+    }
 }
 
 impl SqlTable for RootSettings {
@@ -53,6 +66,9 @@ impl MagiskD {
     }
 
     pub fn prune_su_access(&self) {
+        // K27 parity: pruning can change the answer for the cached uid, so
+        // drop the cache before it is rebuilt.
+        self.cached_su_info.store(Arc::new(SuInfo::default()));
         let mut list = UidList(Vec::new());
         if self
             .db_exec_with_rows("SELECT uid FROM policies", &[], &mut list)
@@ -91,6 +107,14 @@ impl MagiskD {
             Ok(cfg) => cfg,
             Err(_) => return false,
         };
+
+        // Check user root access settings
+        match cfg.root_access {
+            RootAccess::Disabled => return false,
+            RootAccess::AppsOnly if uid == AID_SHELL => return false,
+            RootAccess::AdbOnly if uid != AID_SHELL => return false,
+            _ => {}
+        }
 
         // Check multiuser settings
         match cfg.multiuser_mode {

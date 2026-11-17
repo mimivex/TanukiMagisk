@@ -11,6 +11,8 @@
 umask 022
 
 OUTFD=$2
+# The release APK doubles as the flashable zip; $3 is the zip path
+ZIPFILE=$3
 COMMONDIR=$INSTALLER/assets
 
 if [ ! -f $COMMONDIR/util_functions.sh ]; then
@@ -65,6 +67,11 @@ $BOOTMODE || remove_system_su
 
 ui_print "- Constructing environment"
 
+# Keep the hidden manager stash and its install imprint across the wipe:
+# without them a Ripristina from the hidden copy has nothing to reinstall
+[ -f $MAGISKBIN/manager.apk ] && cp -af $MAGISKBIN/manager.apk $TMPDIR/manager.apk 2>/dev/null
+[ -f $MAGISKBIN/manager.imprint ] && cp -af $MAGISKBIN/manager.imprint $TMPDIR/manager.imprint 2>/dev/null
+
 # Copy required files
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN 2>/dev/null
@@ -75,6 +82,22 @@ rm -f $MAGISKBIN/bootctl $MAGISKBIN/main.jar \
   $MAGISKBIN/module_installer.sh $MAGISKBIN/uninstaller.sh
 
 chmod -R 755 $MAGISKBIN
+
+# When flashing the release APK, keep a copy so magiskd can install the full
+# manager offline on first boot instead of the network-dependent stub
+if [ -n "$ZIPFILE" ] && [ -f "$ZIPFILE" ] && \
+    $BBBIN unzip -l "$ZIPFILE" AndroidManifest.xml >/dev/null 2>&1; then
+  ui_print "- Bundling manager APK"
+  cp -af "$ZIPFILE" "$MAGISKBIN/manager.apk"
+  chmod 755 "$MAGISKBIN/manager.apk"
+# A Direct Install has no zip: restore the pair saved above. The zip branch
+# drops the imprint on purpose (the bundled APK is a new file; magiskd
+# rewrites the imprint after its next successful install).
+elif [ -f "$TMPDIR/manager.apk" ]; then
+  cp -af $TMPDIR/manager.apk $MAGISKBIN/manager.apk
+  chmod 755 $MAGISKBIN/manager.apk
+  [ -f $TMPDIR/manager.imprint ] && cp -af $TMPDIR/manager.imprint $MAGISKBIN/manager.imprint
+fi
 
 # addon.d
 if [ -d /system/addon.d ]; then

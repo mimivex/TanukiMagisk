@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <cstring>
 #include <sys/wait.h>
 
 #include <consts.hpp>
@@ -230,6 +231,40 @@ void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_lis
     }
 
     PFS_DONE()
+}
+
+constexpr char install_script[] = R"EOF(
+APK=%s
+MAGISK=%s/magisk
+BUNDLED=%d
+log -t Magisk "pm_install: $APK"
+OUT=$(pm install -g -r -d $APK 2>&1)
+RES=$?
+log -t Magisk "pm_install: $OUT"
+if [ $RES -eq 0 ]; then
+  if [ "$BUNDLED" = "1" ]; then
+    # The bundled APK is kept for the next boots, so remember which copy
+    # was installed and skip reinstalling it every time.
+    printf '%%s' "$(stat -c '%%s:%%Y' "$APK")" > /data/adb/magisk/manager.imprint
+  else
+    # Temporary stub copy: drop it once installed.
+    rm -f $APK
+  fi
+  appops set %s REQUEST_INSTALL_PACKAGES allow
+  if [ -x $MAGISK ]; then
+    ( $MAGISK magiskhide sulist && $MAGISK magiskhide add %s ) &
+  fi
+fi
+)EOF";
+
+void install_apk(Utf8CStr apk) {
+    setfilecon(apk.c_str(), MAGISK_FILE_CON);
+    bool bundled = strcmp(apk.c_str(), DATABIN "/manager.apk") == 0;
+    char cmds[sizeof(install_script) + 4096];
+    ssprintf(cmds, sizeof(cmds), install_script,
+             apk.c_str(), get_magisk_tmp(), bundled ? 1 : 0,
+             JAVA_PACKAGE_NAME, JAVA_PACKAGE_NAME);
+    exec_command_async("/system/bin/sh", "-c", cmds);
 }
 
 constexpr char uninstall_script[] = R"EOF(

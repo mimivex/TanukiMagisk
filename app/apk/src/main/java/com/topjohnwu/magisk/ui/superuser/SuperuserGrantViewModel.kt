@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.R as CoreR
 import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.ktx.concurrentMap
 import com.topjohnwu.magisk.core.ktx.getLabel
@@ -159,7 +160,9 @@ class SuperuserGrantViewModel(
                     withContext(Dispatchers.IO) {
                         if (willGrant) {
                             val existing = policyDB.fetch(uid)
-                            val suPolicy = existing ?: SuPolicy(uid)
+                            // A grant made here is permanent (remain = 0);
+                            // a fetched row keeps its deadline
+                            val suPolicy = existing ?: SuPolicy(uid, remain = 0L)
                             suPolicy.policy = if (Config.suRestrict) SuPolicy.RESTRICT else SuPolicy.ALLOW
                             policyDB.update(suPolicy)
                         } else {
@@ -189,14 +192,20 @@ class SuperuserGrantViewModel(
     override suspend fun doLoadWork() {
         if (_allApps.value.isNotEmpty()) return
         _loading.value = true
+        // A failed read is not an empty policy set
+        val fetched = withContext(Dispatchers.IO) {
+            policyDB.deleteOutdated()
+            policyDB.fetchAll()
+        }
+        if (fetched == null) {
+            Timber.w("Policy read failed; keeping the previous app list")
+            showToast(CoreR.string.no_connection)
+            _loading.value = false
+            return
+        }
+        val policies = fetched.associateBy { it.uid }
         val apps = withContext(Dispatchers.Default) {
             val pm = AppContext.packageManager
-            withContext(Dispatchers.IO) {
-                policyDB.deleteOutdated()
-            }
-            val policies = withContext(Dispatchers.IO) {
-                policyDB.fetchAll()
-            }.associateBy { it.uid }
 
             val myUid = AppContext.applicationInfo.uid
             val myPackage = AppContext.packageName

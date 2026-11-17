@@ -77,7 +77,9 @@ class JobService : BaseJobService() {
     private fun checkUpdate(params: JobParameters): Boolean {
         GlobalScope.launch(Dispatchers.IO) {
             Info.fetchUpdate(ServiceLocator.networkService)?.let {
-                if (Info.env.isActive && BuildConfig.APP_VERSION_CODE < it.versionCode)
+                if (Info.env.isActive && isOlderVersion(
+                        BuildConfig.APP_VERSION_CODE, BuildConfig.APP_VERSION_NAME,
+                        it.versionCode, it.version))
                     Notifications.updateAvailable()
                 jobFinished(params, false)
             }

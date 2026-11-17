@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.core.repository
 
 import com.topjohnwu.magisk.core.data.magiskdb.SettingsDao
+import com.topjohnwu.magisk.core.data.magiskdb.StringDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -9,6 +10,7 @@ import kotlin.reflect.KProperty
 
 interface DBConfig {
     val settingsDB: SettingsDao
+    val stringDB: StringDao
     val coroutineScope: CoroutineScope
 
     fun dbSettings(
@@ -20,6 +22,12 @@ interface DBConfig {
         name: String,
         default: Boolean
     ) = BoolDBProperty(name, default)
+
+    fun dbStrings(
+        name: String,
+        default: String,
+        sync: Boolean = false
+    ) = StringDBProperty(name, default, sync)
 }
 
 class IntDBProperty(
@@ -31,8 +39,13 @@ class IntDBProperty(
 
     @Synchronized
     override fun getValue(thisRef: DBConfig, property: KProperty<*>): Int {
-        if (value == null)
-            value = runBlocking { thisRef.settingsDB.fetch(name, default) }
+        if (value == null) {
+            val fetched = runBlocking { thisRef.settingsDB.fetch(name, default) }
+            // Never cache a failed read, or the degraded state would stick
+            // for the life of the process.
+            if (fetched == null) return default
+            value = fetched
+        }
         return value as Int
     }
 
@@ -58,4 +71,37 @@ open class BoolDBProperty(
 
     override fun setValue(thisRef: DBConfig, property: KProperty<*>, value: Boolean) =
         base.setValue(thisRef, property, if (value) 1 else 0)
+}
+
+class StringDBProperty(
+    private val name: String,
+    private val default: String,
+    private val sync: Boolean
+) : ReadWriteProperty<DBConfig, String> {
+
+    private var value: String? = null
+
+    @Synchronized
+    override fun getValue(thisRef: DBConfig, property: KProperty<*>): String {
+        if (value == null)
+            value = runBlocking { thisRef.stringDB.fetch(name, default) }
+        return value!!
+    }
+
+    override fun setValue(thisRef: DBConfig, property: KProperty<*>, value: String) {
+        synchronized(this) {
+            this.value = value
+        }
+        if (sync) {
+            runBlocking {
+                if (value.isEmpty()) thisRef.stringDB.delete(name)
+                else thisRef.stringDB.put(name, value)
+            }
+        } else {
+            thisRef.coroutineScope.launch {
+                if (value.isEmpty()) thisRef.stringDB.delete(name)
+                else thisRef.stringDB.put(name, value)
+            }
+        }
+    }
 }

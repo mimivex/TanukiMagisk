@@ -1,0 +1,8 @@
+# sepolicy.rule — SELinux rules applied at boot by the Tanuki engine
+# (magiskinit time), one statement per line. Lines starting with '#' are
+# skipped. An empty file is removed by tanuki.sh and never installed.
+#
+# Reference: https://topjohnwu.github.io/Magisk/guides.html
+#
+# Example: allow the module's own service domain to read a directory
+# allow my_domain my_file_type:dir { open read search };

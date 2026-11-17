@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
@@ -14,93 +13,172 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.android.material.color.utilities.DynamicColor
-import com.google.android.material.color.utilities.Hct
-import com.google.android.material.color.utilities.MaterialDynamicColors
-import com.google.android.material.color.utilities.SchemeTonalSpot
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.model.ColorMode
+import kotlin.math.abs
 
-@SuppressLint("RestrictedApi")
-fun dynamicColorScheme(
-    seed: Color,
-    isDark: Boolean,
-    contrastLevel: Double = 0.0
-): ColorScheme {
-    val scheme = SchemeTonalSpot(Hct.fromInt(seed.toArgb()), isDark, contrastLevel)
-    val dyn = MaterialDynamicColors()
-    fun DynamicColor.toColor() = Color(getArgb(scheme))
+// The "Golden Earth" palette: six anchors (golden yellow #EAB308,
+// ochre #B8942A, bronze #857239, earth brown #524A33, dark umber
+// #33312A, warm cream #F5F0E6) mapped onto the Material 3 roles. Gold
+// cannot carry white text, so onPrimary is the dark umber in both modes;
+// the cream is the light background, the umber families the dark one.
+private val TanukiLight = lightColorScheme(
+    primary = Color(0xFFEAB308),
+    onPrimary = Color(0xFF33312A),
+    primaryContainer = Color(0xFFFFE08A),
+    onPrimaryContainer = Color(0xFF33312A),
+    inversePrimary = Color(0xFFB8942A),
+    secondary = Color(0xFF857239),
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = Color(0xFFE9D9B0),
+    onSecondaryContainer = Color(0xFF33312A),
+    tertiary = Color(0xFFB8942A),
+    onTertiary = Color(0xFF33312A),
+    tertiaryContainer = Color(0xFFE9D9B0),
+    onTertiaryContainer = Color(0xFF33312A),
+    background = Color(0xFFF5F0E6),
+    onBackground = Color(0xFF33312A),
+    surface = Color(0xFFF5F0E6),
+    onSurface = Color(0xFF33312A),
+    surfaceVariant = Color(0xFFE8E0D2),
+    onSurfaceVariant = Color(0xFF524A33),
+    surfaceTint = Color(0xFFEAB308),
+    inverseSurface = Color(0xFF33312A),
+    inverseOnSurface = Color(0xFFF5F0E6),
+    error = Color(0xFFBA1A1A),
+    onError = Color(0xFFFFFFFF),
+    errorContainer = Color(0xFFFFDAD6),
+    onErrorContainer = Color(0xFF410002),
+    outline = Color(0xFF857239),
+    outlineVariant = Color(0xFFD1C7B7),
+    scrim = Color(0xFF000000),
+    surfaceBright = Color(0xFFFFFAF1),
+    surfaceDim = Color(0xFFE2D9C9),
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    surfaceContainerLow = Color(0xFFF0E9DC),
+    surfaceContainer = Color(0xFFEAE2D4),
+    surfaceContainerHigh = Color(0xFFE4DCCD),
+    surfaceContainerHighest = Color(0xFFDED5C6),
+)
 
-    return ColorScheme(
-        primary = dyn.primary().toColor(),
-        onPrimary = dyn.onPrimary().toColor(),
-        primaryContainer = dyn.primaryContainer().toColor(),
-        onPrimaryContainer = dyn.onPrimaryContainer().toColor(),
-        inversePrimary = dyn.inversePrimary().toColor(),
-        secondary = dyn.secondary().toColor(),
-        onSecondary = dyn.onSecondary().toColor(),
-        secondaryContainer = dyn.secondaryContainer().toColor(),
-        onSecondaryContainer = dyn.onSecondaryContainer().toColor(),
-        tertiary = dyn.tertiary().toColor(),
-        onTertiary = dyn.onTertiary().toColor(),
-        tertiaryContainer = dyn.tertiaryContainer().toColor(),
-        onTertiaryContainer = dyn.onTertiaryContainer().toColor(),
-        background = dyn.background().toColor(),
-        onBackground = dyn.onBackground().toColor(),
-        surface = dyn.surface().toColor(),
-        onSurface = dyn.onSurface().toColor(),
-        surfaceVariant = dyn.surfaceVariant().toColor(),
-        onSurfaceVariant = dyn.onSurfaceVariant().toColor(),
-        surfaceTint = dyn.surfaceTint().toColor(),
-        inverseSurface = dyn.inverseSurface().toColor(),
-        inverseOnSurface = dyn.inverseOnSurface().toColor(),
-        error = dyn.error().toColor(),
-        onError = dyn.onError().toColor(),
-        errorContainer = dyn.errorContainer().toColor(),
-        onErrorContainer = dyn.onErrorContainer().toColor(),
-        outline = dyn.outline().toColor(),
-        outlineVariant = dyn.outlineVariant().toColor(),
-        scrim = dyn.scrim().toColor(),
-        surfaceBright = dyn.surfaceBright().toColor(),
-        surfaceDim = dyn.surfaceDim().toColor(),
-        surfaceContainer = dyn.surfaceContainer().toColor(),
-        surfaceContainerHigh = dyn.surfaceContainerHigh().toColor(),
-        surfaceContainerHighest = dyn.surfaceContainerHighest().toColor(),
-        surfaceContainerLow = dyn.surfaceContainerLow().toColor(),
-        surfaceContainerLowest = dyn.surfaceContainerLowest().toColor(),
-        primaryFixed = dyn.primaryFixed().toColor(),
-        primaryFixedDim = dyn.primaryFixedDim().toColor(),
-        onPrimaryFixed = dyn.onPrimaryFixed().toColor(),
-        onPrimaryFixedVariant = dyn.onPrimaryFixedVariant().toColor(),
-        secondaryFixed = dyn.secondaryFixed().toColor(),
-        secondaryFixedDim = dyn.secondaryFixedDim().toColor(),
-        onSecondaryFixed = dyn.onSecondaryFixed().toColor(),
-        onSecondaryFixedVariant = dyn.onSecondaryFixedVariant().toColor(),
-        tertiaryFixed = dyn.tertiaryFixed().toColor(),
-        tertiaryFixedDim = dyn.tertiaryFixedDim().toColor(),
-        onTertiaryFixed = dyn.onTertiaryFixed().toColor(),
-        onTertiaryFixedVariant = dyn.onTertiaryFixedVariant().toColor(),
-    )
-}
+private val TanukiDark = darkColorScheme(
+    primary = Color(0xFFEAB308),
+    onPrimary = Color(0xFF33312A),
+    primaryContainer = Color(0xFF5B4300),
+    onPrimaryContainer = Color(0xFFFFE08A),
+    inversePrimary = Color(0xFFB8942A),
+    secondary = Color(0xFFB8942A),
+    onSecondary = Color(0xFF33312A),
+    secondaryContainer = Color(0xFF524A33),
+    onSecondaryContainer = Color(0xFFF5F0E6),
+    tertiary = Color(0xFFB8942A),
+    onTertiary = Color(0xFF33312A),
+    tertiaryContainer = Color(0xFF524A33),
+    onTertiaryContainer = Color(0xFFF5F0E6),
+    background = Color(0xFF33312A),
+    onBackground = Color(0xFFF5F0E6),
+    surface = Color(0xFF33312A),
+    onSurface = Color(0xFFF5F0E6),
+    surfaceVariant = Color(0xFF524A33),
+    onSurfaceVariant = Color(0xFFE4DCCD),
+    surfaceTint = Color(0xFFEAB308),
+    inverseSurface = Color(0xFFF5F0E6),
+    inverseOnSurface = Color(0xFF33312A),
+    error = Color(0xFFFFB4AB),
+    onError = Color(0xFF690005),
+    errorContainer = Color(0xFF93000A),
+    onErrorContainer = Color(0xFFFFDAD6),
+    outline = Color(0xFFB8942A),
+    outlineVariant = Color(0xFF524A33),
+    scrim = Color(0xFF000000),
+    surfaceBright = Color(0xFF504E46),
+    surfaceDim = Color(0xFF2A2821),
+    surfaceContainerLowest = Color(0xFF28261F),
+    surfaceContainerLow = Color(0xFF393730),
+    surfaceContainer = Color(0xFF403E36),
+    surfaceContainerHigh = Color(0xFF44423B),
+    surfaceContainerHighest = Color(0xFF4B4942),
+)
 
-val MagiskAccentColor = Color(0xFF00AF9C)
+// Module Remove/Restore button: colorRemove maps to ?colorSecondary, so
+// the static themes use secondary/onSecondary (#857239/#FFFFFF 4.70:1
+// light, #B8942A/#33312A 4.53:1 dark, both AA). Material You shifts one
+// tone off its secondaryContainer. The Module tab replaces the dark
+// static pair with the container pair in moduleRemoveColors.
+private val AlertMyShift = 0.15f
+
+private fun shiftTone(base: Color, shift: Float): Color =
+    lerp(base, if (shift >= 0) Color.White else Color.Black, abs(shift).coerceIn(0f, 1f))
+
+fun removeColors(colorScheme: ColorScheme, isDarkTheme: Boolean): Pair<Color, Color> =
+    if (ThemeState.isDynamicActive)
+        shiftTone(colorScheme.secondaryContainer, if (isDarkTheme) AlertMyShift else -AlertMyShift) to colorScheme.onSecondaryContainer
+    else colorScheme.secondary to colorScheme.onSecondary
+
+// Tonal buttons (Action/WebUI, Patreon/PayPal, Reinstall):
+// the secondaryContainer role pair.
+fun actionColors(colorScheme: ColorScheme, isDarkTheme: Boolean): Pair<Color, Color> =
+    colorScheme.secondaryContainer to colorScheme.onSecondaryContainer
+
+// The module tab flips these two pairs when dynamic color is off and the
+// theme is dark: Action/WebUI take the golden secondary pair, and
+// Remove/Restore take the container pair. Dynamic color and light mode
+// keep the shared defaults.
+fun moduleActionColors(colorScheme: ColorScheme, isDarkTheme: Boolean): Pair<Color, Color> =
+    if (isDarkTheme && !ThemeState.dynamicColor)
+        colorScheme.secondary to colorScheme.onSecondary
+    else actionColors(colorScheme, isDarkTheme)
+
+// The other half of the swap above: Remove/Restore take the
+// secondaryContainer pair in the dark static theme.
+fun moduleRemoveColors(colorScheme: ColorScheme, isDarkTheme: Boolean): Pair<Color, Color> =
+    if (isDarkTheme && !ThemeState.dynamicColor)
+        colorScheme.secondaryContainer to colorScheme.onSecondaryContainer
+    else removeColors(colorScheme, isDarkTheme)
+
+// The module Update button and the Home notice card:
+// the tertiaryContainer role pair.
+fun updateColors(colorScheme: ColorScheme, isDarkTheme: Boolean): Pair<Color, Color> =
+    colorScheme.tertiaryContainer to colorScheme.onTertiaryContainer
+
+// The (+) FABs: the primaryContainer role pair.
+fun fabColors(colorScheme: ColorScheme, isDarkTheme: Boolean): Pair<Color, Color> =
+    colorScheme.primaryContainer to colorScheme.onPrimaryContainer
+
+// The granted/denied badges of the root-access log tab: the
+// primaryContainer / errorContainer role pairs.
+fun badgeColors(
+    colorScheme: ColorScheme,
+    isDarkTheme: Boolean,
+    allowed: Boolean
+): Pair<Color, Color> =
+    if (allowed) {
+        colorScheme.primaryContainer to colorScheme.onPrimaryContainer
+    } else {
+        colorScheme.errorContainer to colorScheme.onErrorContainer
+    }
 
 object ThemeState {
     var colorMode by mutableIntStateOf(Config.colorMode)
+    var dynamicColor by mutableStateOf(Config.dynamicColor)
+    val isDynamicActive get() = dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 }
 
 // Same values as androidx.activity's internal DefaultLightScrim / DefaultDarkScrim
@@ -207,22 +285,19 @@ val MagiskTypography = Typography(
     ),
 )
 
+@Suppress("DEPRECATION")
 @Composable
 fun MagiskTheme(
     content: @Composable () -> Unit
 ) {
-    val isDark = isSystemInDarkTheme()
     val mode = ColorMode.fromValue(ThemeState.colorMode)
-    val context = LocalContext.current
-
-    val isDarkTheme = mode.isDark(isDark)
-    val useDynamicColor = mode.isMonet && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val isDarkTheme = mode.isDark(isSystemInDarkTheme())
 
     val colorScheme = when {
-        useDynamicColor && isDarkTheme -> dynamicDarkColorScheme(context)
-        useDynamicColor && !isDarkTheme -> dynamicLightColorScheme(context)
-        isDarkTheme -> dynamicColorScheme(MagiskAccentColor, isDark = true)
-        else -> dynamicColorScheme(MagiskAccentColor, isDark = false)
+        ThemeState.isDynamicActive && isDarkTheme -> dynamicDarkColorScheme(LocalContext.current)
+        ThemeState.isDynamicActive -> dynamicLightColorScheme(LocalContext.current)
+        isDarkTheme -> TanukiDark
+        else -> TanukiLight
     }
 
     val activity = LocalActivity.current as? ComponentActivity

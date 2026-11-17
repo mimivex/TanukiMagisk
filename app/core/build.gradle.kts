@@ -20,7 +20,7 @@ android {
     namespace = "com.topjohnwu.magisk.core"
 
     defaultConfig {
-        buildConfigField("String", "APP_PACKAGE_NAME", "\"com.topjohnwu.magisk\"")
+        buildConfigField("String", "APP_PACKAGE_NAME", "\"io.github.mimivex.tanuki\"")
         buildConfigField("int", "APP_VERSION_CODE", "${Config.versionCode}")
         buildConfigField("String", "APP_VERSION_NAME", "\"${Config.version}\"")
         consumerProguardFile("proguard-rules.pro")
@@ -41,6 +41,7 @@ dependencies {
 
     api(libs.timber)
     api(libs.markwon.core)
+    implementation(libs.bcpkix)
     implementation(libs.commons.compress)
     implementation(libs.xz)
     implementation(libs.wire.runtime)
@@ -48,6 +49,7 @@ dependencies {
     api(libs.libsu.core)
     api(libs.libsu.service)
     api(libs.libsu.nio)
+    implementation(libs.libsu.io)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.moshi)
@@ -64,6 +66,7 @@ dependencies {
     implementation(libs.core.splashscreen)
     implementation(libs.core.ktx)
     implementation(libs.activity)
+    implementation(libs.androidx.webkit)
     implementation(libs.collection.ktx)
     implementation(libs.profileinstaller)
 
@@ -72,4 +75,16 @@ dependencies {
     // That's why we make it compileOnly.
     compileOnly(libs.test.junit)
     compileOnly(libs.test.uiautomator)
+
+    // JVM unit tests
+    testImplementation(libs.junit)
+    // org.json for the JVM tests: the Android stub throws "not mocked"
+    testImplementation(libs.json)
+}
+
+// The real-dex gate needs a built manager APK: -Ptanuki.test.apk=<apk>
+tasks.withType<Test>().configureEach {
+    providers.gradleProperty("tanuki.test.apk").orNull?.let {
+        systemProperty("tanuki.test.apk", File(it).absolutePath)
+    }
 }

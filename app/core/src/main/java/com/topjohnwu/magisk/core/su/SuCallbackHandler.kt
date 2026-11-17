@@ -20,6 +20,7 @@ object SuCallbackHandler {
 
     const val LOG = "log"
     const val NOTIFY = "notify"
+    const val REQUEST = "request"
 
     fun run(context: Context, action: String?, data: Bundle?) {
         data ?: return

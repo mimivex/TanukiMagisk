@@ -4,6 +4,7 @@ import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -76,7 +77,10 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.timeDateFormat
 import com.topjohnwu.magisk.core.ktx.toTime
+import com.topjohnwu.magisk.core.model.ColorMode
 import com.topjohnwu.magisk.core.model.su.SuLog
+import com.topjohnwu.magisk.ui.ThemeState
+import com.topjohnwu.magisk.ui.badgeColors
 import com.topjohnwu.magisk.ui.component.onlyHorizontal
 import com.topjohnwu.magisk.ui.component.rememberExternalStoragePermissionLauncher
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
@@ -397,8 +401,8 @@ private fun SuActionBadge(
     allowed: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val bg = if (allowed) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
-    val fg = if (allowed) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer
+    val isDarkTheme = ColorMode.fromValue(ThemeState.colorMode).isDark(isSystemInDarkTheme())
+    val (bg, fg) = badgeColors(MaterialTheme.colorScheme, isDarkTheme, allowed)
     val text = if (allowed) stringResource(CoreR.string.granted) else stringResource(CoreR.string.denied)
     Badge(
         modifier = modifier,

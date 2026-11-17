@@ -3,7 +3,7 @@
     <!--Sections-->
     <string name="modules">Moduli</string>
     <string name="superuser">Accesso root</string>
-    <string name="logs">Registro eventi</string>
+    <string name="logs">Registro</string>
     <string name="settings">Impostazioni</string>
     <string name="install">Installa</string>
     <string name="section_home">Home</string>
@@ -16,13 +16,14 @@
     <string name="loading">Caricamento…</string>
     <string name="update">Aggiorna</string>
     <string name="not_available">N/D</string>
+    <string name="not_installed">Non installato</string>
     <string name="hide">Nascondi</string>    <string name="home_package">Pacchetto</string>
     <string name="home_app_title">App</string>    <string name="reinstall">Reinstalla</string>
-    <string name="home_notice_content">Scarica Magisk SOLTANTO dalla pagina GitHub ufficiale. I file provenienti da fonti sconosciute possono essere dannosi!</string>
-    <string name="home_support_title">Supportaci</string>
+    <string name="home_notice_content">Questo è un fork di Magisk non mantenuto attivamente. Se hai pagato per questa app, ti hanno truffato: è gratuita e open source. Build sperimentale fornita così com\'è, senza alcuna garanzia; usala a tuo rischio.</string>
+    <string name="home_support_title">Supporta gli autori originali</string>
     <string name="home_follow_title">Seguici</string>
     <string name="home_item_source">Codice sorgente</string>
-    <string name="home_support_content">Magisk è, e sempre sarà, gratuito ed open source. Puoi comunque mostrarci il tuo apprezzamento facendo una donazione.</string>    <string name="home_installed_version">Installata</string>
+    <string name="home_support_content">Magisk è, e sempre sarà, gratuito e open source. Questo è un fork di Magisk che non riceverà supporto attivo. Puoi comunque mostrare il tuo apprezzamento facendo una donazione agli autori originali di Magisk.</string>    <string name="home_installed_version">Installata</string>
     <string name="home_latest_version">Ultima</string>
     <string name="invalid_update_channel">Canale di aggiornamento non valido</string>    <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi!\nIl root verrà rimosso!\nGli spazi di archiviazione interni decriptati tramite l\'uso di Magisk verranno nuovamente criptati!</string>
@@ -83,6 +84,8 @@
     <string name="menuSaveLog">Salva registro eventi</string>
     <string name="menuClearLog">Svuota il registro eventi</string>
     <string name="logs_cleared">Registro eventi svuotato correttamente.</string>    <string name="back">Indietro</string>    <string name="enabled">Abilitato</string>
+    <string name="provided">Fornito</string>
+    <string name="yes_provided">Sì (fornito)</string>
     <string name="disabled">Disabilitato</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
@@ -95,6 +98,7 @@
     <!-- MagiskHide -->
     <string name="show_system_app">Mostra app di sistema</string>
     <string name="show_os_app">Mostra app del sistema operativo</string>
+    <string name="add_recommended">Aggiungi consigliati</string>
     <string name="hide_filter_hint">Filtra per nome</string>
     <string name="sort_by_name">Ordina per nome</string>
     <string name="sort_by_package_name">Ordina per nome pacchetto</string>
@@ -140,7 +144,7 @@
     <string name="settings_update_channel_title">Canale di aggiornamento</string>
     <string name="settings_update_stable">Stabile</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_update_debug">Debug</string>
+    <string name="settings_update_canary">Canary</string>
     <string name="settings_update_custom">Personalizzato</string>
     <string name="settings_update_custom_msg">Inserisci l\'URL del canale personalizzato</string>
     <string name="settings_zygisk_summary">Esegui parti di Magisk nel processo zygote</string>
@@ -231,4 +235,63 @@
     <string name="install_unknown_denied">Consenti l\'installazione di app sconosciute per abilitare questa funzionalità</string>
     <string name="app_not_found">Non è stata trovata un\'app per gestire questa azione</string>
     <string name="reboot_apply_change">Riavvia per applicare le modifiche</string>
+    <string name="auto_response">Azione predefinita</string>
+    <string name="download_patch_file">Scarica e applica una patch a un file</string>
+    <string name="tanuki_notice">Build non ufficiale del fork Tanuki</string>
+    <string name="patch_file_msg">Seleziona un\'immagine in formato .img, un file .tar di ODIN o un file payload.bin</string>
+    <string name="prompt">Chiedi</string>
+    <string name="request_timeout">Timeout richiesta</string>
+    <string name="restore_app_confirmation">L\'app nascosta verrà sostituita con la versione originale. Sei sicuro di voler continuare?</string>
+    <string name="select_patch_file">Seleziona e aggiorna un file</string>
+    <string name="settings_app_name_error">Formato non valido</string>
+    <string name="settings_app_name_helper">L\'app sarà ricreata con questo nome</string>
+    <string name="settings_app_name_hint">Nuovo nome</string>
+    <string name="settings_hide_app_summary">Installa un\'app \"proxy\" con un ID pacchetto casuale e un nome personalizzato</string>
+    <string name="settings_hide_app_title">Nascondi l\'app di Magisk</string>
+    <string name="settings_hidelist_config_summary">Seleziona i processi da includere nella hidelist</string>
+    <string name="settings_hidelist_config_title">Configura HideList</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide non può essere disattivato mentre SuList è attivo.</string>
+    <string name="settings_magiskhide_summary">Le modifiche di Magisk vengono annullate per i processi nella hidelist</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_restore_app_summary">Rendi l\'app nuovamente rilevabile e ripristina l\'APK originale</string>
+    <string name="settings_restore_app_title">Ripristina l\'app di Magisk</string>
+    <string name="settings_su_adb">Solo ADB</string>
+    <string name="settings_su_app">Solo app</string>
+    <string name="settings_su_app_adb">App e ADB</string>
+    <string name="settings_su_disable">Disabilitato</string>
+    <string name="settings_su_reauth_summary">Richiedi nuovamente i permessi di root dopo l\'aggiornamento di un\'app</string>
+    <string name="settings_su_reauth_title">Riautentica dopo aggiornamento</string>
+    <string name="settings_su_request_10">10 secondi</string>
+    <string name="settings_su_request_15">15 secondi</string>
+    <string name="settings_su_request_20">20 secondi</string>
+    <string name="settings_su_request_30">30 secondi</string>
+    <string name="settings_su_request_45">45 secondi</string>
+    <string name="settings_su_request_60">60 secondi</string>
+    <string name="settings_su_tapjack_summary">La schermata di richiesta dei permessi di root non risponderà al tocco mentre è oscurata da altre finestre o elementi in sovraimpressione</string>
+    <string name="settings_su_tapjack_title">Protezione anti-tapjacking</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_config_summary">Seleziona i processi da includere nella sulist</string>
+    <string name="settings_sulist_config_title">Configura SuList</string>
+    <string name="settings_sulist_enforced">SuList è applicata</string>
+    <string name="settings_sulist_error_magiskhide">Questa funzione richiede MagiskHide attivo</string>
+    <string name="settings_sulist_summary">Solo i processi nella sulist possono ottenere l\'accesso root di Magisk</string>
+    <string name="settings_sulist_title">Applica SuList</string>
+    <string name="su_request_title">Richiesta di accesso root</string>
+    <string name="sulist_empty_warning">SuList è una whitelist di root: solo le app nell\'elenco possono ottenere il root di Magisk. Il manager e i componenti di sistema sono sempre esenti.</string>
+    <string name="superuser_access">Accesso root</string>
+    <string name="zygisk_provider_disabled">Un provider Zygisk è installato ma disabilitato.</string>
+    <string name="zygisk_provider_missing">Nessun provider Zygisk è installato. Abilita lo Zygisk integrato nelle impostazioni, oppure installa ZygiskNext (o un provider compatibile), per i moduli Zygisk. MagiskHide/SuList funzionano senza Zygisk.</string>
+    <string name="zygisk_provider_not_injected">Provider Zygisk installato; iniezione non rilevata.</string>
+    <string name="settings_material_you">Colori dinamici</string>
+    <string name="settings_material_you_summary">Adatta i colori allo sfondo</string>
+    <string name="forever">Per sempre</string>
+    <string name="once">Una volta</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_warning">Concede l\'accesso completo al tuo dispositivo.\nNega se non sei sicuro!</string>
+    <string name="touch_filtered_warning">Poiché un\'app sta oscurando una richiesta di Superuser, Magisk non può verificare la tua risposta.</string>
+    <string name="superuser_grant">Concedi Superuser</string>
+    <string name="su_legacy_cmd">Attenzione: riga di comando non supportata rilevata</string>
 </resources>

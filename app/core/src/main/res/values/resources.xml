@@ -13,6 +13,11 @@
     <string name="twitter" translatable="false">Twitter</string>
     <string name="github" translatable="false">GitHub</string>
     <string name="sponsor" translatable="false">Sponsor</string>
+    <string name="kofi" translatable="false">Ko-fi</string>
+    <string name="webui" translatable="false">WebUI</string>
+    <string name="webui_unavailable" translatable="false">WebUI not available</string>
+    <string name="start_downloading" translatable="false">Start downloading</string>
+    <string name="download_failed" translatable="false">Download failed: %s</string>
 
     <drawable name="ic_launcher">@drawable/ic_logo</drawable>
 

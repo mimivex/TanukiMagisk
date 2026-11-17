@@ -4,7 +4,7 @@
     <string name="modules">Moduler</string>
     <string name="superuser">Superbruker</string>
     <string name="logs">Logg</string>
-    <string name="settings">Innstillinger</string>
+    <string name="settings">Valg</string>
     <string name="install">Install</string>
     <string name="section_home">Hjem</string>
     <string name="section_theme">Drakter</string>
@@ -15,14 +15,15 @@
     <string name="loading">Laster inn…</string>
     <string name="update">Oppgrader</string>
     <string name="not_available">I/T</string>
+    <string name="not_installed">Ikke installert</string>
     <string name="hide">Skjul</string>
     <string name="home_package">Pakke</string>
     <string name="home_app_title">Program</string>
 
-    <string name="home_notice_content">Kun last ned Magisk fra den offisielle GitHub siden. Filer fra ukjente kilder kan være skadelige!</string>
-    <string name="home_support_title">Kronerulling</string>
+    <string name="home_notice_content">Ikke aktivt vedlikeholdt fork av Magisk. Hvis du betalte for denne appen, ble du lurt: den er gratis og åpen kildekode. Eksperimentell build leveres som den er, uten garanti; bruk på egen risiko.</string>
+    <string name="home_support_title">Støtt de opprinnelige forfatterne</string>
     <string name="home_item_source">Kildekode</string>
-    <string name="home_support_content">Magisk er og vil alltid forbli fritt.\nDu kan vise at du setter pris på programmet ved å sende en slant.</string>
+    <string name="home_support_content">Magisk er og vil alltid forbli fritt. Dette er en fork av Magisk som ikke vil motta aktiv støtte. \nDu kan vise at du setter pris på programmet ved å sende en slant til de opprinnelige forfatterne av Magisk.</string>
     <string name="home_installed_version">Installert</string>
     <string name="home_latest_version">Seneste</string>
     <string name="invalid_update_channel">Ugyldig installasjonskanal</string>
@@ -89,6 +90,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">Vis systemprogrammer</string>
     <string name="show_os_app">Vis systemprogrammer</string>
+    <string name="add_recommended">Legg til anbefalte</string>
     <string name="hide_filter_hint">Filtrer etter navn</string>
     <string name="hide_search">Søk</string>
 
@@ -184,4 +186,61 @@
     <string name="external_rw_permission_denied">Innvilg lagringstilgang for å skru på denne funksjonaliteten</string>
     <string name="app_not_found">Ingen programmer kan håndtere denne forespørselen</string>
 
+    <string name="auto_response">Automatisk svar</string>
+    <string name="patch_file_msg">Velg et rå-avtrykk (*.img) eller en ODIN-tjæreballfil (*.tar)</string>
+    <string name="prompt">Spør</string>
+    <string name="request_timeout">Tidsavbrudd for forespørsel</string>
+    <string name="select_patch_file">Velg og utfør programfiks av en fil</string>
+    <string name="settings_app_name_error">Ugyldig format</string>
+    <string name="settings_app_name_helper">Programmet vil bli ompakket til dette navnet</string>
+    <string name="settings_app_name_hint">Nytt navn</string>
+    <string name="settings_hide_app_summary">Installer et mellomtjenerprogram med tilfeldig pakke-ID og egendefinert program-etikett</string>
+    <string name="settings_hide_app_title">Skjul Magisk-programmet</string>
+    <string name="settings_restore_app_summary">Opphev skjuling av programmet og gjenopprett det tilbake til opprinnelig APK</string>
+    <string name="settings_restore_app_title">Gjenopprett Magisk-programmet</string>
+    <string name="settings_su_adb">Kun ADB</string>
+    <string name="settings_su_app">Kun programmer</string>
+    <string name="settings_su_app_adb">Programmer og ADB</string>
+    <string name="settings_su_disable">Avskrudd</string>
+    <string name="settings_su_reauth_summary">Identitetsbekreft superbrukertilganger etter programoppgraderinger</string>
+    <string name="settings_su_reauth_title">Ny identitetsbekreftelse etter oppgradering</string>
+    <string name="settings_su_request_10">10 sekunder</string>
+    <string name="settings_su_request_15">15 sekunder</string>
+    <string name="settings_su_request_20">20 sekunder</string>
+    <string name="settings_su_request_30">30 sekunder</string>
+    <string name="settings_su_request_45">45 sekunder</string>
+    <string name="settings_su_request_60">60 sekunder</string>
+    <string name="settings_su_tapjack_summary">Superbrukings-forespørselsdialogen vil ikke svare på inndata mens den dekkes av et annet vindu eller lag</string>
+    <string name="settings_su_tapjack_title">Trykkstjelingsbeskyttelse</string>
+    <string name="su_request_title">Superbrukerforespørsel</string>
+    <string name="superuser_access">Superbruker-tilgang</string>
+    <string name="tanuki_notice">Uoffisiell Tanuki-fork-build</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide kan ikke deaktiveres mens SuList er aktivert.</string>
+    <string name="settings_magiskhide_summary">Magisk-endringer tilbakestilles for prosesser i hidelist</string>
+    <string name="settings_hidelist_config_title">Konfigurer HideList</string>
+    <string name="settings_hidelist_config_summary">Velg prosessene som skal tas med i hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">Håndhev SuList</string>
+    <string name="settings_sulist_summary">Bare prosesser i sulist kan få Magisk root-tilgang</string>
+    <string name="settings_sulist_config_title">Konfigurer SuList</string>
+    <string name="settings_sulist_config_summary">Velg prosessene som skal tas med i sulist</string>
+    <string name="settings_sulist_enforced">SuList håndheves</string>
+    <string name="settings_sulist_error_magiskhide">Denne funksjonen krever at MagiskHide er aktivert</string>
+    <string name="sulist_empty_warning">SuList er en root-hviteliste: bare apper på listen kan få Magisk root. Behandleren og systemkomponenter er alltid unntatt.</string>
+    <string name="zygisk_provider_missing">Ingen Zygisk-leverandør er installert. Aktiver innebygd Zygisk i innstillingene, eller installer ZygiskNext (eller en kompatibel leverandør) for Zygisk-moduler. MagiskHide/SuList fungerer uten Zygisk.</string>
+    <string name="zygisk_provider_disabled">En Zygisk-leverandør er installert, men deaktivert.</string>
+    <string name="zygisk_provider_not_injected">Zygisk-leverandør installert; injeksjon ikke oppdaget.</string>
+    <string name="settings_material_you">Dynamiske farger</string>
+    <string name="settings_material_you_summary">Bruk farger fra enheten din</string>
+    <string name="forever">For alltid</string>
+    <string name="once">En gang</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_warning">Gir full tilgang til enheten din.\nAvslå hvis du ikke er sikker!</string>
+    <string name="touch_filtered_warning">Siden en app skjuler en Superuser-forespørsel, kan ikke Magisk verifisere svaret ditt.</string>
+    <string name="superuser_grant">Gi Superuser-tilgang</string>
+    <string name="su_legacy_cmd">Advarsel: ustøttet kommandolinje oppdaget</string>
 </resources>

@@ -227,6 +227,7 @@ std::string full_read(int fd);
 std::string full_read(const char *filename);
 void write_zero(int fd, size_t size);
 std::string resolve_preinit_dir(const char *base_dir);
+std::string resolve_early_mount_dir(const char *base_dir);
 
 using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;
 using sDIR = std::unique_ptr<DIR, decltype(&closedir)>;

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ThemeOverlay.Button.Text.Secondary" parent="">
+        <item name="colorPrimary">?attr/colorRemove</item>
+    </style>
+    <style name="ThemeOverlay.Button.Text.Action" parent="">
+        <item name="colorPrimary">?attr/colorAction</item>
+    </style>
+    <style name="ThemeOverlay.Button.Text.Update" parent="">
+        <item name="colorPrimary">?attr/colorUpdate</item>
+    </style>
+
+</resources>

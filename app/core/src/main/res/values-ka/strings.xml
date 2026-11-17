@@ -2,7 +2,7 @@
 
     <!--Sections-->
     <string name="modules">მოდულები</string>
-    <string name="superuser">სუპერმომხმარებელი</string>
+    <string name="superuser">Superuser</string>
     <string name="logs">ლოგები</string>
     <string name="settings">პარამეტრები</string>
     <string name="install">ინსტალაცია</string>
@@ -15,14 +15,15 @@
     <string name="loading">იტვირთება…</string>
     <string name="update">განახლება</string>
     <string name="not_available">ხელმიუწვდომელია</string>
+    <string name="not_installed">არ არის დაინსტალირებული</string>
     <string name="hide">დამალვა</string>
     <string name="home_package">პაკეტი</string>
     <string name="home_app_title">აპი</string>
 
-    <string name="home_notice_content">გადმოიწერეთ Magisk მხოლოდ ოფიციალური GitHub-ის გვერდიდან. სხვა წყაროებიდან გადმოწერილი ფაილები შესაძლოა სახიფათო იყოს!</string>
-    <string name="home_support_title">მხარდაჭერა</string>
+    <string name="home_notice_content">Magisk-ის აქტიურად არმოვლენილი fork. თუ ამ აპისთვის გადაიხადეთ, მოგატყუეს: ის უფასო და ღია კოდის მქონეა. ექსპერიმენტული build მოწოდებულია როგორც არის, ყოველგვარი გარანტიის გარეშე; გამოიყენეთ საკუთარი რისკით.</string>
+    <string name="home_support_title">მხარი დაუჭირეთ ორიგინალ ავტორებს</string>
     <string name="home_item_source">წყარო</string>
-    <string name="home_support_content">Magisk-ი არის და ყოველთვის იქნება უფასო და წყარო-გახსნილი. მაგრამ თქვენ შეგიძლიათ დახმარება გაგვიწიოთ პატარა დონაციით.</string>
+    <string name="home_support_content">Magisk-ი არის და ყოველთვის იქნება უფასო და წყარო-გახსნილი. ეს არის Magisk-ის fork, რომელიც აქტიურ მხარდაჭერას ვერ მიიღებს. მაგრამ თქვენ შეგიძლიათ დახმარება გაგვიწიოთ პატარა დონაციით. დონაციები Magisk-ის ორიგინალ ავტორებს მიდის.</string>
     <string name="home_installed_version">დაინსტალირებული</string>
     <string name="home_latest_version">უახლესი</string>
     <string name="invalid_update_channel">არასწორი განახლების არხი</string>
@@ -89,6 +90,7 @@
     <!-- MagiskHide -->
     <string name="show_system_app">სისტემის პროგრამების ჩვენება</string>
     <string name="show_os_app">ოპერაციული სისტემის აპების ჩვენება</string>
+    <string name="add_recommended">რეკომენდებულის დამატება</string>
     <string name="hide_filter_hint">ფილტრაცია სახელის მიხედვით</string>
     <string name="hide_search">ძებნა</string>
 
@@ -179,4 +181,61 @@
     <string name="external_rw_permission_denied">დართეთ მეხსიერებასთან წვდომის ნებართვა ამ ფუნქციის გამოსაყნებლად</string>
     <string name="app_not_found">ამ ფუნქციის შესასრულებლად აპი ვერ მოიძებნა</string>
 
+    <string name="auto_response">ავტომატური პასუხი</string>
+    <string name="patch_file_msg">აირჩიეთ (*.img) ფაილი ან ODIN tarfile-ი (*.tar)</string>
+    <string name="prompt">კითხვა</string>
+    <string name="request_timeout">პასუხის ტაიმაუტი</string>
+    <string name="select_patch_file">ფაილის დაპატჩვა</string>
+    <string name="settings_app_name_error">არასწორი ფორმატი</string>
+    <string name="settings_app_name_helper">პროგრამას ეს პაკეტის სახელი ექნება</string>
+    <string name="settings_app_name_hint">ახალი სახელი</string>
+    <string name="settings_hide_app_summary">დაყენდეს ამოუცნობელი აპი შემთხვევითი პაკეტის ID-ით და განსხვავებული სახელით</string>
+    <string name="settings_hide_app_title">Magisk-ის აპის დამალვა</string>
+    <string name="settings_restore_app_summary">აპის თავდაპირველ მდგომარეობაზე დაბრუნება</string>
+    <string name="settings_restore_app_title">Magisk-ის აპის დაბრუნება</string>
+    <string name="settings_su_adb">მხოლოდ ADB</string>
+    <string name="settings_su_app">მხოლოდ აპები</string>
+    <string name="settings_su_app_adb">აპები და ADB</string>
+    <string name="settings_su_disable">გამორთულია</string>
+    <string name="settings_su_reauth_summary">სუპერმომხმარებლის ნებართვის რეაუტენთიფიკაცია აპის განახლების შემდეგ</string>
+    <string name="settings_su_reauth_title">რეაუტენთიფიკაცია განახლების შემდეგ</string>
+    <string name="settings_su_request_10">10 წამი</string>
+    <string name="settings_su_request_15">15 წამი</string>
+    <string name="settings_su_request_20">20 წამი</string>
+    <string name="settings_su_request_30">30 წამი</string>
+    <string name="settings_su_request_45">45 წამი</string>
+    <string name="settings_su_request_60">60 წამი</string>
+    <string name="settings_su_tapjack_summary">superuser-ის დიალოგის ღილაკებზე დაჭერა არ იქნება შესაძლებელი თუ სხვა აპი არის მასზე გადახურული</string>
+    <string name="settings_su_tapjack_title">Tapjacking-სგან თავის დაცვა</string>
+    <string name="su_request_title">სუპერმომხმარებლის ნებართვის მოთხოვნა</string>
+    <string name="superuser_access">სუპერმომხმარებელთან წვდომა</string>
+    <string name="tanuki_notice">Tanuki fork-ის არაოფიციალური build</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide ვერ გამოირთვება, სანამ SuList ჩართულია.</string>
+    <string name="settings_magiskhide_summary">hidelist-ის პროცესებისთვის Magisk-ის ცვლილებები უქმდება</string>
+    <string name="settings_hidelist_config_title">HideList-ის კონფიგურაცია</string>
+    <string name="settings_hidelist_config_summary">აირჩიეთ პროცესები hidelist-ში დასამატებლად</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">SuList-ის გამოყენება</string>
+    <string name="settings_sulist_summary">მხოლოდ sulist-ის პროცესებს შეუძლიათ Magisk root-წვდომის მიღება</string>
+    <string name="settings_sulist_config_title">SuList-ის კონფიგურაცია</string>
+    <string name="settings_sulist_config_summary">აირჩიეთ პროცესები sulist-ში დასამატებლად</string>
+    <string name="settings_sulist_enforced">SuList გამოყენებულია</string>
+    <string name="settings_sulist_error_magiskhide">ეს ფუნქცია საჭიროებს MagiskHide-ის ჩართვას</string>
+    <string name="sulist_empty_warning">SuList არის root-ის ნებადართული სია: მხოლოდ სიაში მყოფ აპებს შეუძლიათ Magisk root-ის მიღება. მენეჯერი და სისტემური კომპონენტები ყოველთვის გათავისუფლებულია.</string>
+    <string name="zygisk_provider_missing">Zygisk პროვაიდერი არ არის დაინსტალირებული. ჩართეთ ჩაშენებული Zygisk პარამეტრებში, ან დააყენეთ ZygiskNext (ან თავსებადი პროვაიდერი) Zygisk მოდულებისთვის. MagiskHide/SuList მუშაობს Zygisk-ის გარეშე.</string>
+    <string name="zygisk_provider_disabled">Zygisk პროვაიდერი დაინსტალირებულია, მაგრამ გამორთულია.</string>
+    <string name="zygisk_provider_not_injected">Zygisk პროვაიდერი დაინსტალირებულია; ინექცია არ არის აღმოჩენილი.</string>
+    <string name="settings_material_you">დინამიკური ფერები</string>
+    <string name="settings_material_you_summary">გამოიყენეთ თქვენი მოწყობილობის მიერ მოწოდებული ფერები</string>
+    <string name="forever">სამუდამოდ</string>
+    <string name="once">ერთხელ</string>
+    <string name="tenmin">10 წთ</string>
+    <string name="twentymin">20 წთ</string>
+    <string name="thirtymin">30 წთ</string>
+    <string name="sixtymin">60 წთ</string>
+    <string name="su_warning">აძლევს სრულ წვდომას თქვენს მოწყობილობაზე.\nუარი თქვით, თუ დარწმუნებული არ ხართ!</string>
+    <string name="touch_filtered_warning">რადგან აპი ფარავს Superuser-ის მოთხოვნას, Magisk ვერ ამოწმებს თქვენს პასუხს.</string>
+    <string name="superuser_grant">Superuser-ის მიცემა</string>
+    <string name="su_legacy_cmd">გაფრთხილება: აღმოჩენილია მხარდაუჭერელი ბრძანების სტრიქონი</string>
 </resources>

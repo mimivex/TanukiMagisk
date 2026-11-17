@@ -5,13 +5,13 @@ use base::const_format::concatcp;
 mod flags;
 
 pub const POST_FS_DATA_WAIT_TIME: i32 = 40;
-pub const APPLET_NAMES: &[&str] = &["su", "resetprop"];
+pub const APPLET_NAMES: &[&str] = &["su", "resetprop", "magiskhide"];
 
 // versions
 pub use flags::*;
 pub const MAGISK_FULL_VER: &str = concatcp!(MAGISK_VERSION, "(", MAGISK_VER_CODE, ")");
 
-pub const APP_PACKAGE_NAME: &str = "com.topjohnwu.magisk";
+pub const APP_PACKAGE_NAME: &str = "io.github.mimivex.tanuki";
 
 pub const LOGFILE: &str = "/cache/magisk.log";
 
@@ -27,6 +27,9 @@ pub const MAGISKDB: &str = concatcp!(SECURE_DIR, "/magisk.db");
 pub const INTERNAL_DIR: &str = ".magisk";
 pub const MAIN_CONFIG: &str = concatcp!(INTERNAL_DIR, "/config");
 pub const PREINITMIRR: &str = concatcp!(INTERNAL_DIR, "/preinit");
+pub const EARLYMNT: &str = concatcp!(INTERNAL_DIR, "/early-mount.d");
+// Source name of the early mount tmpfs magiskinit creates
+pub const EARLYMNTNAME: &str = "early-mount.d/v2";
 pub const MODULEMNT: &str = concatcp!(INTERNAL_DIR, "/modules");
 pub const WORKERDIR: &str = concatcp!(INTERNAL_DIR, "/worker");
 pub const BBPATH: &str = concatcp!(INTERNAL_DIR, "/busybox");

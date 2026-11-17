@@ -405,8 +405,25 @@ void ZygiskContext::app_specialize_pre() {
     if ((info_flags & UNMOUNT_MASK) == UNMOUNT_MASK) {
         ZLOGI("[%s] is on the denylist\n", process);
         flags |= DO_REVERT_UNMOUNT;
-    } else if (fd >= 0) {
+    }
+    // As in Kitsune 27, the deny targets load the Zygisk modules too;
+    // DO_REVERT_UNMOUNT above hides the mounts in the same pass. Upstream
+    // v31.1 used an else-if here, which kept the modules out of every
+    // MagiskHide target and broke PIF/PlaySpoofer/HMA inside the hidden
+    // apps.
+    if (fd >= 0) {
         run_modules_pre(module_fds);
+    }
+    // Under SuList the built-in Zygisk reverts the Magisk mounts of
+    // non-listed processes at unshare while still loading modules into
+    // them, because SuList governs root only. The bit is set by
+    // update_deny_flags and defined in lib.rs; it stays out of
+    // PRIVATE_MASK in module.hpp, which is untouched. This check must
+    // come AFTER the gate above: placed first, it sets DO_REVERT_UNMOUNT
+    // so the module-load gate skips run_modules_pre and Zygisk modules
+    // never load into non-listed processes.
+    if ((info_flags & +ZygiskStateFlags::HideMounts) != 0) {
+        flags |= DO_REVERT_UNMOUNT;
     }
 }
 

@@ -6,8 +6,8 @@
 
 using namespace std;
 
-#define DB_VERSION     13
-#define DB_VERSION_STR "13"
+#define DB_VERSION     12
+#define DB_VERSION_STR "12"
 
 // SQLite APIs
 
@@ -194,10 +194,18 @@ sqlite3 *open_and_init_db() {
     };
     sql_chk_log(sql_exec_impl, db.get(), "PRAGMA user_version", nullptr, nullptr, ver_cb, &ver);
     if (ver > DB_VERSION) {
-        // Don't support downgrading database, delete and retry
-        LOGE("sqlite3: Downgrading database is not supported\n");
-        unlink(MAGISKDB);
-        return open_and_init_db();
+        // Upstream v13 dropped `strings`, which the manager needs; the other
+        // tables are compatible, so adopt it. Writing 12 back keeps a Kitsune
+        // 27.2 rollback working.
+        if (ver == 13) {
+            ver = 12;
+            upgrade = true;
+        } else {
+            // Don't support downgrading database, delete and retry
+            LOGE("sqlite3: Downgrading database is not supported\n");
+            unlink(MAGISKDB);
+            return open_and_init_db();
+        }
     }
 
     auto create_policy = [&] {
@@ -211,9 +219,24 @@ sqlite3 *open_and_init_db() {
                 "CREATE TABLE IF NOT EXISTS settings "
                 "(key TEXT, value INT, PRIMARY KEY(key))");
     };
+    auto create_strings = [&] {
+        return sql_exec_impl(db.get(),
+                "CREATE TABLE IF NOT EXISTS strings "
+                "(key TEXT, value TEXT, PRIMARY KEY(key))");
+    };
     auto create_denylist = [&] {
         return sql_exec_impl(db.get(),
                 "CREATE TABLE IF NOT EXISTS denylist "
+                "(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process))");
+    };
+    auto create_hidelist = [&] {
+        return sql_exec_impl(db.get(),
+                "CREATE TABLE IF NOT EXISTS hidelist "
+                "(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process))");
+    };
+    auto create_sulist = [&] {
+        return sql_exec_impl(db.get(),
+                "CREATE TABLE IF NOT EXISTS sulist "
                 "(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process))");
     };
 
@@ -227,12 +250,13 @@ sqlite3 *open_and_init_db() {
     // 10: remove table `logs`
     // 11: remove table `hidelist` and create table `denylist` (same data structure)
     // 12: rebuild table `policies` to drop column `package_name`
-    // 13: remove table `strings`
 
     if (/* 0, 1, 2, 3, 4, 5, 6 */ ver <= 6) {
         sql_chk_log(create_policy);
         sql_chk_log(create_settings);
         sql_chk_log(create_denylist);
+        sql_chk_log(create_hidelist);
+        sql_chk_log(create_sulist);
 
         // Directly jump to latest
         ver = DB_VERSION;
@@ -290,11 +314,56 @@ sqlite3 *open_and_init_db() {
         ver = 12;
         upgrade = true;
     }
-    if (ver == 12) {
-        sql_chk_log(sql_exec_impl, db.get(), "DROP TABLE IF EXISTS strings;");
-        ver = 13;
-        upgrade = true;
-    }
+
+    // The schema version stays at 12, so no upgrade step runs for stock or
+    // Kitsune databases: create the tables the engine relies on here.
+    // `hidelist` is Kitsune 27.2's list, kept so a rollback still finds it.
+    sql_chk_log(create_strings);
+    sql_chk_log(create_denylist);
+    sql_chk_log(create_hidelist);
+    sql_chk_log(create_sulist);
+
+    // A database written while the SuList complement lived in `denylist`
+    // would make stock Magisk read it as a hide list of every app.
+    // `denylist_mode` marks those databases.
+    sql_chk_log(sql_exec_impl, db.get(),
+            "BEGIN TRANSACTION;"
+            "DELETE FROM denylist WHERE EXISTS "
+            "(SELECT 1 FROM settings WHERE key='denylist_mode' AND CAST(value AS INTEGER) != 0);"
+            "INSERT OR IGNORE INTO denylist (package_name, process) "
+            "SELECT package_name, process FROM hidelist "
+            "WHERE EXISTS (SELECT 1 FROM settings WHERE key='denylist_mode' AND CAST(value AS INTEGER) != 0) "
+            "AND NOT EXISTS (SELECT 1 FROM denylist);"
+            "DELETE FROM settings WHERE key IN ('denylist_mode','hide_migration','hide_defaults_seeded');"
+            "COMMIT;");
+
+    // Import a Kitsune 27.2 `hidelist` once, and copy back so a rollback still
+    // finds its list; a non-empty destination is never overwritten.
+    // It runs whatever the mode: a dormant `denylist` next to an armed
+    // `sulist` is harmless, while skipping the import would leave the Kitsune
+    // list in `hidelist`, where nothing reads it again.
+    sql_chk_log(sql_exec_impl, db.get(),
+            "BEGIN TRANSACTION;"
+            "INSERT OR IGNORE INTO denylist (package_name, process) "
+            "SELECT package_name, process FROM hidelist "
+            "WHERE NOT EXISTS (SELECT 1 FROM denylist);"
+            "INSERT OR IGNORE INTO hidelist (package_name, process) "
+            "SELECT package_name, process FROM denylist "
+            "WHERE NOT EXISTS (SELECT 1 FROM hidelist);"
+            "COMMIT;");
+
+    // Kitsune arms the engine on `magiskhide`; copy a stock database's
+    // `denylist` once so an upgrade keeps its state, then pin `denylist` to
+    // 0 -- it must never be 1 together with `sulist`, so it is reset on
+    // every open.
+    sql_chk_log(sql_exec_impl, db.get(),
+            "BEGIN TRANSACTION;"
+            "INSERT OR IGNORE INTO settings (key, value) "
+            "SELECT 'magiskhide', value FROM settings WHERE key='denylist' "
+            "AND NOT EXISTS (SELECT 1 FROM settings WHERE key='magiskhide');"
+            "REPLACE INTO settings (key, value) VALUES ('denylist', 0);"
+            "COMMIT;");
+
 
     if (upgrade) {
         // Set version

@@ -2,11 +2,11 @@
 
     <!--Sections-->
     <string name="modules">தொகுதிகள்</string>
-    <string name="superuser">சூப்பர் யூசர்</string>
+    <string name="superuser">Superuser</string>
     <string name="logs">பதிவுகள்</string>
     <string name="settings">அமைப்புகள்</string>
     <string name="install">நிறுவு</string>
-    <string name="section_home">முகப்புப்பக்கம்</string>
+    <string name="section_home">முகப்பு</string>
     <string name="section_theme">வடிவமைப்புகள்</string>
 
     <!--Home-->
@@ -15,14 +15,15 @@
     <string name="loading">ஏற்றுகிறது...</string>
     <string name="update">புதுப்பிப்பு</string>
     <string name="not_available">எதுவும் இல்லை</string>
+    <string name="not_installed">நிறுவப்படவில்லை</string>
     <string name="hide">பார்வையில் இருந்து மறைத்து வை</string>
     <string name="home_package">தொகுப்பு</string>
     <string name="home_app_title">செயலி</string>
 
-    <string name="home_notice_content">அதிகாரப்பூர்வ கிட்ஹப் பக்கத்திலிருந்து மட்டுமே மேகிஸ்கை பதிவிறக்கவும். அறியப்படாத மூலங்களிலிருந்து வரும் கோப்புகள் தீங்கிழைக்கும்!</string>
-    <string name="home_support_title">எங்களை ஆதரியுங்கள்</string>
+    <string name="home_notice_content">Magisk-இன் தீவிரமாக பராமரிக்கப்படாத fork. இந்த ஆப்பிற்கு நீங்கள் பணம் செலுத்தியிருந்தால் ஏமாற்றப்பட்டீர்கள்: இது இலவசம் மற்றும் திறந்த மூலம். சோதனை பில்ட் உள்ளபடியே, எந்த உத்தரவாதமும் இல்லாமல் வழங்கப்படுகிறது; உங்கள் சொந்த பொறுப்பில் பயன்படுத்தவும்.</string>
+    <string name="home_support_title">அசல் ஆசிரியர்களை ஆதரிக்கவும்</string>
     <string name="home_item_source">ஆரம்ப இடம்</string>
-    <string name="home_support_content">மேஜிஸ்க் என்பது எப்போதும் இலவசமாகவும் திறந்த மூலமாகவும் இருக்கும். ஒரு சிறிய நன்கொடை அனுப்புவதன் மூலம் நீங்கள் அக்கறை காட்டுகிறீர்கள் என்பதை எங்களுக்குக் காட்டலாம்.</string>
+    <string name="home_support_content">மேஜிஸ்க் என்பது எப்போதும் இலவசமாகவும் திறந்த மூலமாகவும் இருக்கும். இது Magisk இன் fork ஆகும், இதற்கு செயலூக்கமான ஆதரவு கிடைக்காது. ஒரு சிறிய நன்கொடை அனுப்புவதன் மூலம் நீங்கள் அக்கறை காட்டுகிறீர்கள் என்பதை எங்களுக்குக் காட்டலாம். நன்கொடைகள் Magisk இன் அசல் ஆசிரியர்களுக்குச் செல்லும்.</string>
     <string name="home_installed_version">நிறுவப்பட்டுள்ளது</string>
     <string name="home_latest_version">அண்மை</string>
     <string name="invalid_update_channel">புதுப்பிப்பு சேனல் தவறானது</string>
@@ -89,6 +90,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">தொலைபேசி பயன்பாடுகளைக் காட்டு</string>
     <string name="show_os_app">OS பயன்பாடுகளைக் காட்டு</string>
+    <string name="add_recommended">பரிந்துரைக்கப்பட்டவற்றைச் சேர்</string>
     <string name="hide_filter_hint">பெயரால் வடிகட்டவும்</string>
     <string name="hide_search">தேடல்</string>
 
@@ -180,4 +182,61 @@
     <string name="external_rw_permission_denied">இந்த செயல்பாட்டை இயக்க சேமிப்பக அனுமதி வழங்கவும்</string>
     <string name="app_not_found">இந்த செயலைக் கையாள எந்த பயன்பாடும் கிடைக்கவில்லை</string>
 
+    <string name="auto_response">தானியங்கி பதில்</string>
+    <string name="patch_file_msg">மூல படம் (* .img) அல்லது ODIN டார்ஃபைல் (* .tar) ஐத் தேர்ந்தெடுக்கவும்</string>
+    <string name="prompt">உடனடி</string>
+    <string name="request_timeout">கோரிக்கை முடிவு நேரம்</string>
+    <string name="select_patch_file">ஒரு கோப்பைத் தேர்ந்தெடுத்து ஒட்டவும்</string>
+    <string name="settings_app_name_error">தவறான வடிவம்</string>
+    <string name="settings_app_name_helper">பயன்பாடு இந்த பெயருக்கு மீண்டும் தொகுக்கப்படும்</string>
+    <string name="settings_app_name_hint">புதிய பெயர்</string>
+    <string name="settings_hide_app_summary">சீரற்ற தொகுப்பு ஐடி மற்றும் தனிப்பயன் பயன்பாட்டு லேபிளுடன் ப்ராக்ஸி பயன்பாட்டை நிறுவவும்</string>
+    <string name="settings_hide_app_title">மேஜிஸ்க் செயலியை மறைக்கவும்</string>
+    <string name="settings_restore_app_summary">பயன்பாட்டை மறைத்து, அசல் APK க்கு மீண்டும் மீட்டமைக்கவும்</string>
+    <string name="settings_restore_app_title">மேஜிஸ்க் பயன்பாட்டை மீட்டமை</string>
+    <string name="settings_su_adb">ADB மட்டும்</string>
+    <string name="settings_su_app">பயன்பாடுகள் மட்டும்</string>
+    <string name="settings_su_app_adb">பயன்பாடுகள் மற்றும் ADB</string>
+    <string name="settings_su_disable">முடக்கப்பட்டது</string>
+    <string name="settings_su_reauth_summary">பயன்பாட்டு மேம்படுத்தல்களுக்குப் பிறகு சூப்பர் யூசர் அனுமதிகளை மீண்டும் அங்கீகரிக்கவும்</string>
+    <string name="settings_su_reauth_title">மேம்படுத்தப்பட்ட பிறகு மீண்டும் அங்கீகரிக்கவும்</string>
+    <string name="settings_su_request_10">10 வினாடிகள்</string>
+    <string name="settings_su_request_15">15 வினாடிகள்</string>
+    <string name="settings_su_request_20">20 வினாடிகள்</string>
+    <string name="settings_su_request_30">30 வினாடிகள்</string>
+    <string name="settings_su_request_45">45 வினாடிகள்</string>
+    <string name="settings_su_request_60">60 வினாடிகள்</string>
+    <string name="settings_su_tapjack_summary">வேறு எந்த சாளரத்தாலும் அல்லது மேலடுக்கினாலும் மறைக்கப்படும்போது சூப்பர் யூசர் வரியில் உரையாடல் உள்ளீட்டிற்கு பதிலளிக்காது</string>
+    <string name="settings_su_tapjack_title">டாப்ஜாகிங் பாதுகாப்பை இயக்கு</string>
+    <string name="su_request_title">சூப்பர் யூசர் கோரிக்கை</string>
+    <string name="superuser_access">சூப்பர் யூசர் அணுகல்</string>
+    <string name="tanuki_notice">Tanuki fork-இன் அதிகாரப்பூர்வமற்ற பில்ட்</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">SuList இயக்கப்பட்டிருக்கும்போது MagiskHide ஐ முடக்க முடியாது.</string>
+    <string name="settings_magiskhide_summary">hidelist-இல் உள்ள செயல்முறைகளுக்கு Magisk மாற்றங்கள் திரும்பப் பெறப்படும்</string>
+    <string name="settings_hidelist_config_title">HideList-ஐ அமைக்கவும்</string>
+    <string name="settings_hidelist_config_summary">hidelist-இல் சேர்க்க வேண்டிய செயல்முறைகளைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">SuList-ஐ செயல்படுத்து</string>
+    <string name="settings_sulist_summary">sulist-இல் உள்ள செயல்முறைகள் மட்டுமே Magisk root அணுகலைப் பெற முடியும்</string>
+    <string name="settings_sulist_config_title">SuList-ஐ அமைக்கவும்</string>
+    <string name="settings_sulist_config_summary">sulist-இல் சேர்க்க வேண்டிய செயல்முறைகளைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="settings_sulist_enforced">SuList செயல்படுத்தப்பட்டுள்ளது</string>
+    <string name="settings_sulist_error_magiskhide">இந்த அம்சத்திற்கு MagiskHide இயக்கப்பட்டிருக்க வேண்டும்</string>
+    <string name="sulist_empty_warning">SuList ஒரு root வெள்ளைப்பட்டியல்: பட்டியலில் உள்ள செயலிகள் மட்டுமே Magisk root-ஐப் பெற முடியும். மேலாளர் மற்றும் கணினி கூறுகள் எப்போதும் விலக்கப்படுகின்றன.</string>
+    <string name="zygisk_provider_missing">Zygisk வழங்குநர் நிறுவப்படவில்லை. அமைப்புகளில் உள்ளமைந்த Zygisk-ஐ இயக்கவும், அல்லது Zygisk தொகுதிகளுக்கு ZygiskNext (அல்லது இணக்கமான வழங்குநர்) நிறுவவும். MagiskHide/SuList Zygisk இல்லாமல் வேலை செய்யும்.</string>
+    <string name="zygisk_provider_disabled">Zygisk வழங்குநர் நிறுவப்பட்டுள்ளது ஆனால் முடக்கப்பட்டுள்ளது.</string>
+    <string name="zygisk_provider_not_injected">Zygisk வழங்குநர் நிறுவப்பட்டுள்ளது; ஊசி கண்டறியப்படவில்லை.</string>
+    <string name="settings_material_you">மாறும் வண்ணங்கள்</string>
+    <string name="settings_material_you_summary">சாதனம் வழங்கும் வண்ணங்களைப் பயன்படுத்தவும்</string>
+    <string name="forever">எப்போதும்</string>
+    <string name="once">ஒருமுறை</string>
+    <string name="tenmin">10 நிமிடங்கள்</string>
+    <string name="twentymin">20 நிமிடங்கள்</string>
+    <string name="thirtymin">30 நிமிடங்கள்</string>
+    <string name="sixtymin">60 நிமிடங்கள்</string>
+    <string name="su_warning">உங்கள் சாதனத்திற்கு முழு அணுகலை வழங்குகிறது.\nஉறுதியாக இல்லாவிட்டால் மறுக்கவும்!</string>
+    <string name="touch_filtered_warning">ஒரு ஆப்ஸ் Superuser கோரிக்கையை மறைப்பதால், Magisk உங்கள் பதிலைச் சரிபார்க்க முடியாது.</string>
+    <string name="superuser_grant">Superuser வழங்கு</string>
+    <string name="su_legacy_cmd">எச்சரிக்கை: ஆதரிக்கப்படாத கட்டளை வரி கண்டறியப்பட்டது</string>
 </resources>

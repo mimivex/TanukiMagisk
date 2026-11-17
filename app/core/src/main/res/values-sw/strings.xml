@@ -2,7 +2,7 @@
 
     <!--Sections-->
     <string name="modules">Moduli</string>
-    <string name="superuser">Mtumiaji mkuu</string>
+    <string name="superuser">Superuser</string>
     <string name="logs">Kumbukumbu</string>
     <string name="settings">Mipangilio</string>
     <string name="install">Sakinisha</string>
@@ -16,14 +16,15 @@
     <string name="loading">Loading…</string>
     <string name="update">Sasisha</string>
     <string name="not_available">Haipatikani</string>
+    <string name="not_installed">Haijasakinishwa</string>
     <string name="hide">Ficha</string>
     <string name="home_package">Kifurushi</string>
     <string name="home_app_title">Programu</string>
 
-    <string name="home_notice_content">Download Magisk ONLY from the official GitHub page. Files from unknown sources can be malicious!</string>
-    <string name="home_support_title">Support Us</string>
+    <string name="home_notice_content">Fork ya Magisk isiyotunzwa kwa bidii. Ukilipa kwa programu hii umedanganywa: ni bure na chanzo huria. Build ya majaribio hutolewa kama ilivyo, bila dhamana yoyote; tumia kwa hatari yako mwenyewe.</string>
+    <string name="home_support_title">Saidia waandishi asili</string>
     <string name="home_item_source">Source</string>
-    <string name="home_support_content">Magisk is, and always will be, free, and open source. You can however show us that you care by making a donation.</string>
+    <string name="home_support_content">Magisk is, and always will be, free, and open source. Hii ni fork ya Magisk ambayo haitapata usaidizi wa bidii. You can however show us that you care by making a donation. Michango huenda kwa waandishi asili wa Magisk.</string>
     <string name="home_installed_version">Installed</string>
     <string name="home_latest_version">Latest</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
@@ -90,6 +91,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">Show system apps</string>
     <string name="show_os_app">Show OS apps</string>
+    <string name="add_recommended">Add recommended</string>
     <string name="hide_filter_hint">Filter by name</string>
     <string name="hide_search">Search</string>
 
@@ -105,8 +107,6 @@
     <string name="module_state_restore">Restore</string>
     <string name="module_action_install_external">Install from storage</string>
     <string name="update_available">Update Available</string>
-    <string name="suspend_text_riru">Module suspended because %1$s is enabled</string>
-    <string name="suspend_text_zygisk">Module suspended because %1$s is not enabled</string>
     <string name="zygisk_module_unloaded">Zygisk module not loaded due to incompatibility</string>
 
     <!--Settings-->
@@ -197,4 +197,62 @@
     <string name="install_unknown_denied">Allow "install unknown apps" to enable this functionality</string>
     <string name="app_not_found">No app found to handle this action</string>
     <string name="reboot_apply_change">Reboot to apply changes</string>
+    <string name="auto_response">Automatic Response</string>
+    <string name="patch_file_msg">Select a raw image (*.img) or an ODIN tarfile (*.tar)</string>
+    <string name="prompt">Prompt</string>
+    <string name="request_timeout">Request Timeout</string>
+    <string name="restore_app_confirmation">This will restore the hidden app back to the original app. Do you really want to do this?</string>
+    <string name="select_patch_file">Select and Patch a File</string>
+    <string name="settings_app_name_error">Invalid format</string>
+    <string name="settings_app_name_helper">App will be repackaged with this name</string>
+    <string name="settings_app_name_hint">New name</string>
+    <string name="settings_hide_app_summary">Install a proxy app with a random package ID and custom app label</string>
+    <string name="settings_hide_app_title">Hide the Magisk app</string>
+    <string name="settings_restore_app_summary">Unhide the app and restore the original APK</string>
+    <string name="settings_restore_app_title">Restore the Magisk app</string>
+    <string name="settings_su_adb">ADB only</string>
+    <string name="settings_su_app">Apps only</string>
+    <string name="settings_su_app_adb">Apps and ADB</string>
+    <string name="settings_su_disable">Disabled</string>
+    <string name="settings_su_reauth_summary">Ask for Superuser permissions again after upgrading apps</string>
+    <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
+    <string name="settings_su_request_10">10 seconds</string>
+    <string name="settings_su_request_15">15 seconds</string>
+    <string name="settings_su_request_20">20 seconds</string>
+    <string name="settings_su_request_30">30 seconds</string>
+    <string name="settings_su_request_45">45 seconds</string>
+    <string name="settings_su_request_60">60 seconds</string>
+    <string name="settings_su_tapjack_summary">The Superuser prompt dialog will not respond to input while obscured by any other window or overlay</string>
+    <string name="settings_su_tapjack_title">Tapjacking Protection</string>
+    <string name="su_request_title">Superuser Request</string>
+    <string name="superuser_access">Superuser Access</string>
+    <string name="tanuki_notice">Build isiyo rasmi ya fork ya Tanuki</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide haiwezi kuzimwa wakati SuList imewashwa.</string>
+    <string name="settings_magiskhide_summary">Mabadiliko ya Magisk hurudishwa kwa michakato iliyo kwenye hidelist</string>
+    <string name="settings_hidelist_config_title">Sanidi HideList</string>
+    <string name="settings_hidelist_config_summary">Chagua michakato itakayojumuishwa kwenye hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">Tekeleza SuList</string>
+    <string name="settings_sulist_summary">Ni michakato iliyo kwenye sulist pekee inayoweza kupata ufikiaji wa root wa Magisk</string>
+    <string name="settings_sulist_config_title">Sanidi SuList</string>
+    <string name="settings_sulist_config_summary">Chagua michakato itakayojumuishwa kwenye sulist</string>
+    <string name="settings_sulist_enforced">SuList imetekelezwa</string>
+    <string name="settings_sulist_error_magiskhide">Kipengele hiki kinahitaji MagiskHide iwe imewezeshwa</string>
+    <string name="sulist_empty_warning">SuList ni orodha nyeupe ya root: ni programu zilizo kwenye orodha pekee zinazoweza kupata root ya Magisk. Msimamizi na vipengele vya mfumo husamehewa kila wakati.</string>
+    <string name="zygisk_provider_missing">Hakuna mtoa huduma wa Zygisk aliyesakinishwa. Washa Zygisk iliyojengwa ndani kwenye mipangilio, au sakinisha ZygiskNext (au mtoa huduma anayeoana) kwa moduli za Zygisk. MagiskHide/SuList hufanya kazi bila Zygisk.</string>
+    <string name="zygisk_provider_disabled">Mtoa huduma wa Zygisk amesakinishwa lakini amezimwa.</string>
+    <string name="zygisk_provider_not_injected">Mtoa huduma wa Zygisk amesakinishwa; sindikizo halijagunduliwa.</string>
+    <string name="settings_material_you">Rangi zinazobadilika</string>
+    <string name="settings_material_you_summary">Use colors provided by your device</string>
+    <string name="forever">Daima</string>
+    <string name="once">Mara moja</string>
+    <string name="tenmin">Dakika 10</string>
+    <string name="twentymin">Dakika 20</string>
+    <string name="thirtymin">Dakika 30</string>
+    <string name="sixtymin">Dakika 60</string>
+    <string name="su_warning">Inatoa ufikiaji kamili kwa kifaa chako.\nKataa ikiwa huna uhakika!</string>
+    <string name="touch_filtered_warning">Kwa sababu programu inaficha ombi la Superuser, Magisk haiwezi kuthibitisha jibu lako.</string>
+    <string name="superuser_grant">Ruhusu Superuser</string>
+    <string name="su_legacy_cmd">Onyo: mstari wa amri usiotumika umegunduliwa</string>
 </resources>

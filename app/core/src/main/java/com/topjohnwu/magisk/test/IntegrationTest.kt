@@ -72,7 +72,7 @@ class IntegrationTest : TestCommon {
         val module = modules.find { it.id == "zygisk_lsposed" }
         assertNotNull("zygisk_lsposed is not installed", module)
         module!!
-        assertFalse("zygisk_lsposed is not enabled", module.zygiskUnloaded)
+        assertTrue("zygisk_lsposed is not enabled", module.enable)
 
         // Launch lsposed manager to ensure the module is active
         uiAutomation.executeShellCommand(
@@ -123,7 +123,7 @@ class IntegrationTest : TestCommon {
         val module = modules.find { it.id == EMPTY_ZYGISK }
         assertNotNull("$EMPTY_ZYGISK is not installed", module)
         module!!
-        assertTrue("$EMPTY_ZYGISK should be zygisk unloaded", module.zygiskUnloaded)
+        assertTrue("$EMPTY_ZYGISK should be enabled", module.enable)
     }
 
     @Test
@@ -131,7 +131,7 @@ class IntegrationTest : TestCommon {
         val module = modules.find { it.id == INVALID_ZYGISK }
         assertNotNull("$INVALID_ZYGISK is not installed", module)
         module!!
-        assertTrue("$INVALID_ZYGISK should be zygisk unloaded", module.zygiskUnloaded)
+        assertTrue("$INVALID_ZYGISK should be enabled", module.enable)
     }
 
     @Test

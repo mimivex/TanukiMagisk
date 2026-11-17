@@ -1,6 +1,7 @@
+use super::connect::SuAppContext;
 use super::db::RootSettings;
-use crate::daemon::{AID_APP_START, AID_ROOT, MagiskD, to_app_id, to_user_id};
-use crate::db::{DbSettings, MultiuserMode};
+use crate::daemon::{AID_APP_START, AID_ROOT, AID_SHELL, MagiskD, to_app_id, to_user_id};
+use crate::db::{DbSettings, MultiuserMode, RootAccess};
 use crate::ffi::{SuPolicy, SuRequest, exec_root_shell};
 use crate::socket::IpcRead;
 use base::{LoggedResult, ResultExt, WriteExt, debug, error, exit_on_error, libc, warn};
@@ -30,6 +31,8 @@ impl Default for SuRequest {
 pub struct SuInfo {
     pub(super) uid: i32,
     pub(super) eval_uid: i32,
+    pub(super) mgr_pkg: String,
+    pub(super) mgr_uid: i32,
     pub(super) settings: RootSettings,
     cfg: DbSettings,
     timestamp: Instant,
@@ -40,6 +43,8 @@ impl Default for SuInfo {
         SuInfo {
             uid: -1,
             eval_uid: -1,
+            mgr_pkg: String::new(),
+            mgr_uid: -1,
             settings: Default::default(),
             cfg: Default::default(),
             timestamp: Instant::now(),
@@ -51,7 +56,8 @@ impl SuInfo {
     fn allow(uid: i32) -> SuInfo {
         let settings = RootSettings {
             policy: SuPolicy::Allow,
-            ..Default::default()
+            log: false,
+            notify: false,
         };
         SuInfo {
             uid,
@@ -61,8 +67,14 @@ impl SuInfo {
     }
 
     fn deny(uid: i32) -> SuInfo {
+        let settings = RootSettings {
+            policy: SuPolicy::Deny,
+            log: false,
+            notify: false,
+        };
         SuInfo {
             uid,
+            settings,
             ..Default::default()
         }
     }
@@ -98,11 +110,32 @@ impl MagiskD {
         };
 
         let info = self.get_su_info(cred.uid as i32);
+        let mut settings = info.settings;
 
-        // Talk to su manager
-        self.notify_app(&cred, &info, &req);
+        // Talk to su manager: prompt for an undetermined policy, then
+        // record the request for logging and notifications.
+        {
+            let mut app = SuAppContext {
+                cred,
+                request: &req,
+                info: &info,
+                settings: &mut settings,
+                sdk_int: self.sdk_int(),
+            };
+            app.connect_app();
+        }
 
-        match info.settings.policy {
+        // Keep the manager's answer around briefly so a burst of requests
+        // from the same uid does not open a prompt each time.
+        if settings.policy != info.settings.policy {
+            self.cached_su_info.store(Arc::new(SuInfo {
+                settings,
+                timestamp: Instant::now(),
+                ..(*info).clone()
+            }));
+        }
+
+        match settings.policy {
             SuPolicy::Restrict => req.drop_cap = true,
             SuPolicy::Allow => {}
             _ => {
@@ -191,11 +224,14 @@ impl MagiskD {
             let mut settings = RootSettings::default();
             self.get_root_settings(eval_uid, &mut settings)?;
 
-            let mut mgr_uid = self.get_manager_uid(to_user_id(eval_uid));
+            // The manager is both the prompt target and the notification receiver
+            let (mut mgr_uid, mut mgr_pkg) = self.get_manager(to_user_id(eval_uid), false);
             if mgr_uid < 0 && to_app_id(eval_uid) < AID_APP_START {
                 for user in self.get_users() {
-                    mgr_uid = self.get_manager_uid(user);
-                    if mgr_uid >= 0 {
+                    let (user_uid, pkg) = self.get_manager(user, false);
+                    if user_uid >= 0 {
+                        mgr_uid = user_uid;
+                        mgr_pkg = pkg;
                         break;
                     }
                 }
@@ -209,10 +245,34 @@ impl MagiskD {
                 return Ok(Arc::new(SuInfo::allow(uid)));
             }
 
+            // Check user root access settings
+            match cfg.root_access {
+                RootAccess::Disabled => {
+                    warn!("Root access is disabled!");
+                    return Ok(Arc::new(SuInfo::deny(uid)));
+                }
+                RootAccess::AdbOnly if uid != AID_SHELL => {
+                    warn!("Root access limited to ADB only!");
+                    return Ok(Arc::new(SuInfo::deny(uid)));
+                }
+                RootAccess::AppsOnly if uid == AID_SHELL => {
+                    warn!("Root access is disabled for ADB!");
+                    return Ok(Arc::new(SuInfo::deny(uid)));
+                }
+                _ => {}
+            }
+
+            // Without a manager there is nobody to answer the prompt
+            if settings.policy == SuPolicy::Query && mgr_uid < 0 {
+                return Ok(Arc::new(SuInfo::deny(uid)));
+            }
+
             // Finally, the SuInfo
             Ok(Arc::new(SuInfo {
                 uid,
                 eval_uid,
+                mgr_pkg,
+                mgr_uid,
                 settings,
                 cfg,
                 timestamp: Instant::now(),

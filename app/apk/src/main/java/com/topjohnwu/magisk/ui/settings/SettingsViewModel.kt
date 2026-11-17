@@ -13,15 +13,18 @@ import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.model.ColorMode
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.RootChannel
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.ui.ThemeState
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsViewModel : BaseViewModel() {
 
@@ -29,8 +32,7 @@ class SettingsViewModel : BaseViewModel() {
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
     private fun buildInitialState(): SettingsUiState {
-        val isDynamicColorSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-        val selectedColorIndex = ColorMode.fromValue(Config.colorMode).toUiIndex(isDynamicColorSupported)
+        val selectedColorIndex = ColorMode.fromValue(Config.colorMode).ordinal
 
         val localeTags = LocaleSetting.available.tags.toList()
         val localeNames = LocaleSetting.available.names.toList()
@@ -50,7 +52,8 @@ class SettingsViewModel : BaseViewModel() {
             availableLanguageTags = localeTags,
             selectedLanguageIndex = selectedLocaleIndex,
             selectedColorModeIndex = selectedColorIndex,
-            isDynamicColorSupported = isDynamicColorSupported,
+            isDynamicColorSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
+            dynamicColorEnabled = Config.dynamicColor,
 
             selectedUpdateChannelIndex = updateIndex,
             isCustomChannel = isCustomChannel,
@@ -62,8 +65,10 @@ class SettingsViewModel : BaseViewModel() {
             randomPackageNameEnabled = Config.randName,
 
             zygiskEnabled = Config.zygisk,
-            isZygiskPendingReboot = Config.zygisk != Info.isZygiskEnabled,
-            denyListEnabled = Config.denyList,
+            isZygiskPendingReboot = Config.zygisk != Info.builtInZygiskActive,
+            denyListEnabled = Config.magiskHide,
+            isDenyListPendingReboot = Config.magiskHide != Config.denyList,
+            suListEnabled = Config.sulist,
 
             selectedMultiuserModeIndex = Config.suMultiuserMode,
             selectedNamespaceModeIndex = Config.suMntNamespaceMode,
@@ -85,18 +90,45 @@ class SettingsViewModel : BaseViewModel() {
             suAuthEnabled = Config.suAuth,
             // Turned off when the notification permission is denied on startup
             checkUpdateEnabled = Config.checkUpdate,
+            // The lock follows the REQUESTED SuList mode (suListEnabled); the
+            // engine refuses a disable while SuList is requested, and the
+            // summaries/titles keep following the applied mode below.
+            suListArmed = Info.sulist,
         )
     }
 
     fun refreshEnvironment() {
         _uiState.update { it.withEnvironment() }
+        // The cached root shell may have degraded while the app was in the
+        // background. Heal it, then re-read the DB-backed toggles that
+        // withEnvironment() does not cover.
+        viewModelScope.launch {
+            if (RootChannel.ensure()) {
+                val fresh = withContext(Dispatchers.IO) {
+                    _uiState.value.copy(
+                        denyListEnabled = Config.magiskHide,
+                        isDenyListPendingReboot = Config.magiskHide != Config.denyList,
+                        suListEnabled = Config.sulist,
+                    ).withEnvironment()
+                }
+                _uiState.update { fresh }
+            } else if (Info.isRooted) {
+                showToast(CoreR.string.no_connection)
+            }
+        }
     }
 
     fun setColorMode(index: Int) {
-        val newMode = ColorMode.fromUiIndex(index, _uiState.value.isDynamicColorSupported)
+        val newMode = ColorMode.entries[index]
         Config.colorMode = newMode.value
         ThemeState.colorMode = newMode.value
         _uiState.update { it.copy(selectedColorModeIndex = index) }
+    }
+
+    fun toggleDynamicColor(enabled: Boolean) {
+        Config.dynamicColor = enabled
+        ThemeState.dynamicColor = enabled
+        _uiState.update { it.copy(dynamicColorEnabled = enabled) }
     }
 
     fun setLanguage(index: Int) {
@@ -176,27 +208,101 @@ class SettingsViewModel : BaseViewModel() {
     }
 
     fun toggleZygisk(enabled: Boolean) {
-        Config.zygisk = enabled
-        val isMismatch = enabled != Info.isZygiskEnabled
         _uiState.update {
             it.copy(
                 zygiskEnabled = enabled,
-                isZygiskPendingReboot = isMismatch,
+                isZygiskPendingReboot = enabled != Info.builtInZygiskActive,
             )
         }
-        if (isMismatch) {
-            showToast(CoreR.string.reboot_apply_change)
-        }
+        val value = if (enabled) 1 else 0
+        // The setting is read once at post-fs-data, so a write lost on a
+        // broken su shell would silently leave the next boot unarmed. Write
+        // it explicitly, verify the result and revert the toggle on failure,
+        // like the deny and sulist toggles do.
+        Shell.cmd("magisk --sqlite 'REPLACE INTO settings (key,value) VALUES(\"zygisk\",$value)'")
+            .submit { result ->
+                if (result.isSuccess) {
+                    Config.zygisk = enabled
+                    if (enabled != Info.builtInZygiskActive) {
+                        showToast(CoreR.string.reboot_apply_change)
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            zygiskEnabled = !enabled,
+                            isZygiskPendingReboot = !enabled != Info.builtInZygiskActive,
+                        )
+                    }
+                }
+            }
     }
 
     fun toggleDenyList(enabled: Boolean) {
-        _uiState.update { it.copy(denyListEnabled = enabled) }
-        val cmd = if (enabled) "enable" else "disable"
-        Shell.cmd("magisk --denylist $cmd").submit { result ->
+        // SuList forces MagiskHide on; refuse the disable while SuList is
+        // requested and explain why.
+        if (!enabled && _uiState.value.suListEnabled) {
+            AppContext.toast(CoreR.string.settings_magiskhide_sulist_locked, Toast.LENGTH_SHORT)
+            return
+        }
+        _uiState.update {
+            it.copy(
+                denyListEnabled = enabled,
+                isDenyListPendingReboot = enabled != Config.denyList,
+            )
+        }
+        val value = if (enabled) 1 else 0
+        // Only the requested state is persisted: the daemon reads this key
+        // at boot, so the running ptrace monitor is never touched and the
+        // choice stays revocable until the reboot.
+        Shell.cmd("magisk --sqlite 'REPLACE INTO settings (key,value) VALUES(\"magiskhide\",$value)'")
+            .submit { result ->
+                if (result.isSuccess) {
+                    Config.magiskHide = enabled
+                    val pending = enabled != Config.denyList
+                    _uiState.update { it.copy(isDenyListPendingReboot = pending) }
+                    if (pending) {
+                        showToast(CoreR.string.reboot_apply_change)
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            denyListEnabled = !enabled,
+                            isDenyListPendingReboot = !enabled != Config.denyList,
+                        )
+                    }
+                }
+            }
+    }
+
+    fun toggleSuList(enabled: Boolean) {
+        _uiState.update { it.copy(suListEnabled = enabled) }
+        // Enabling SuList forces MagiskHide on in the requested state; both
+        // writes land in the DB and are applied by the boot-time reader.
+        // The multi-row REPLACE keeps them atomic; the fallback chains them
+        // if the applet rejects the multi-row form.
+        val setSulist = "magisk --sqlite 'REPLACE INTO settings (key,value) VALUES(\"sulist\",1)'"
+        val setMagiskHide = "magisk --sqlite 'REPLACE INTO settings (key,value) VALUES(\"magiskhide\",1)'"
+        val command =
+            if (enabled) "magisk --sqlite 'REPLACE INTO settings (key,value) " +
+                "VALUES(\"sulist\",1),(\"magiskhide\",1)' || ($setSulist && $setMagiskHide)"
+            else "magisk magiskhide sulist disable"
+        Shell.cmd(command).submit { result ->
             if (result.isSuccess) {
-                Config.denyList = enabled
+                Config.sulist = enabled
+                if (enabled) Config.magiskHide = true
+                _uiState.update {
+                    val denyListEnabled = if (enabled) true else it.denyListEnabled
+                    it.copy(
+                        suListEnabled = enabled,
+                        denyListEnabled = denyListEnabled,
+                        isDenyListPendingReboot = denyListEnabled != Config.denyList,
+                    )
+                }
+                if (Info.sulist != enabled) {
+                    AppContext.toast(CoreR.string.reboot_apply_change, Toast.LENGTH_SHORT)
+                }
             } else {
-                _uiState.update { it.copy(denyListEnabled = !enabled) }
+                _uiState.update { it.copy(suListEnabled = !enabled) }
             }
         }
     }

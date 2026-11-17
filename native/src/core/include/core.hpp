@@ -69,6 +69,7 @@ bool read_vector(int fd, std::vector<T> &vec) {
 }
 
 // Scripting
+void install_apk(Utf8CStr apk);
 void uninstall_pkg(Utf8CStr pkg);
 void exec_common_scripts(Utf8CStr stage);
 void exec_module_scripts(Utf8CStr stage, const rust::Vec<ModuleInfo> &module_list);
@@ -79,10 +80,13 @@ void clear_pkg(const char *pkg, int user_id);
 // Denylist
 extern std::atomic<bool> denylist_enforced;
 int denylist_cli(rust::Vec<rust::String> &args);
+int magiskhide_cli(rust::Vec<rust::String> &args);
+int magiskhide_main(int argc, char *argv[]);
 void denylist_handler(int client);
+void hide_handler(int client);
 void initialize_denylist();
 void scan_deny_apps();
-bool is_deny_target(int uid, std::string_view process);
+bool is_deny_target(int uid, std::string_view process, int max_len = 1024);
 void revert_unmount(int pid = -1) noexcept;
 void update_deny_flags(int uid, rust::Str process, uint32_t &flags);
 
@@ -93,4 +97,7 @@ void exec_root_shell(int client, int pid, SuRequest &req, MntNsMode mode);
 inline Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }
 inline rust::String resolve_preinit_dir_rs(Utf8CStr base_dir) {
     return resolve_preinit_dir(base_dir.c_str());
+}
+inline rust::String resolve_early_mount_dir_rs(Utf8CStr base_dir) {
+    return resolve_early_mount_dir(base_dir.c_str());
 }

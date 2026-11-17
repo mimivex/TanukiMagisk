@@ -87,6 +87,7 @@ pub mod ffi {
         fn mount_overlay(self: &mut MagiskInit, dest: Utf8CStrRef);
         fn handle_sepolicy(self: &mut MagiskInit);
         fn restore_overlay_contexts(self: &MagiskInit);
+        fn install_hyos_shim(self: &mut MagiskInit);
     }
     unsafe extern "C++" {
         // Used in Rust

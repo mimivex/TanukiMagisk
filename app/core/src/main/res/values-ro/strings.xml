@@ -2,7 +2,7 @@
 
     <!--Sections-->
     <string name="modules">Module</string>
-    <string name="superuser">Superutilizator</string>
+    <string name="superuser">Superuser</string>
     <string name="logs">Jurnale</string>
     <string name="settings">Setări</string>
     <string name="install">Instalează</string>
@@ -16,15 +16,16 @@
     <string name="loading">Se încarcă…</string>
     <string name="update">Actualizează</string>
     <string name="not_available">Indisponibil</string>
+    <string name="not_installed">Neinstalat</string>
     <string name="hide">Ascunde</string>
     <string name="home_package">Pachet</string>
     <string name="home_app_title">Aplicație</string>
 
-    <string name="home_notice_content">Descarcă Magisk NUMAI de pe pagina oficială GitHub. Fișierele din surse necunoscute pot fi rău intenționate!</string>
-    <string name="home_support_title">Sprijină-ne</string>
+    <string name="home_notice_content">Fork al Magisk care nu este întreținut activ. Dacă ați plătit pentru această aplicație, ați fost înșelat: este gratuită și open source. Build experimental oferit ca atare, fără garanție; utilizați pe propriul risc.</string>
+    <string name="home_support_title">Susține autorii originali</string>
     <string name="home_follow_title">Urmărește-ne</string>
     <string name="home_item_source">Sursă</string>
-    <string name="home_support_content">Magisk este și va fi întotdeauna gratuit și open-source. Cu toate acestea, ne poți arăta că îți pasă făcând o donație.</string>
+    <string name="home_support_content">Magisk este și va fi întotdeauna gratuit și open-source. Acesta este un fork al Magisk care nu va primi suport activ. Cu toate acestea, ne poți arăta că îți pasă făcând o donație autorilor originali ai Magisk.</string>
     <string name="home_installed_version">Versiune instalată</string>
     <string name="home_latest_version">Ultima versiune</string>
     <string name="invalid_update_channel">Canal de actualizare nevalid</string>
@@ -94,6 +95,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">Afișează aplicațiile de sistem</string>
     <string name="show_os_app">Afișează aplicațiile SO-ului</string>
+    <string name="add_recommended">Adaugă recomandatele</string>
     <string name="hide_filter_hint">Filtrează după nume</string>
     <string name="hide_search">Căutare</string>
 
@@ -110,8 +112,6 @@
     <string name="module_state_restore">Restaurează</string>
     <string name="module_action_install_external">Instalează din spațiul de stocare</string>
     <string name="update_available">Actualizare disponibilă</string>
-    <string name="suspend_text_riru">Modul suspendat deoarece %1$s este activat</string>
-    <string name="suspend_text_zygisk">Modul suspendat deoarece %1$s nu este activat</string>
     <string name="zygisk_module_unloaded">Modulul Zygisk nu a fost încărcat din cauza incompatibilității</string>
     <string name="module_empty">Niciun modul instalat</string>
     <string name="confirm_install">Instalezi modulul %1$s?</string>
@@ -212,4 +212,62 @@
     <string name="install_unknown_denied">Permite „instalarea de aplicații necunoscute” pentru a activa această funcționalitate</string>
     <string name="app_not_found">Nu s-a găsit nicio aplicație care să gestioneze această acțiune</string>
     <string name="reboot_apply_change">Repornește pentru a aplica modificările</string>
+    <string name="auto_response">Răspuns automat</string>
+    <string name="patch_file_msg">Selectează o imagine brută (*.img) sau un fișier tar ODIN (*.tar)</string>
+    <string name="prompt">Solicită</string>
+    <string name="request_timeout">Expirare pentru cerere</string>
+    <string name="restore_app_confirmation">Acest lucru va restaura aplicația ascunsă în aplicația originală. Sigur vrei să faci asta?</string>
+    <string name="select_patch_file">Selectează și patchuiește un fișier</string>
+    <string name="settings_app_name_error">Format nevalid</string>
+    <string name="settings_app_name_helper">Aplicația va fi reîmpachetată cu acest nume</string>
+    <string name="settings_app_name_hint">Nume nou</string>
+    <string name="settings_hide_app_summary">Instalează o aplicație proxy cu ID aleatoriu pentru pachet și etichetă personalizată pentru aplicație</string>
+    <string name="settings_hide_app_title">Ascunde aplicația Magisk</string>
+    <string name="settings_restore_app_summary">Dezvăluie aplicația și restaurează APK-ul original</string>
+    <string name="settings_restore_app_title">Restaurează aplicația Magisk</string>
+    <string name="settings_su_adb">Doar ADB</string>
+    <string name="settings_su_app">Doar aplicații</string>
+    <string name="settings_su_app_adb">Aplicații și ADB</string>
+    <string name="settings_su_disable">Dezactivat</string>
+    <string name="settings_su_reauth_summary">Cere din nou permisiunile de superutilizator după actualizarea aplicațiilor</string>
+    <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
+    <string name="settings_su_request_10">10 secunde</string>
+    <string name="settings_su_request_15">15 secunde</string>
+    <string name="settings_su_request_20">20 de secunde</string>
+    <string name="settings_su_request_30">30 de secunde</string>
+    <string name="settings_su_request_45">45 de secunde</string>
+    <string name="settings_su_request_60">60 de secunde</string>
+    <string name="settings_su_tapjack_summary">Caseta de dialog pentru solicitarea permisiunilor de superutilizator nu va răspunde la input cât timp este ascunsă de orice altă fereastră sau suprapunere</string>
+    <string name="settings_su_tapjack_title">Protecție față de tapjacking</string>
+    <string name="su_request_title">Cerere de superutilizator</string>
+    <string name="superuser_access">Acces pentru superutilizator</string>
+    <string name="tanuki_notice">Build neoficial al fork-ului Tanuki</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide nu poate fi dezactivat cât timp SuList este activat.</string>
+    <string name="settings_magiskhide_summary">Modificările Magisk sunt anulate pentru procesele din hidelist</string>
+    <string name="settings_hidelist_config_title">Configurează HideList</string>
+    <string name="settings_hidelist_config_summary">Selectează procesele de inclus în hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">Aplică SuList</string>
+    <string name="settings_sulist_summary">Doar procesele din sulist pot obține acces root Magisk</string>
+    <string name="settings_sulist_config_title">Configurează SuList</string>
+    <string name="settings_sulist_config_summary">Selectează procesele de inclus în sulist</string>
+    <string name="settings_sulist_enforced">SuList este aplicat</string>
+    <string name="settings_sulist_error_magiskhide">Această funcție necesită MagiskHide activat</string>
+    <string name="sulist_empty_warning">SuList este o listă albă de root: doar aplicațiile din listă pot obține root Magisk. Managerul și componentele de sistem sunt întotdeauna exceptate.</string>
+    <string name="zygisk_provider_missing">Nu este instalat niciun furnizor Zygisk. Activează Zygisk integrat din setări sau instalează ZygiskNext (sau un furnizor compatibil) pentru modulele Zygisk. MagiskHide/SuList funcționează fără Zygisk.</string>
+    <string name="zygisk_provider_disabled">Un furnizor Zygisk este instalat, dar dezactivat.</string>
+    <string name="zygisk_provider_not_injected">Furnizor Zygisk instalat; injecția nu a fost detectată.</string>
+    <string name="settings_material_you">Culori dinamice</string>
+    <string name="settings_material_you_summary">Adaptează culorile la tapet</string>
+    <string name="forever">Pentru totdeauna</string>
+    <string name="once">O dată</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_warning">Acordă acces complet la dispozitivul tău.\nRefuză dacă nu ești sigur!</string>
+    <string name="touch_filtered_warning">Deoarece o aplicație ascunde o cerere Superuser, Magisk nu poate verifica răspunsul tău.</string>
+    <string name="superuser_grant">Acordă Superuser</string>
+    <string name="su_legacy_cmd">Avertisment: a fost detectată o linie de comandă neacceptată</string>
 </resources>

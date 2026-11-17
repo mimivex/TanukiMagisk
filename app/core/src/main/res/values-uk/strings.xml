@@ -2,7 +2,7 @@
 
     <!--Sections-->
     <string name="modules">Модулі</string>
-    <string name="superuser">Суперкористувач</string>
+    <string name="superuser">Superuser</string>
     <string name="logs">Журнали</string>
     <string name="settings">Налаштування</string>
     <string name="install">Встановлення</string>
@@ -16,13 +16,14 @@
     <string name="loading">Завантаження…</string>
     <string name="update">Оновити</string>
     <string name="not_available">Н/Д</string>
+    <string name="not_installed">Не встановлено</string>
     <string name="hide">Сховати</string>    <string name="home_package">Пакунок</string>
     <string name="home_app_title">Застосунок</string>    <string name="reinstall">Перевстановити</string>
-    <string name="home_notice_content">Завантажуйте Magisk ЛИШЕ з офіційної сторінки на GitHub. Файли з невідомих джерел можуть містити шкідливий функціонал!</string>
-    <string name="home_support_title">Підтримати нас</string>
+    <string name="home_notice_content">Форк Magisk, який активно не підтримується. Якщо ви платили за цей застосунок, вас обманули: він безкоштовний і з відкритим кодом. Експериментальна збірка надається як є, без будь-яких гарантій; використовуйте на свій ризик.</string>
+    <string name="home_support_title">Підтримайте оригінальних авторів</string>
     <string name="home_follow_title">Слідкуйте за нами</string>
     <string name="home_item_source">Джерело</string>
-    <string name="home_support_content">Magisk є, і завжди буде безкоштовним та з відкритим кодом. Однак, якщо вам не байдуже, можете зробити невеличке пожертвування.</string>    <string name="home_installed_version">Встановлено</string>
+    <string name="home_support_content">Magisk є, і завжди буде безкоштовним та з відкритим кодом. Це fork Magisk, який не отримуватиме активної підтримки. Однак, якщо вам не байдуже, можете зробити невеличке пожертвування оригінальним авторам Magisk.</string>    <string name="home_installed_version">Встановлено</string>
     <string name="home_latest_version">Найновіша</string>
     <string name="invalid_update_channel">Невірний канал оновлення</string>    <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до вимкнення/видалення всіх модулів! Рут буде повністю видалено!\nВаші дані можуть зашифруватися, якщо вони не зашифровані!\nВпевнені, що бажаєте продовжити?</string>
@@ -83,6 +84,8 @@
     <string name="menuSaveLog">Зберегти журнал</string>
     <string name="menuClearLog">Очистити журнал</string>
     <string name="logs_cleared">Журнал успішно очищено</string>    <string name="back">Назад</string>    <string name="enabled">Увімкнено</string>
+    <string name="provided">Надано</string>
+    <string name="yes_provided">Так (Надано)</string>
     <string name="disabled">Вимкнено</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Цільовий UID: %1$d</string>
@@ -95,6 +98,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">Показувати системні застосунки</string>
     <string name="show_os_app">Показувати вбудовані застосунки</string>
+    <string name="add_recommended">Додати рекомендовані</string>
     <string name="hide_filter_hint">Фільтрувати за назвою</string>
     <string name="sort_by_name">Сортувати за назвою</string>
     <string name="sort_by_package_name">Сортувати за назвою пакунка</string>
@@ -118,8 +122,6 @@
     <string name="module_state_restore">Відновити</string>
     <string name="module_action_install_external">Встановити зі сховища</string>
     <string name="update_available">Доступне оновлення</string>
-    <string name="suspend_text_riru">Модуль призупинено, оскільки %1$s увімкнено</string>
-    <string name="suspend_text_zygisk">Модуль призупинено, оскільки %1$s не увімкнено</string>
     <string name="zygisk_module_unloaded">Модуль Zygisk не завантажено через несумісність</string>
     <string name="module_empty">Немає встановлених модулів</string>
     <string name="confirm_install">Встановити модуль %1$s?</string>
@@ -140,7 +142,7 @@
     <string name="settings_update_channel_title">Канал оновлення</string>
     <string name="settings_update_stable">Стабільний реліз</string>
     <string name="settings_update_beta">Бета реліз</string>
-    <string name="settings_update_debug">Налагодження</string>
+    <string name="settings_update_canary">Canary</string>
     <string name="settings_update_custom">Власний</string>
     <string name="settings_update_custom_msg">Вставте власний URL</string>
     <string name="settings_zygisk_summary">Запускати частини Magisk в сервісі zygote</string>
@@ -229,4 +231,63 @@
     <string name="install_unknown_denied">Дозвольте \"Встановлення невідомих застосунків\", щоб увімкнути цей функціонал</string>
     <string name="app_not_found">Не знайдено застосунок, який повинен опрацювати цю дію</string>
     <string name="reboot_apply_change">Перезавантажити, щоб застосувати зміни</string>
+    <string name="auto_response">Автоматична відповідь</string>
+    <string name="download_patch_file">Завантажити і пропатчити файл</string>
+    <string name="patch_file_msg">Виберіть необроблений образ (*.img) або стиснутий файл ODIN (*.tar)</string>
+    <string name="prompt">Запитувати</string>
+    <string name="request_timeout">Час запиту</string>
+    <string name="restore_app_confirmation">Це відновить прихований застосунок до оригінального. Ви справді бажаєте це зробити?</string>
+    <string name="select_patch_file">Вибрати і пропатчити файл</string>
+    <string name="settings_app_name_error">Неправильний формат</string>
+    <string name="settings_app_name_helper">Застосунок буде перезібрано з цим ім\’ям</string>
+    <string name="settings_app_name_hint">Нове ім\’я</string>
+    <string name="settings_hide_app_summary">Встановити проксі-застосунок з довільним ID пакунку та назвою</string>
+    <string name="settings_hide_app_title">Сховати застосунок Magisk</string>
+    <string name="settings_restore_app_summary">Відновити застосунок з оригінального APK та показати його</string>
+    <string name="settings_restore_app_title">Відновити застосунок Magisk</string>
+    <string name="settings_su_adb">ADB</string>
+    <string name="settings_su_app">Застосунки</string>
+    <string name="settings_su_app_adb">Застосунки і ADB</string>
+    <string name="settings_su_disable">Вимкнено</string>
+    <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення застосунку</string>
+    <string name="settings_su_reauth_title">Повторна автентифікація</string>
+    <string name="settings_su_request_10">10 секунд</string>
+    <string name="settings_su_request_15">15 секунд</string>
+    <string name="settings_su_request_20">20 секунд</string>
+    <string name="settings_su_request_30">30 секунд</string>
+    <string name="settings_su_request_45">45 секунд</string>
+    <string name="settings_su_request_60">60 секунд</string>
+    <string name="settings_su_tapjack_summary">Діалогове вікно суперкористувача не буде отримувати ввід від користувача, коли вікно перекрито іншим застосунком чи вікном</string>
+    <string name="settings_su_tapjack_title">Увімкнути захист від підміни натискань</string>
+    <string name="su_request_title">Запит прав суперкористувача</string>
+    <string name="superuser_access">Доступ суперкористувача</string>
+    <string name="tanuki_notice">Неофіційна збірка форку Tanuki</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide не можна вимкнути, поки ввімкнено SuList.</string>
+    <string name="settings_magiskhide_summary">Для процесів у hidelist зміни Magisk скасовуються</string>
+    <string name="settings_hidelist_config_title">Налаштувати HideList</string>
+    <string name="settings_hidelist_config_summary">Виберіть процеси для включення до hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">Застосувати SuList</string>
+    <string name="settings_sulist_summary">Лише процеси в sulist можуть отримати root-доступ Magisk</string>
+    <string name="settings_sulist_config_title">Налаштувати SuList</string>
+    <string name="settings_sulist_config_summary">Виберіть процеси для включення до sulist</string>
+    <string name="settings_sulist_enforced">SuList застосовано</string>
+    <string name="settings_sulist_error_magiskhide">Ця функція потребує увімкненого MagiskHide</string>
+    <string name="sulist_empty_warning">SuList — це білий список root: лише застосунки зі списку можуть отримати root Magisk. Менеджер і системні компоненти завжди виключені.</string>
+    <string name="zygisk_provider_missing">Провайдер Zygisk не встановлено. Увімкніть вбудований Zygisk у налаштуваннях або встановіть ZygiskNext (або сумісний провайдер) для модулів Zygisk. MagiskHide/SuList працюють без Zygisk.</string>
+    <string name="zygisk_provider_disabled">Провайдер Zygisk встановлено, але вимкнено.</string>
+    <string name="zygisk_provider_not_injected">Провайдер Zygisk встановлено; впровадження не виявлено.</string>
+    <string name="settings_material_you">Динамічні кольори</string>
+    <string name="settings_material_you_summary">Адаптувати кольори до шпалер</string>
+    <string name="forever">Назавжди</string>
+    <string name="once">Один раз</string>
+    <string name="tenmin">10 хв</string>
+    <string name="twentymin">20 хв</string>
+    <string name="thirtymin">30 хв</string>
+    <string name="sixtymin">60 хв</string>
+    <string name="su_warning">Надає повний доступ до вашого пристрою.\nВідхиліть, якщо ви не впевнені!</string>
+    <string name="touch_filtered_warning">Оскільки застосунок приховує запит Superuser, Magisk не може перевірити вашу відповідь.</string>
+    <string name="superuser_grant">Дозволити Superuser</string>
+    <string name="su_legacy_cmd">Попередження: виявлено непідтримуваний рядок команди</string>
 </resources>

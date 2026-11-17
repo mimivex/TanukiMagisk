@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.home
 import android.os.Build
 import android.os.PowerManager
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +33,8 @@ import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -45,6 +48,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -79,11 +83,18 @@ import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.tanukiMinorOf
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.ktx.reboot
+import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.tasks.AppMigration
+import com.topjohnwu.magisk.core.model.ColorMode
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.ui.ThemeState
+import com.topjohnwu.magisk.ui.actionColors
+import com.topjohnwu.magisk.ui.updateColors
 import com.topjohnwu.magisk.ui.component.AdaptiveColumns
 import com.topjohnwu.magisk.ui.component.LoadingDialog
 import com.topjohnwu.magisk.ui.component.MagiskDialog
@@ -115,6 +126,8 @@ fun HomeScreen(
     var managerUpdate by rememberSaveable { mutableStateOf<UpdateInfo?>(null) }
     var showEnvFixDialog by rememberSaveable { mutableStateOf(false) }
     var showInstallDialog by rememberSaveable { mutableStateOf(false) }
+    var showHideDialog by rememberSaveable { mutableStateOf(false) }
+    var showRestoreDialog by rememberSaveable { mutableStateOf(false) }
     var envFixCode by rememberSaveable { mutableIntStateOf(0) }
 
     LaunchedEffect(uiState.showUninstall) {
@@ -134,6 +147,13 @@ fun HomeScreen(
             envFixCode = uiState.envFixCode
             showEnvFixDialog = true
             viewModel.onEnvFixConsumed()
+        }
+    }
+    LaunchedEffect(uiState.showHideRestore) {
+        if (uiState.showHideRestore) {
+            val hidden = context.packageName != BuildConfig.APP_PACKAGE_NAME
+            if (hidden) showRestoreDialog = true else showHideDialog = true
+            viewModel.onHideRestoreConsumed()
         }
     }
 
@@ -179,6 +199,26 @@ fun HomeScreen(
             onFixEnv = {
                 showEnvFixDialog = false
                 viewModel.fixEnv()
+            }
+        )
+    }
+
+    if (showHideDialog) {
+        HideAppDialog(
+            onDismiss = { showHideDialog = false },
+            onConfirm = { name ->
+                showHideDialog = false
+                viewModel.hideApp(name)
+            }
+        )
+    }
+
+    if (showRestoreDialog) {
+        RestoreAppDialog(
+            onDismiss = { showRestoreDialog = false },
+            onConfirm = {
+                showRestoreDialog = false
+                viewModel.restoreApp()
             }
         )
     }
@@ -248,7 +288,9 @@ fun HomeScreen(
                     version = uiState.managerInstalledVersion,
                     remoteVersion = uiState.managerRemoteVersion,
                     progress = uiState.managerProgress,
+                    isHidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
                     onManagerPressed = viewModel::onManagerPressed,
+                    onHideRestorePressed = viewModel::onHideRestorePressed,
                 )
             },
             second = {
@@ -269,7 +311,10 @@ fun HomeScreen(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
                 )
-                DevelopersCard(onLinkClicked = viewModel::onLinkPressed)
+                DevelopersCard(
+                    devs = developers,
+                    onLinkClicked = viewModel::onLinkPressed,
+                )
             },
         )
     }
@@ -379,10 +424,12 @@ private fun NoticeCard(
     onHide: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDarkTheme = ColorMode.fromValue(ThemeState.colorMode).isDark(isSystemInDarkTheme())
+    val (containerColor, contentColor) = updateColors(MaterialTheme.colorScheme, isDarkTheme)
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+        colors = CardDefaults.cardColors(containerColor = containerColor)
     ) {
         Row(
             modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 6.dp, end = 6.dp),
@@ -391,7 +438,7 @@ private fun NoticeCard(
             Text(
                 text = stringResource(CoreR.string.home_notice_content),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                color = contentColor,
                 modifier = Modifier
                     .weight(1f)
                     .padding(vertical = 6.dp)
@@ -401,7 +448,7 @@ private fun NoticeCard(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(CoreR.string.hide),
                     modifier = Modifier.size(18.dp),
-                    tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                    tint = contentColor,
                 )
             }
         }
@@ -415,6 +462,9 @@ private fun InstallButton(
     modifier: Modifier = Modifier,
     isPrimary: Boolean = false,
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val isDarkTheme = ColorMode.fromValue(ThemeState.colorMode).isDark(isSystemInDarkTheme())
+    val (containerColor, contentColor) = actionColors(colorScheme, isDarkTheme)
     val buttonContent = @Composable {
         Icon(
             painter = painterResource(R.drawable.ic_download),
@@ -440,6 +490,10 @@ private fun InstallButton(
         FilledTonalButton(
             onClick = onClick,
             contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+            colors = ButtonDefaults.filledTonalButtonColors(
+                containerColor = containerColor,
+                contentColor = contentColor
+            ),
             modifier = modifier,
         ) {
             buttonContent()
@@ -492,7 +546,8 @@ private fun CoreCard(
                     )
                     Text(
                         text = if (isInstalled) {
-                            version.ifEmpty { stringResource(CoreR.string.not_available) }
+                            version.replaceFirst(" (", "\n(")
+                                .ifEmpty { stringResource(CoreR.string.not_available) }
                         } else {
                             stringResource(CoreR.string.not_installed)
                         },
@@ -524,7 +579,9 @@ private fun AppCard(
     version: String,
     remoteVersion: String,
     progress: Int,
+    isHidden: Boolean,
     onManagerPressed: () -> Unit,
+    onHideRestorePressed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val actionLabel = when (state) {
@@ -562,14 +619,27 @@ private fun AppCard(
                     )
                 }
 
-                if (actionLabel != null) {
-                    InstallButton(
-                        label = actionLabel,
-                        onClick = onManagerPressed,
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (Info.env.isActive) {
+                        val hideRestoreIcon = if (isHidden) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                        IconButton(onClick = onHideRestorePressed) {
+                            Icon(
+                                imageVector = hideRestoreIcon,
+                                contentDescription = stringResource(
+                                    if (isHidden) CoreR.string.settings_restore_app_title else CoreR.string.settings_hide_app_title
+                                ),
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    }
+                    if (actionLabel != null) {
+                        InstallButton(
+                            label = actionLabel,
+                            onClick = onManagerPressed,
+                        )
+                    }
                 }
             }
-
             Spacer(Modifier.height(16.dp))
 
             if (state != HomeViewModel.State.LOADING) {
@@ -623,7 +693,13 @@ private fun StatusCard(
     val statuses = listOf(
         StatusInfo(
             label = stringResource(CoreR.string.zygisk),
-            status = stringResource(if (Info.isZygiskEnabled) CoreR.string.enabled else CoreR.string.disabled)
+            status = stringResource(
+                when {
+                    !Info.isZygiskEnabled -> CoreR.string.disabled
+                    Info.builtInZygiskActive -> CoreR.string.enabled
+                    else -> CoreR.string.provided
+                }
+            )
         ),
         StatusInfo(
             label = stringResource(CoreR.string.ramdisk),
@@ -679,6 +755,8 @@ private fun SupportCard(
     onLinkClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDarkTheme = ColorMode.fromValue(ThemeState.colorMode).isDark(isSystemInDarkTheme())
+    val (containerColor, contentColor) = actionColors(MaterialTheme.colorScheme, isDarkTheme)
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -698,7 +776,11 @@ private fun SupportCard(
             ) {
                 FilledTonalButton(
                     onClick = { onLinkClicked(Const.Url.PATREON_URL) },
-                    contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+                    contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = containerColor,
+                        contentColor = contentColor
+                    )
                 ) {
                     Icon(
                         painter = painterResource(CoreR.drawable.ic_patreon),
@@ -713,7 +795,11 @@ private fun SupportCard(
                 }
                 FilledTonalButton(
                     onClick = { onLinkClicked("https://paypal.me/magiskdonate") },
-                    contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+                    contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = containerColor,
+                        contentColor = contentColor
+                    )
                 ) {
                     Icon(
                         painter = painterResource(CoreR.drawable.ic_paypal),
@@ -756,10 +842,19 @@ private val developers = listOf(
         LinkInfo(CoreR.string.twitter, CoreR.drawable.ic_twitter, "https://x.com/canyie2977"),
         LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/canyie"),
     )),
+    DeveloperInfo("HuskyDG", listOf(
+        LinkInfo(CoreR.string.paypal, CoreR.drawable.ic_paypal, "https://paypal.me/HuskyDG"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/HuskyDG"),
+    )),
+    DeveloperInfo("mimivex", listOf(
+        LinkInfo(CoreR.string.kofi, CoreR.drawable.ic_favorite, "https://ko-fi.com/X0K029DTFX"),
+        LinkInfo(CoreR.string.github, CoreR.drawable.ic_github, "https://github.com/mimivex"),
+    )),
 )
 
 @Composable
 private fun DevelopersCard(
+    devs: List<DeveloperInfo>,
     onLinkClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -769,7 +864,7 @@ private fun DevelopersCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Column {
-            developers.forEachIndexed { index, dev ->
+            devs.forEachIndexed { index, dev ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -795,7 +890,7 @@ private fun DevelopersCard(
                         }
                     }
                 }
-                if (index < developers.lastIndex) {
+                if (index < devs.lastIndex) {
                     HorizontalDivider(
                         thickness = 0.5.dp,
                         modifier = Modifier.padding(horizontal = 18.dp),
@@ -847,7 +942,7 @@ private fun ManagerInstallComposableDialog(
     ) {
         MarkdownTextAsync {
             val text = update.note
-            File(cacheDir, "${update.versionCode}.md").writeText(text)
+            File(cacheDir, "${update.version}.md").writeText(text)
             text
         }
     }
@@ -861,9 +956,12 @@ private fun EnvFixComposableDialog(
     onFixEnv: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // A difference only in the tanuki minor is the normal "daemon older than the
+    // manager" state, handled by the OUTDATED card, not by a full fix.
     val needsFullFix = code == 2 ||
         Info.env.versionCode != BuildConfig.APP_VERSION_CODE ||
-        Info.env.versionString != BuildConfig.APP_VERSION_NAME
+        (Info.env.versionString != BuildConfig.APP_VERSION_NAME &&
+            Info.env.tanukiMinor == tanukiMinorOf(BuildConfig.APP_VERSION_NAME))
 
     MagiskDialog(
         modifier = modifier,
@@ -881,5 +979,56 @@ private fun EnvFixComposableDialog(
                 if (needsFullFix) CoreR.string.env_full_fix_msg else CoreR.string.env_fix_msg
             )
         )
+    }
+}
+
+@Composable
+private fun HideAppDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val defaultName = stringResource(CoreR.string.settings)
+    var appName by rememberSaveable { mutableStateOf(defaultName) }
+    val isError = appName.length > AppMigration.MAX_LABEL_LENGTH || appName.isBlank()
+
+    MagiskDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        title = stringResource(CoreR.string.settings_hide_app_title),
+        confirmText = stringResource(android.R.string.ok),
+        onConfirm = { if (!isError) onConfirm(appName) },
+        confirmEnabled = !isError,
+        dismissText = stringResource(android.R.string.cancel),
+        onDismiss = onDismiss,
+    ) {
+        Column(modifier = Modifier.padding(top = 8.dp)) {
+            OutlinedTextField(
+                value = appName,
+                onValueChange = { appName = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(CoreR.string.settings_app_name_hint)) },
+                isError = isError
+            )
+        }
+    }
+}
+
+@Composable
+private fun RestoreAppDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    MagiskDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        title = stringResource(CoreR.string.settings_restore_app_title),
+        confirmText = stringResource(android.R.string.ok),
+        onConfirm = onConfirm,
+        dismissText = stringResource(android.R.string.cancel),
+        onDismiss = onDismiss,
+    ) {
+        Text(text = stringResource(CoreR.string.restore_app_confirmation))
     }
 }

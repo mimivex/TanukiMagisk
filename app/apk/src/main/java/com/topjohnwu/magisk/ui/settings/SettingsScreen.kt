@@ -71,6 +71,7 @@ fun SettingsScreen(
         },
         onLanguageSelected = viewModel::setLanguage,
         onColorModeSelected = viewModel::setColorMode,
+        onDynamicColorToggle = viewModel::toggleDynamicColor,
         onUpdateChannelSelected = viewModel::setUpdateChannel,
         onOpenCustomUrlDialog = viewModel::openCustomChannelUrlDialog,
         onSaveCustomUrl = viewModel::saveCustomChannelUrl,
@@ -85,6 +86,7 @@ fun SettingsScreen(
         onCreateHosts = viewModel::createHosts,
         onToggleZygisk = viewModel::toggleZygisk,
         onToggleDenyList = viewModel::toggleDenyList,
+        onToggleSuList = viewModel::toggleSuList,
         // Drop taps while a screen transition runs, so a quick second tap can't push again
         onNavigateToDenyList = dropUnlessResumed { viewModel.navigateToDenyList() },
         onToggleSuAuth = { newValue ->
@@ -108,6 +110,7 @@ fun SettingsContent(
     onOpenSystemLocale: () -> Unit,
     onLanguageSelected: (Int) -> Unit,
     onColorModeSelected: (Int) -> Unit,
+    onDynamicColorToggle: (Boolean) -> Unit,
     onUpdateChannelSelected: (Int) -> Unit,
     onOpenCustomUrlDialog: () -> Unit,
     onSaveCustomUrl: (String) -> Unit,
@@ -119,6 +122,7 @@ fun SettingsContent(
     onCreateHosts: () -> Unit,
     onToggleZygisk: (Boolean) -> Unit,
     onToggleDenyList: (Boolean) -> Unit,
+    onToggleSuList: (Boolean) -> Unit,
     onNavigateToDenyList: () -> Unit,
     onToggleSuAuth: (Boolean) -> Unit,
     onMultiuserModeSelected: (Int) -> Unit,
@@ -171,6 +175,7 @@ fun SettingsContent(
                         onOpenSystemLocale = onOpenSystemLocale,
                         onLanguageSelected = onLanguageSelected,
                         onColorModeSelected = onColorModeSelected,
+                        onDynamicColorToggle = onDynamicColorToggle,
                     )
                 }
                 if (uiState.hasRootSections) {
@@ -208,6 +213,7 @@ fun SettingsContent(
                             onCreateHosts = onCreateHosts,
                             onToggleZygisk = onToggleZygisk,
                             onToggleDenyList = onToggleDenyList,
+                            onToggleSuList = onToggleSuList,
                             onNavigateToDenyList = onNavigateToDenyList,
                         )
                     }
@@ -255,6 +261,7 @@ private fun CustomizationSection(
     onOpenSystemLocale: () -> Unit,
     onLanguageSelected: (Int) -> Unit,
     onColorModeSelected: (Int) -> Unit,
+    onDynamicColorToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     SmallTitle(text = stringResource(CoreR.string.settings_customization))
@@ -289,10 +296,26 @@ private fun CustomizationSection(
         val colorModes = stringArrayResource(CoreR.array.color_mode).asList()
         SettingsDropdown(
             title = stringResource(CoreR.string.settings_color_mode),
-            items = if (uiState.isDynamicColorSupported) colorModes else colorModes.drop(3),
+            items = colorModes,
             selectedIndex = uiState.selectedColorModeIndex,
             onSelectedIndexChange = onColorModeSelected
         )
+
+        if (uiState.isDynamicColorSupported) {
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
+
+            // Wallpaper-based colors; the Color Mode dropdown still picks
+            // the light/dark variant.
+            SettingsSwitch(
+                title = stringResource(CoreR.string.settings_material_you),
+                summary = stringResource(CoreR.string.settings_material_you_summary),
+                checked = uiState.dynamicColorEnabled,
+                onCheckedChange = onDynamicColorToggle
+            )
+        }
     }
 }
 
@@ -397,6 +420,7 @@ private fun MagiskSection(
     onCreateHosts: () -> Unit,
     onToggleZygisk: (Boolean) -> Unit,
     onToggleDenyList: (Boolean) -> Unit,
+    onToggleSuList: (Boolean) -> Unit,
     onNavigateToDenyList: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -435,11 +459,19 @@ private fun MagiskSection(
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
 
-            // DenyList
+            // While SuList is requested the engine forces MagiskHide on, so
+            // the switch shows the effective state and stays on; turning it
+            // off is refused with a toast instead of locking the control.
             SettingsSwitch(
-                title = stringResource(CoreR.string.settings_denylist_title),
-                summary = stringResource(CoreR.string.settings_denylist_summary),
-                checked = uiState.denyListEnabled,
+                title = stringResource(CoreR.string.settings_magiskhide_title),
+                summary = stringResource(
+                    when {
+                        uiState.suListArmed -> CoreR.string.settings_sulist_enforced
+                        uiState.isDenyListPendingReboot -> CoreR.string.reboot_apply_change
+                        else -> CoreR.string.settings_magiskhide_summary
+                    }
+                ),
+                checked = uiState.denyListEnabled || uiState.suListEnabled,
                 onCheckedChange = onToggleDenyList
             )
 
@@ -448,10 +480,36 @@ private fun MagiskSection(
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
 
-            // DenyList Config
+            // SuList
+            SettingsSwitch(
+                title = stringResource(CoreR.string.settings_sulist_title),
+                summary = stringResource(
+                    if (uiState.denyListEnabled) CoreR.string.settings_sulist_summary
+                    else CoreR.string.settings_sulist_error_magiskhide
+                ),
+                checked = uiState.suListEnabled,
+                // Enabling SuList auto-enables MagiskHide, so the gate on the
+                // master switch is gone.
+                onCheckedChange = onToggleSuList
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
+
+            // DenyList / SuList Config
             SettingsArrow(
-                title = stringResource(CoreR.string.settings_denylist_config_title),
-                summary = stringResource(CoreR.string.settings_denylist_config_summary),
+                title = stringResource(
+                    // Follow the applied mode (Info.sulist, the daemon state
+                    // upgraded at boot).
+                    if (uiState.suListArmed) CoreR.string.settings_sulist_config_title
+                    else CoreR.string.settings_hidelist_config_title
+                ),
+                summary = stringResource(
+                    if (uiState.suListArmed) CoreR.string.settings_sulist_config_summary
+                    else CoreR.string.settings_hidelist_config_summary
+                ),
                 onClick = onNavigateToDenyList
             )
         }

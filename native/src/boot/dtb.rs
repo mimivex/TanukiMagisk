@@ -64,12 +64,12 @@ fn print_node(node: &UnalignedNode) {
             let last = depth_set.peek().is_none();
             if *depth {
                 if last {
-                    print!("├── ");
+                    print!("|-- ");
                 } else {
-                    print!("│   ");
+                    print!("|   ");
                 }
             } else if last {
-                print!("└── ");
+                print!("`-- ");
             } else {
                 print!("    ");
             }
@@ -82,12 +82,12 @@ fn print_node(node: &UnalignedNode) {
             let last = depth_set.peek().is_none();
             if *depth {
                 if last {
-                    print!("│  ");
+                    print!("|  ");
                 } else {
-                    print!("│   ");
+                    print!("|   ");
                 }
             } else if last {
-                print!("└─ ");
+                print!("`- ");
             } else {
                 print!("    ");
             }

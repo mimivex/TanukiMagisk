@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -62,7 +63,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.VMFactory
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.model.module.LocalModule
+import com.topjohnwu.magisk.core.model.ColorMode
 import com.topjohnwu.magisk.ui.home.HomeScreen
 import com.topjohnwu.magisk.ui.home.HomeViewModel
 import com.topjohnwu.magisk.ui.install.InstallViewModel
@@ -102,7 +103,8 @@ fun MainScreen(
         Tab.entries.filter { tab ->
             when (tab) {
                 Tab.SUPERUSER -> Info.showSuperUser
-                Tab.MODULES -> Info.env.isActive && LocalModule.loaded()
+                // Same condition as Superuser: modules need Magisk active.
+                Tab.MODULES -> Info.env.isActive
                 else -> true
             }
         }
@@ -155,6 +157,7 @@ fun MainScreen(
         navType == NavigationSuiteType.ShortNavigationBarMedium
     val showFab = (isModulesTab && moduleFabAction != null) || (isSuperuserTab && superuserFabAction != null)
     val hasFabTab = Tab.MODULES in visibleTabs || Tab.SUPERUSER in visibleTabs
+    val isDarkTheme = ColorMode.fromValue(ThemeState.colorMode).isDark(isSystemInDarkTheme())
 
     // The explicit focus wiring below assumes the FAB sits above a bottom bar, so only apply
     // it in bar mode. With a rail, the default 2D focus search works as is.
@@ -207,6 +210,8 @@ fun MainScreen(
                     enter = scaleIn() + fadeIn(),
                     exit = scaleOut() + fadeOut(),
                 ) {
+                    val (containerColor, contentColor) =
+                        fabColors(MaterialTheme.colorScheme, isDarkTheme)
                     FloatingActionButton(
                         onClick = {
                             if (isModulesTab) moduleFabAction?.invoke()
@@ -223,8 +228,8 @@ fun MainScreen(
                                     right = FocusRequester.Cancel
                                 }
                         } else Modifier,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        containerColor = containerColor,
+                        contentColor = contentColor,
                         // M3: a FAB nested in the navigation rail has no elevation
                         elevation = if (isBar) FloatingActionButtonDefaults.elevation()
                             else FloatingActionButtonDefaults.bottomAppBarFabElevation(),

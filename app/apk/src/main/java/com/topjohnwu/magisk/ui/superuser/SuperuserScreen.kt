@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.superuser
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,9 +40,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.dropUnlessResumed
+import com.topjohnwu.magisk.core.model.ColorMode
+import com.topjohnwu.magisk.ui.ThemeState
 import com.topjohnwu.magisk.ui.component.onlyHorizontal
 import com.topjohnwu.magisk.ui.component.rememberBiometricAuth
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
+import com.topjohnwu.magisk.ui.fabColors
 import com.topjohnwu.magisk.ui.navigation.LocalNavigator
 import com.topjohnwu.magisk.ui.navigation.Route
 import com.topjohnwu.magisk.core.R as CoreR
@@ -79,10 +83,14 @@ fun SuperuserScreen(
         },
         floatingActionButton = {
             if (onRegisterFab == null) {
+                val isDarkTheme =
+                    ColorMode.fromValue(ThemeState.colorMode).isDark(isSystemInDarkTheme())
+                val (containerColor, contentColor) =
+                    fabColors(MaterialTheme.colorScheme, isDarkTheme)
                 FloatingActionButton(
                     onClick = openGrant,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    containerColor = containerColor,
+                    contentColor = contentColor,
                     content = {
                         Icon(
                             imageVector = Icons.Default.Add,

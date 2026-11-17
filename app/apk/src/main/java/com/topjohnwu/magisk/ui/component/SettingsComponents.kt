@@ -64,7 +64,13 @@ fun SettingsSwitch(
     ListItem(
         headlineContent = { Text(title, style = MaterialTheme.typography.bodyLarge) },
         supportingContent = summary?.takeIf { it.isNotEmpty() }?.let { { Text(it, style = MaterialTheme.typography.bodyMedium) } },
-        trailingContent = { Switch(checked = checked, onCheckedChange = null, enabled = enabled) },
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = null,
+                enabled = enabled
+            )
+        },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         modifier = modifier.toggleable(
             value = checked,

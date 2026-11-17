@@ -10,7 +10,26 @@ import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.ShellUtils.fastCmdResult
+import java.io.File
 import kotlinx.coroutines.Runnable
+import timber.log.Timber
+
+// Revision suffix in the version string ("31.1-6239-tanuki28" or
+// "31.1-tanuki28"). A version string without a numeric tanuki suffix
+// parses to 0.
+private val TANUKI_MINOR = Regex("-tanuki(\\d+)")
+
+fun tanukiMinorOf(version: String): Int =
+    TANUKI_MINOR.find(version)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: 0
+
+// Ordering for the update checks: the base version code decides first, then
+// the revision suffix, so "31.1-tanuki2" is newer than "31.1-tanuki1" although
+// both report 31100. Without the suffix the revision is 0, so a stock tag of
+// the same base never outranks a revision of the fork.
+fun isOlderVersion(code: Int, version: String, thanCode: Int, thanVersion: String): Boolean {
+    if (code != thanCode) return code < thanCode
+    return tanukiMinorOf(version) < tanukiMinorOf(thanVersion)
+}
 
 object Info {
 
@@ -32,6 +51,9 @@ object Info {
     var noDataExec = false
     var patchBootVbmeta = false
 
+    // SuList state of the running daemon; the stored setting applies at boot.
+    var sulist = false
+
     @JvmStatic var env = Env()
         private set
     @JvmStatic var isSAR = false
@@ -44,7 +66,21 @@ object Info {
         private set
     var isVendorBoot = false
         private set
-    @JvmField val isZygiskEnabled = System.getenv("ZYGISK_ENABLED") == "1"
+
+    // Zygisk comes from an external provider, so the manager is not
+    // necessarily injected; the status is read from the provider and zygote.
+    enum class ZygiskStatus { ABSENT, DISABLED, INSTALLED, ACTIVE }
+
+    @JvmField var zygiskStatus = ZygiskStatus.ABSENT
+
+    // Whether a Zygisk provider is actually injecting into processes
+    @JvmField var isZygiskEnabled = false
+
+    // Built-in Zygisk injects via the native bridge: the magisk binary is
+    // mounted as /system/lib(64)/libzygisk.so, so zygote maps contain it.
+    // External providers (ZygiskNext) load through memfd and never match,
+    // keeping the toggle's reboot notice built-in specific.
+    @JvmField var builtInZygiskActive = false
     @JvmStatic val isFDE get() = crypto == "block"
     @JvmStatic var ramdisk = false
         private set
@@ -87,17 +123,96 @@ object Info {
         }
         val isUnsupported = code > 0 && code < Const.Version.MIN_VERCODE
         val isActive = versionCode > 0
+        // The revision suffix reported by the daemon, 0 when the version
+        // string has no numeric tanuki suffix.
+        val tanukiMinor get() = tanukiMinorOf(versionString)
     }
 
     fun init(shell: Shell) {
         if (shell.isRoot) {
-            val v = fastCmd(shell, "magisk -v").split(":")
-            env = Env(
-                v[0], v.size >= 3 && v[2] == "D",
-                runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1)
-            )
-            Config.denyList = fastCmdResult(shell, "magisk --denylist status")
+            val v = runCatching { fastCmd(shell, "magisk -v") }.getOrDefault("").split(":")
+            // `magisk -v` goes through the daemon handshake; an empty reply
+            // means the channel is degraded even though the shell is root.
+            // Keep the previous state instead of overwriting it with "not
+            // running".
+            if (v.firstOrNull().isNullOrEmpty()) {
+                Timber.w("magisk -v empty on a root shell; keeping previous state")
+            } else {
+                env = Env(
+                    v[0], v.size >= 3 && v[2] == "D",
+                    runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1)
+                )
+                Config.denyList = fastCmdResult(shell, "magisk magiskhide status")
+                sulist = fastCmdResult(shell, "magisk magiskhide sulist")
+            }
         }
+
+        // The maps probe is blind to the built-in engine: its loader
+        // dlclose()s itself from every app process after specialization,
+        // so "zygisk" is gone from the maps by the time the manager reads
+        // them. The engine leaves an in-process signal instead:
+        // ZYGISK_ENABLED=1 is set for the manager process. The maps probe
+        // still covers external providers (ZygiskNext, ReZygisk), whose
+        // loader stays mapped.
+        val selfInjected = runCatching {
+            System.getenv("ZYGISK_ENABLED") == "1" ||
+                File("/proc/self/maps").useLines { lines -> lines.any { "zygisk" in it } }
+        }.getOrDefault(false)
+
+        // Scan every provider dir instead of taking the first match: the
+        // glob enumerates in readdir order, and a disabled residue (a
+        // leftover `rezygisk` dir) can shadow the enabled provider
+        // (zygisksu) and report DISABLED. An enabled provider wins; DISABLED
+        // needs every provider disabled.
+        var providerState = ZygiskStatus.ABSENT
+        if (shell.isRoot) {
+            val states = runCatching {
+                Shell.cmd(
+                    "for m in /data/adb/modules/*; do " +
+                        "case \"\$(basename \$m)\" in zygisksu|rezygisk) " +
+                        "[ -e \$m/remove ] && continue; " +
+                        "if [ -e \$m/disable ]; then echo DISABLED; else echo INSTALLED; fi;; " +
+                        "esac; done"
+                ).exec().out
+            }.getOrDefault(emptyList())
+            providerState = when {
+                "INSTALLED" in states -> ZygiskStatus.INSTALLED
+                "DISABLED" in states -> ZygiskStatus.DISABLED
+                else -> ZygiskStatus.ABSENT
+            }
+        }
+
+        // Run the liveness probes whenever a provider exists, not only when
+        // one is enabled: a live injection wins over a disabled sibling.
+        val zygoteInjected = providerState != ZygiskStatus.ABSENT && runCatching {
+            Shell.cmd(
+                "for p in \$(pidof zygote64) \$(pidof zygote); do " +
+                    "grep -qi zygisk /proc/\$p/maps && echo yes; done | head -n 1"
+            ).exec().out.isNotEmpty()
+        }.getOrDefault(false)
+
+        // ZygiskNext and ReZygisk run the provider as a daemon named
+        // zygiskd64/zygiskd32, spawned by the module watchdog at boot. The
+        // zygote maps probe can miss it because modules are loaded via memfd.
+        // ZygiskNext 1.5.2 closed runs a single zygiskd and ReZygisk's
+        // rezygiskd name is observational; a name that matches nothing only
+        // costs one pidof iteration.
+        val daemonAlive = providerState != ZygiskStatus.ABSENT && !zygoteInjected && runCatching {
+            Shell.cmd("pidof zygiskd zygiskd64 zygiskd32 rezygiskd 2>/dev/null || true").exec().out.isNotEmpty()
+        }.getOrDefault(false)
+
+        zygiskStatus = when {
+            selfInjected || zygoteInjected || daemonAlive -> ZygiskStatus.ACTIVE
+            else -> providerState
+        }
+        isZygiskEnabled = zygiskStatus == ZygiskStatus.ACTIVE
+
+        builtInZygiskActive = shell.isRoot && runCatching {
+            Shell.cmd(
+                "for p in \$(pidof zygote64) \$(pidof zygote); do " +
+                    "grep -qi libzygisk /proc/\$p/maps && echo yes; done | head -n 1"
+            ).exec().out.isNotEmpty()
+        }.getOrDefault(false)
 
         val map = mutableMapOf<String, String>()
         val list = object : CallbackList<String>(Runnable::run) {

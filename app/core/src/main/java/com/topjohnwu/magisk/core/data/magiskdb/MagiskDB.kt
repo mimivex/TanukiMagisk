@@ -7,19 +7,37 @@ import kotlinx.coroutines.withContext
 
 open class MagiskDB {
 
+    // Timed su grants need a raw SQL expression as a column value.
+    class Literal(
+        val str: String
+    )
+
+    // Callers must be able to tell a failed command (no root channel) apart
+    // from a legitimately empty result.
+    class ExecResult<R>(
+        val ok: Boolean,
+        val rows: List<R>
+    )
+
     suspend inline fun <R> exec(
         query: String,
         crossinline mapper: (Map<String, String>) -> R
-    ): List<R> {
+    ): List<R> = execResult(query, mapper).rows
+
+    suspend inline fun <R> execResult(
+        query: String,
+        crossinline mapper: (Map<String, String>) -> R
+    ): ExecResult<R> {
         return withContext(Dispatchers.IO) {
-            val out = Shell.cmd("magisk --sqlite '$query'").await().out
-            out.map { line ->
+            val result = Shell.cmd("magisk --sqlite '$query'").await()
+            val rows = result.out.map { line ->
                 line.split("\\|".toRegex())
                     .map { it.split("=", limit = 2) }
                     .filter { it.size == 2 }
                     .associate { it[0] to it[1] }
                     .let(mapper)
             }
+            ExecResult(result.isSuccess, rows)
         }
     }
 
@@ -35,6 +53,7 @@ open class MagiskDB {
             when (it) {
                 is Boolean -> if (it) "1" else "0"
                 is Number -> it.toString()
+                is Literal -> it.str
                 else -> "\"$it\""
             }
         }
@@ -44,5 +63,6 @@ open class MagiskDB {
     object Table {
         const val POLICY = "policies"
         const val SETTINGS = "settings"
+        const val STRINGS = "strings"
     }
 }

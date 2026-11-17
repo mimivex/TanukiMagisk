@@ -14,6 +14,7 @@
     <string name="uninstall_magisk_title">ถอนการติดตั้ง Magisk</string>
     <string name="uninstall_magisk_msg">โมดูลทั้งหมดจะถูกปิดการใช้งาน/ถูกลบ, สิทธิการเข้าถึง Root จะถูกลบ และข้อมูลของคุณอาจถูกเข้ารหัส</string>
     <string name="update">อัปเดต</string>
+    <string name="not_installed">ไม่ได้ติดตั้ง</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(ไม่มีข้อมูล)</string>
@@ -122,4 +123,51 @@
     <!--Superuser logs-->
     <string name="target_uid">UID เป้าหมาย: %1$d</string>
 
+    <string name="auto_response">การตอบกลับ</string>
+    <string name="prompt">ถาม</string>
+    <string name="request_timeout">เวลาการขอใช้งาน</string>
+    <string name="settings_su_adb">ADB เท่านั้น</string>
+    <string name="settings_su_app">แอปเท่านั้น</string>
+    <string name="settings_su_app_adb">แอปและ ADB</string>
+    <string name="settings_su_disable">ปิด</string>
+    <string name="settings_su_reauth_summary">ขอสิทธิ์ superuser ใหม่หลังจากแอปถูกอัปเกรด</string>
+    <string name="settings_su_reauth_title">ขอสิทธิ์ใหม่หลังจากอัปเกรด</string>
+    <string name="settings_su_request_10">10 วินาที</string>
+    <string name="settings_su_request_15">15 วินาที</string>
+    <string name="settings_su_request_20">20 วินาที</string>
+    <string name="settings_su_request_30">30 วินาที</string>
+    <string name="settings_su_request_45">45 วินาที</string>
+    <string name="settings_su_request_60">60 วินาที</string>
+    <string name="su_request_title">การขอเข้าถึง Superuser</string>
+    <string name="superuser_access">การเข้าถึง Superuser</string>
+    <string name="tanuki_notice">บิลด์ fork Tanuki อย่างไม่เป็นทางการ</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">ไม่สามารถปิดใช้งาน MagiskHide ได้ขณะที่ SuList เปิดใช้งานอยู่</string>
+    <string name="settings_magiskhide_summary">การแก้ไขของ Magisk จะถูกย้อนกลับสำหรับโปรเซสใน hidelist</string>
+    <string name="settings_hidelist_config_title">กำหนดค่า HideList</string>
+    <string name="add_recommended">เพิ่มรายการที่แนะนำ</string>
+    <string name="settings_hidelist_config_summary">เลือกโปรเซสที่จะรวมใน hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">บังคับใช้ SuList</string>
+    <string name="settings_sulist_summary">เฉพาะโปรเซสใน sulist เท่านั้นที่สามารถรับสิทธิ์ root ของ Magisk ได้</string>
+    <string name="settings_sulist_config_title">กำหนดค่า SuList</string>
+    <string name="settings_sulist_config_summary">เลือกโปรเซสที่จะรวมใน sulist</string>
+    <string name="settings_sulist_enforced">SuList ถูกบังคับใช้แล้ว</string>
+    <string name="settings_sulist_error_magiskhide">ฟีเจอร์นี้ต้องเปิดใช้งาน MagiskHide</string>
+    <string name="sulist_empty_warning">SuList เป็นรายการที่อนุญาตสำหรับ root: เฉพาะแอปในรายการเท่านั้นที่สามารถรับ root ของ Magisk ได้ ตัวจัดการและส่วนประกอบของระบบได้รับการยกเว้นเสมอ</string>
+    <string name="zygisk_provider_missing">ไม่ได้ติดตั้งผู้ให้บริการ Zygisk เปิดใช้ Zygisk ในตัวในการตั้งค่า หรือติดตั้ง ZygiskNext (หรือผู้ให้บริการที่เข้ากันได้) สำหรับโมดูล Zygisk MagiskHide/SuList ทำงานได้โดยไม่ต้องมี Zygisk</string>
+    <string name="zygisk_provider_disabled">มีผู้ให้บริการ Zygisk ติดตั้งอยู่แต่ถูกปิดใช้งาน</string>
+    <string name="zygisk_provider_not_injected">ติดตั้งผู้ให้บริการ Zygisk แล้ว ไม่พบการฉีด</string>
+    <string name="settings_material_you">สีไดนามิก</string>
+    <string name="settings_material_you_summary">ปรับสีให้เข้ากับวอลเปเปอร์</string>
+    <string name="forever">ตลอดไป</string>
+    <string name="once">ครั้งเดียว</string>
+    <string name="tenmin">10 นาที</string>
+    <string name="twentymin">20 นาที</string>
+    <string name="thirtymin">30 นาที</string>
+    <string name="sixtymin">60 นาที</string>
+    <string name="su_warning">ให้สิทธิ์เข้าถึงอุปกรณ์ของคุณแบบเต็มรูปแบบ\nปฏิเสธหากคุณไม่แน่ใจ!</string>
+    <string name="touch_filtered_warning">เนื่องจากมีแอปบังหน้าคำขอ Superuser อยู่ Magisk จึงไม่สามารถตรวจสอบการตอบสนองของคุณได้</string>
+    <string name="superuser_grant">อนุญาต Superuser</string>
+    <string name="su_legacy_cmd">คำเตือน: ตรวจพบบรรทัดคำสั่งที่ไม่รองรับ</string>
 </resources>

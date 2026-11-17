@@ -2,7 +2,7 @@
 
     <!--Welcome Activity-->
     <string name="modules">Модули</string>
-    <string name="superuser">Супер-корисник</string>
+    <string name="superuser">Superuser</string>
     <string name="logs">Записник</string>
     <string name="settings">Поставки</string>
     <string name="install">Инсталирај</string>
@@ -15,6 +15,7 @@
     <string name="uninstall_magisk_title">Деинсталирај го Magisk</string>
     <string name="uninstall_magisk_msg">Сите модули ќе бидат оневозможени/oтстранети. Рут привилегиите ќе бидат отстранети, а вашите податоци може да се енкриптираат ако моментално не се.</string>
     <string name="update">Ажурирај</string>
+    <string name="not_installed">Не е инсталиран</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Нема информации)</string>
@@ -130,5 +131,54 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">Прикажи ги системските апликации</string>
+    <string name="add_recommended">Додај ги препорачаните</string>
 
+    <string name="auto_response">Автоматски одговор</string>
+    <string name="patch_file_msg">Избери само image датотека (*.img) или ODIN tar датотека (*.tar)</string>
+    <string name="prompt">Прашај</string>
+    <string name="request_timeout">Временско ограничување на барање</string>
+    <string name="select_patch_file">Избери и обнови ја датотеката</string>
+    <string name="settings_su_adb">Само АДБ</string>
+    <string name="settings_su_app">Само апликации</string>
+    <string name="settings_su_app_adb">Апликации и АДБ</string>
+    <string name="settings_su_disable">Оневозможено</string>
+    <string name="settings_su_reauth_summary">Повторна автентикација за супер-корисник дозвола по надградбата на апликацијата</string>
+    <string name="settings_su_reauth_title">Повторна автентикација по надградба</string>
+    <string name="settings_su_request_10">10 секунди</string>
+    <string name="settings_su_request_15">15 секунди</string>
+    <string name="settings_su_request_20">20 секунди</string>
+    <string name="settings_su_request_30">30 секунди</string>
+    <string name="settings_su_request_45">45 секунди</string>
+    <string name="settings_su_request_60">60 секунди</string>
+    <string name="su_request_title">Супер-корисник барање</string>
+    <string name="superuser_access">Пристап за супер-корисник</string>
+    <string name="tanuki_notice">Неофицијална изградба на fork Tanuki</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide не може да се оневозможи додека SuList е овозможен.</string>
+    <string name="settings_magiskhide_summary">Промените на Magisk се враќаат за процесите во hidelist</string>
+    <string name="settings_hidelist_config_title">Конфигурирај HideList</string>
+    <string name="settings_hidelist_config_summary">Изберете процеси што ќе бидат вклучени во hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">Примени SuList</string>
+    <string name="settings_sulist_summary">Само процесите во sulist можат да добијат root пристап од Magisk</string>
+    <string name="settings_sulist_config_title">Конфигурирај SuList</string>
+    <string name="settings_sulist_config_summary">Изберете процеси што ќе бидат вклучени во sulist</string>
+    <string name="settings_sulist_enforced">SuList е применет</string>
+    <string name="settings_sulist_error_magiskhide">Оваа функција бара овозможен MagiskHide</string>
+    <string name="sulist_empty_warning">SuList е бела листа за root: само апликациите на листата можат да добијат Magisk root. Менаџерот и системските компоненти се секогаш изземени.</string>
+    <string name="zygisk_provider_missing">Нема инсталиран Zygisk провајдер. Вклучете го вградениот Zygisk во поставките или инсталирајте ZygiskNext (или компатибилен провајдер) за Zygisk модули. MagiskHide/SuList работат без Zygisk.</string>
+    <string name="zygisk_provider_disabled">Инсталиран е Zygisk провајдер, но е оневозможен.</string>
+    <string name="zygisk_provider_not_injected">Zygisk провајдер е инсталиран; инјектирање не е откриено.</string>
+    <string name="settings_material_you">Динамични бои</string>
+    <string name="settings_material_you_summary">Користете ги боите што ги обезбедува вашиот уред</string>
+    <string name="forever">Засекогаш</string>
+    <string name="once">Еднаш</string>
+    <string name="tenmin">10 мин</string>
+    <string name="twentymin">20 мин</string>
+    <string name="thirtymin">30 мин</string>
+    <string name="sixtymin">60 мин</string>
+    <string name="su_warning">Дава целосен пристап до вашиот уред.\nОдбијте ако не сте сигурни!</string>
+    <string name="touch_filtered_warning">Бидејќи апликација прикрива барање за Superuser, Magisk не може да го потврди вашиот одговор.</string>
+    <string name="superuser_grant">Дозволи Superuser</string>
+    <string name="su_legacy_cmd">Предупредување: откриена е неподдржана командна линија</string>
 </resources>

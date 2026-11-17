@@ -1,6 +1,6 @@
 use crate::new_daemon_thread;
 use base::ResultExt;
-use nix::sys::signal::SigSet;
+use nix::sys::signal::{SigSet, Signal};
 use nix::unistd::{getpid, gettid};
 use std::sync::LazyLock;
 use std::sync::nonpoison::{Condvar, Mutex};
@@ -32,6 +32,11 @@ impl ThreadPool {
         loop {
             // Always restore the sigmask to block all signals
             mask.thread_set_mask().log_ok();
+            // Fatal signals must stay deliverable so the deny engine crash
+            // handler can leave its marker instead of dying silently.
+            SigSet::from_iter([Signal::SIGSEGV, Signal::SIGABRT, Signal::SIGBUS])
+                .thread_unblock()
+                .log_ok();
 
             let task: Option<Box<dyn FnOnce() + Send>>;
             {

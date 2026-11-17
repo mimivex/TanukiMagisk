@@ -13,8 +13,11 @@ class SettingsDao : MagiskDB() {
         exec(query)
     }
 
-    suspend fun fetch(key: String, default: Int = -1): Int {
+    // Null means the command failed; the default only covers a
+    // legitimately missing key.
+    suspend fun fetch(key: String, default: Int = -1): Int? {
         val query = "SELECT value FROM ${Table.SETTINGS} WHERE key=\"$key\" LIMIT 1"
-        return exec(query) { it["value"]?.toInt() }.firstOrNull() ?: default
+        val result = execResult(query) { it["value"]?.toInt() }
+        return if (result.ok) result.rows.firstOrNull() ?: default else null
     }
 }

@@ -72,6 +72,7 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.ui.component.AppIcon
 import com.topjohnwu.magisk.ui.component.AppSortFilterActions
 import com.topjohnwu.magisk.ui.component.verticalScrollbar
@@ -91,6 +92,7 @@ fun DenyListScreen(
     val showOS by viewModel.showOS.collectAsStateWithLifecycle()
     val sortBy by viewModel.sortBy.collectAsStateWithLifecycle()
     val sortReverse by viewModel.sortReverse.collectAsStateWithLifecycle()
+    val allApps by viewModel.allApps.collectAsStateWithLifecycle()
 
     val searchBackState = rememberNavigationEventState(currentInfo = NavigationEventInfo.None)
     NavigationBackHandler(
@@ -106,7 +108,15 @@ fun DenyListScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(CoreR.string.denylist)) },
+                title = {
+                    Text(stringResource(
+                        // Follow the applied mode (Info.sulist); the settings
+                        // toggle shows the reboot hint while a switch is
+                        // pending.
+                        if (Info.sulist) CoreR.string.settings_sulist
+                        else CoreR.string.settings_magiskhide_title
+                    ))
+                },
                 navigationIcon = {
                     IconButton(
                         onClick = {
@@ -133,6 +143,7 @@ fun DenyListScreen(
                         showOS = showOS,
                         onShowSystemChanged = { viewModel.setShowSystem(it) },
                         onShowOSChanged = { viewModel.setShowOS(it) },
+                        onAddRecommended = { viewModel.addRecommended() },
                     )
                 },
                 scrollBehavior = scrollBehavior
@@ -148,6 +159,30 @@ fun DenyListScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 6.dp)
             )
+
+            // SuList is a whitelist: an empty one locks out every app except
+            // the manager and the system defaults at the next boot.
+            // Follow the applied mode (Info.sulist) like the title; the list
+            // shown is the applied table.
+            if (!loading && Info.sulist &&
+                allApps.none { it.isChecked && !it.info.isSystemApp }) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Text(
+                        text = stringResource(CoreR.string.sulist_empty_warning),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
 
             if (loading) {
                 Box(

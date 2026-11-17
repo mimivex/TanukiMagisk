@@ -168,6 +168,16 @@ $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk --preinit-devic
 ./magiskboot compress=xz magisk magisk.xz
 ./magiskboot compress=xz init-ld init-ld.xz
 
+# HyperOS spawner shim, only when this install ships one.
+# Each cpio command must be a single argv (cpio_commands splits it on spaces
+# internally), so HYOS_CMD is expanded as one quoted word via ${HYOS_CMD:+...}
+# below; when empty it contributes no argument. The add is also gated on the
+# compress succeeding, so a failed compress skips the shim instead of aborting.
+HYOS_CMD=
+if [ -f hyos ] && ./magiskboot compress=xz hyos hyos.xz; then
+  HYOS_CMD="add 0644 overlay.d/sbin/hyos.xz hyos.xz"
+fi
+
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
@@ -184,6 +194,7 @@ fi
 "mkdir 0750 overlay.d/sbin" \
 "add 0644 overlay.d/sbin/magisk.xz magisk.xz" \
 "add 0644 overlay.d/sbin/init-ld.xz init-ld.xz" \
+${HYOS_CMD:+"$HYOS_CMD"} \
 "patch" \
 "$SKIP_BACKUP backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
@@ -210,6 +221,11 @@ done
 
 if [ -f kernel ]; then
   PATCHEDKERNEL=false
+  # patch vivo do_mount_check by wuxianlin
+  # /system -> /syswxl
+  # python3 -c "print(hex(int.from_bytes(b'/system', 'big')^int('bdbcbbbab9b8b7', 16)))"
+  ./magiskboot hexpatch kernel 0092CFC2C9CDDDDA00 0092CFC2C9CEC0DB00 && PATCHEDKERNEL=true
+
   # Remove Samsung RKP
   ./magiskboot hexpatch kernel \
   49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \

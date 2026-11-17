@@ -123,7 +123,7 @@ adb_pm_install() {
   local tmp=/data/local/tmp/temp.apk
   cp -f "$1" $tmp
   chmod 644 $tmp
-  local cmd="pm install --user current -g $tmp"
+  local cmd="pm install --user current -g -r -d $tmp"
   su 2000 -c $cmd || $cmd || su 1000 -c $cmd
   local res=$?
   rm -f $tmp

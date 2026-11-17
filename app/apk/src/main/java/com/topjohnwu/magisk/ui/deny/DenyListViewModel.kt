@@ -5,10 +5,12 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.AppContext
+import com.topjohnwu.magisk.core.R as CoreR
 import com.topjohnwu.magisk.core.ktx.concurrentMap
 import com.topjohnwu.magisk.ui.component.AppSortBy
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +21,9 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.toCollection
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Immutable
 data class DenyProcessState(
@@ -58,6 +62,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
     private val _allApps = MutableStateFlow<List<DenyAppState>>(emptyList())
+    val allApps: StateFlow<List<DenyAppState>> = _allApps.asStateFlow()
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
@@ -73,6 +78,9 @@ class DenyListViewModel : AsyncLoadViewModel() {
 
     private val _sortReverse = MutableStateFlow(false)
     val sortReverse: StateFlow<Boolean> = _sortReverse.asStateFlow()
+
+    // One automatic retry after a failed deny list read
+    private var loadRetried = false
 
     val filteredApps: StateFlow<List<DenyAppState>> = combine(
         _allApps, _query, _showSystem, _showOS, _sortBy, _sortReverse
@@ -117,6 +125,17 @@ class DenyListViewModel : AsyncLoadViewModel() {
     fun setSortBy(s: AppSortBy) { _sortBy.value = s }
     fun toggleSortReverse() { _sortReverse.value = !_sortReverse.value }
 
+    // Not a filter: the CLI seeds the recommended packages of the requested
+    // mode (idempotent). The scan runs only once per screen, so drop its
+    // result and rescan to show the seeded rows right away.
+    fun addRecommended() {
+        Shell.cmd("magisk magiskhide recommended").submit {
+            _allApps.value = emptyList()
+            _loading.value = true
+            reload()
+        }
+    }
+
     fun toggleExpanded(app: DenyAppState) {
         _allApps.update { apps ->
             apps.map {
@@ -126,9 +145,12 @@ class DenyListViewModel : AsyncLoadViewModel() {
     }
 
     fun toggleAll(app: DenyAppState) {
-        val willCheck = !app.isChecked
+        // A partially checked card completes itself by adding the missing
+        // processes, so the first tap is add-only and never deletes rows; a
+        // fully checked card keeps the upstream uncheck-all.
+        val willCheck = app.itemsChecked < app.processes.size
         if (!willCheck) {
-            Shell.cmd("magisk --denylist rm ${app.info.packageName}").submit()
+            Shell.cmd("magisk magiskhide rm ${app.info.packageName}").submit()
         }
         _allApps.update { apps ->
             apps.map { currentApp ->
@@ -137,7 +159,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
                         if (willCheck) {
                             if (!proc.isEnabled) {
                                 val (name, pkg) = proc.process
-                                Shell.cmd("magisk --denylist add $pkg '$name'").submit()
+                                Shell.cmd("magisk magiskhide add $pkg '$name'").submit()
                             }
                             proc.copy(isEnabled = true)
                         } else {
@@ -158,7 +180,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
     fun toggleProcess(app: DenyAppState, proc: DenyProcessState) {
         val newEnabled = !proc.isEnabled
         val (name, pkg) = proc.process
-        val cmd = if (newEnabled) "magisk --denylist add $pkg '$name'" else removeCommand(proc.process)
+        val cmd = if (newEnabled) "magisk magiskhide add $pkg '$name'" else removeCommand(proc.process)
         Shell.cmd(cmd).submit()
 
         _allApps.update { apps ->
@@ -180,13 +202,13 @@ class DenyListViewModel : AsyncLoadViewModel() {
     }
 
     private fun removeCommand(proc: ProcessInfo): String {
-        if (!proc.isIsolated) return "magisk --denylist rm ${proc.packageName} '${proc.name}'"
+        if (!proc.isIsolated) return "magisk magiskhide rm ${proc.packageName} '${proc.name}'"
         // Isolated processes are matched by name prefix. Older versions of the app added one
         // entry per isolated service (e.g. "com.foo:com.foo.Service") instead of the prefix
         // itself, so remove every entry starting with the prefix.
-        return "magisk --denylist ls | while IFS='|' read -r pkg proc; do " +
+        return "magisk magiskhide ls | while IFS='|' read -r pkg proc; do " +
             "[ \"\$pkg\" = $ISOLATED_MAGIC ] && case \"\$proc\" in '${proc.name}'*) " +
-            "magisk --denylist rm $ISOLATED_MAGIC \"\$proc\";; esac; done"
+            "magisk magiskhide rm $ISOLATED_MAGIC \"\$proc\";; esac; done"
     }
 
     override suspend fun doLoadWork() {
@@ -196,8 +218,14 @@ class DenyListViewModel : AsyncLoadViewModel() {
         _loading.value = true
         val apps = withContext(Dispatchers.Default) {
             val pm = AppContext.packageManager
-            val denyList = Shell.cmd("magisk --denylist ls").exec().out
-                .map { CmdlineListItem(it) }
+            // An empty stdout from a failed command is not an empty deny
+            // list; never publish it.
+            val lsResult = Shell.cmd("magisk magiskhide ls").exec()
+            if (!lsResult.isSuccess) {
+                Timber.w("magiskhide ls failed (code ${lsResult.code})")
+                return@withContext null
+            }
+            val denyList = lsResult.out.map { CmdlineListItem(it) }
             val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES).run {
                 asFlow()
                     .filter { AppContext.packageName != it.packageName }
@@ -218,6 +246,18 @@ class DenyListViewModel : AsyncLoadViewModel() {
                 { it.info }
             ))
             apps
+        }
+        if (apps == null) {
+            _loading.value = false
+            if (!loadRetried) {
+                loadRetried = true
+                showToast(CoreR.string.no_connection)
+                viewModelScope.launch {
+                    delay(500)
+                    reload()
+                }
+            }
+            return
         }
         _allApps.value = apps
         _loading.value = false

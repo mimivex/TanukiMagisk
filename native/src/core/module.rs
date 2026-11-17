@@ -139,6 +139,17 @@ impl ModulePaths<'_> {
         }
     }
 
+    // Used by the legacy root API: the module tree is read from
+    // MODDIR/<module> while the real path stays the actual partition, so
+    // collected files keep cloning their attributes from the real target.
+    fn append_legacy(&mut self, real: &str, module: &str) -> ModulePaths<'_> {
+        ModulePaths {
+            real: self.real.append(real),
+            module: self.module.append(module),
+            module_mnt: self.module_mnt.append(module),
+        }
+    }
+
     // Returns "/system/bin"
     fn real(&self) -> &Utf8CStr {
         self.real.path
@@ -257,6 +268,17 @@ impl FsNode {
         }
 
         Ok(())
+    }
+
+    // Collect a module directory tree under the `name` child of this node
+    fn collect_into(&mut self, name: &str, paths: ModulePaths) -> LoggedResult<()> {
+        let FsNode::Directory { children } = self else {
+            return Ok(());
+        };
+        let node = children
+            .entry(name.to_string())
+            .or_insert_with(FsNode::new_dir);
+        node.collect(paths)
     }
 
     // The parent node has to be tmpfs if:
@@ -629,13 +651,23 @@ fn upgrade_modules() -> LoggedResult<()> {
         }
         let module_name = e.name();
         let mut disable = false;
+        let mut remove = false;
         // Cleanup old module if exists
         if root.contains_path(module_name) {
             let module = root.open_as_dir_at(module_name)?;
             // If the old module is disabled, we need to also disable the new one
             disable = module.contains_path(cstr!("disable"));
+            // A pending removal wins over a pending upgrade.
+            remove = module.contains_path(cstr!("remove"));
             module.remove_all()?;
             root.unlink_at(module_name, UnlinkatFlags::RemoveDir)?;
+        }
+        if remove {
+            info!("Upgrade / New module: {module_name} (removed instead of upgraded)");
+            let dir = e.open_as_dir()?;
+            dir.remove_all()?;
+            e.unlink()?;
+            continue;
         }
         info!("Upgrade / New module: {module_name}");
         e.rename_to(&root, module_name)?;
@@ -698,7 +730,9 @@ pub fn remove_modules() {
     cstr!(MODULEROOT).remove_all().log_ok();
 }
 
-fn collect_modules(zygisk_enabled: bool, open_zygisk: bool) -> Vec<ModuleInfo> {
+// The Zygisk protocol rebuilds the list lazily after a daemon restart, so
+// the function is visible to the zygisk module.
+pub(crate) fn collect_modules(zygisk_enabled: bool, open_zygisk: bool) -> Vec<ModuleInfo> {
     let mut modules = Vec::new();
 
     #[allow(unused_mut)] // It's possible that z32 and z64 are unused
@@ -868,10 +902,34 @@ impl MagiskD {
             drop(skip);
 
             // Double check whether the system folder exists
-            let sys = paths.append("system");
-            if sys.module().exists() {
-                info!("{}: loading module files", &info.name);
-                system.collect(sys).log_ok();
+            {
+                let sys = paths.append("system");
+                if sys.module().exists() {
+                    info!("{}: loading module files", &info.name);
+                    system.collect(sys).log_ok();
+                }
+            }
+
+            // New mount API: <module>/root/<partition> (legacy K27 layout).
+            // The module tree lives under root/<partition>, but files are
+            // collected exactly as if they were under <partition>/ in the
+            // module tree: sources point at the module mount and the real
+            // path stays the device partition for attribute cloning. No
+            // module with a root folder means zero difference in the tree.
+            if paths.append("root").module().exists() {
+                info!("{}: loading new mount files api", &info.name);
+                for part in ["system", "vendor", "product", "system_ext"] {
+                    let module_path = format!("root/{part}");
+                    let dir = paths.append_legacy(part, &module_path);
+                    if !dir.module().exists() {
+                        continue;
+                    }
+                    if part == "system" {
+                        system.collect(dir).log_ok();
+                    } else {
+                        system.collect_into(part, dir).log_ok();
+                    }
+                }
             }
         }
 

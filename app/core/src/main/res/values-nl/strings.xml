@@ -15,12 +15,13 @@
     <string name="loading">Bezig met laden…</string>
     <string name="update">Updaten</string>
     <string name="not_available">Niet beschikbaar</string>
+    <string name="not_installed">Niet geïnstalleerd</string>
     <string name="hide">Verbergen</string>
     <string name="home_package">Pakket</string>
 
-    <string name="home_support_title">Ondersteun ons</string>
+    <string name="home_support_title">Steun de oorspronkelijke auteurs</string>
     <string name="home_item_source">Broncode</string>
-    <string name="home_support_content">Magisk is en zal altijd gratis en open source blijven, maar als je wilt, kun je een kleine donatie doen.</string>
+    <string name="home_support_content">Magisk is en zal altijd gratis en open source blijven, maar als je wilt, kun je een kleine donatie doen. Dit is een fork van Magisk die geen actieve ondersteuning krijgt. Donaties gaan naar de oorspronkelijke auteurs van Magisk.</string>
     <string name="home_installed_version">Geïnstalleerd</string>
     <string name="home_latest_version">Actueel</string>
     <string name="invalid_update_channel">Ongeldig updatekanaal</string>
@@ -87,6 +88,7 @@
     <!-- MagiskHide -->
     <string name="show_system_app">Systeemapps tonen</string>
     <string name="hide_filter_hint">Filteren op naam</string>
+    <string name="add_recommended">Aanbevolen toevoegen</string>
     <string name="hide_search">Zoeken</string>
 
     <!--Module Fragment-->
@@ -169,4 +171,55 @@
     <string name="external_rw_permission_denied">Verleen het opslagrecht om deze functie gebruiken</string>
     <string name="app_not_found">Er is geen app op je apparaat die deze handeling kan uitvoeren</string>
 
+    <string name="auto_response">Automatisch antwoord</string>
+    <string name="patch_file_msg">Kies een schijfkopie (*.img) of ODIN-tarbestand (*.tar)</string>
+    <string name="prompt">Vraag</string>
+    <string name="request_timeout">Verzoektime-out</string>
+    <string name="select_patch_file">Kies en patch een bestand</string>
+    <string name="settings_app_name_error">Onjuiste opmaak</string>
+    <string name="settings_app_name_helper">De app wordt opnieuw ingepakt onder deze naam</string>
+    <string name="settings_app_name_hint">Nieuwe naam</string>
+    <string name="settings_su_adb">Alleen ADB</string>
+    <string name="settings_su_app">Alleen apps</string>
+    <string name="settings_su_app_adb">Apps en ADB</string>
+    <string name="settings_su_disable">Uitgeschakeld</string>
+    <string name="settings_su_reauth_summary">Superuserrechten opnieuw goedkeuren na app-updates.</string>
+    <string name="settings_su_reauth_title">Opnieuw goedkeuren na update</string>
+    <string name="settings_su_request_10">10 seconden</string>
+    <string name="settings_su_request_15">15 seconden</string>
+    <string name="settings_su_request_20">20 seconden</string>
+    <string name="settings_su_request_30">30 seconden</string>
+    <string name="settings_su_request_45">45 seconden</string>
+    <string name="settings_su_request_60">60 seconden</string>
+    <string name="su_request_title">Superuserverzoek</string>
+    <string name="superuser_access">Superusertoegang</string>
+    <string name="tanuki_notice">Onofficiële Tanuki fork-build</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide kan niet worden uitgeschakeld zolang SuList is ingeschakeld.</string>
+    <string name="settings_magiskhide_summary">Magisk-wijzigingen worden teruggedraaid voor processen in de hidelist</string>
+    <string name="settings_hidelist_config_title">HideList configureren</string>
+    <string name="settings_hidelist_config_summary">Selecteer de processen die in de hidelist moeten worden opgenomen</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">SuList afdwingen</string>
+    <string name="settings_sulist_summary">Alleen processen in de sulist kunnen Magisk root-toegang krijgen</string>
+    <string name="settings_sulist_config_title">SuList configureren</string>
+    <string name="settings_sulist_config_summary">Selecteer de processen die in de sulist moeten worden opgenomen</string>
+    <string name="settings_sulist_enforced">SuList is afgedwongen</string>
+    <string name="settings_sulist_error_magiskhide">Deze functie vereist dat MagiskHide is ingeschakeld</string>
+    <string name="sulist_empty_warning">SuList is een root-whitelist: alleen apps op de lijst kunnen Magisk root krijgen. De beheerder en systeemcomponenten zijn altijd vrijgesteld.</string>
+    <string name="zygisk_provider_missing">Er is geen Zygisk-provider geïnstalleerd. Schakel ingebouwde Zygisk in bij de instellingen, of installeer ZygiskNext (of een compatibele provider) voor Zygisk-modules. MagiskHide/SuList werken zonder Zygisk.</string>
+    <string name="zygisk_provider_disabled">Er is een Zygisk-provider geïnstalleerd maar uitgeschakeld.</string>
+    <string name="zygisk_provider_not_injected">Zygisk-provider geïnstalleerd; injectie niet gedetecteerd.</string>
+    <string name="settings_material_you">Dynamische kleuren</string>
+    <string name="settings_material_you_summary">Kleuren aanpassen aan de achtergrond</string>
+    <string name="forever">Altijd</string>
+    <string name="once">Eenmalig</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_warning">Geeft volledige toegang tot je apparaat.\nWeiger als je het niet zeker weet!</string>
+    <string name="touch_filtered_warning">Omdat een app een Superuser-verzoek verbergt, kan Magisk je antwoord niet verifiëren.</string>
+    <string name="superuser_grant">Superuser verlenen</string>
+    <string name="su_legacy_cmd">Waarschuwing: niet-ondersteunde opdrachtregel gedetecteerd</string>
 </resources>

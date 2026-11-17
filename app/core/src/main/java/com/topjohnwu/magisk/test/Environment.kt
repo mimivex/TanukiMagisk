@@ -5,11 +5,13 @@ import android.os.Build
 import androidx.annotation.Keep
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.download.DownloadNotifier
 import com.topjohnwu.magisk.core.download.DownloadProcessor
 import com.topjohnwu.magisk.core.ktx.cachedFile
 import com.topjohnwu.magisk.core.model.module.LocalModule
+import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.utils.RootUtils
@@ -66,6 +68,7 @@ class Environment : TestCommon {
 
         private const val MODULE_UPDATE_PATH  = "/data/adb/modules_update"
         private const val MODULE_ERROR = "Module zip processing incorrect"
+        private const val HANDOFF_FILE = "/data/local/tmp/tanuki_test_pkg"
         const val MOUNT_TEST = "mount_test"
         const val SEPOLICY_RULE = "sepolicy_rule"
         const val INVALID_ZYGISK = "invalid_zygisk"
@@ -155,8 +158,7 @@ class Environment : TestCommon {
         val path = root.getChildFile(EMPTY_ZYGISK)
 
         // Create an empty zygisk folder
-        val module = LocalModule(path)
-        assertTrue(error, module.zygiskFolder.mkdirs())
+        assertTrue(error, path.getChildFile("zygisk").mkdirs())
     }
 
     private fun setupInvalidZygiskModule(root: ExtendedFile) {
@@ -164,12 +166,12 @@ class Environment : TestCommon {
         val path = root.getChildFile(INVALID_ZYGISK)
 
         // Create invalid zygisk libraries
-        val module = LocalModule(path)
-        assertTrue(error, module.zygiskFolder.mkdirs())
-        assertTrue(error, module.zygiskFolder.getChildFile("armeabi-v7a.so").createNewFile())
-        assertTrue(error, module.zygiskFolder.getChildFile("arm64-v8a.so").createNewFile())
-        assertTrue(error, module.zygiskFolder.getChildFile("x86.so").createNewFile())
-        assertTrue(error, module.zygiskFolder.getChildFile("x86_64.so").createNewFile())
+        val zygisk = path.getChildFile("zygisk")
+        assertTrue(error, zygisk.mkdirs())
+        assertTrue(error, zygisk.getChildFile("armeabi-v7a.so").createNewFile())
+        assertTrue(error, zygisk.getChildFile("arm64-v8a.so").createNewFile())
+        assertTrue(error, zygisk.getChildFile("x86.so").createNewFile())
+        assertTrue(error, zygisk.getChildFile("x86_64.so").createNewFile())
 
         assertTrue(error, Shell.cmd("set_default_perm $path").exec().isSuccess)
     }
@@ -266,5 +268,40 @@ class Environment : TestCommon {
         setupInvalidZygiskModule(update)
         setupRemoveModule(root)
         setupUpgradeModule(root, update)
+    }
+
+    @Test
+    fun setupAppHide() {
+        runBlocking {
+            assertTrue(
+                "App hiding failed",
+                AppMigration.patchAndHide(
+                    context = appContext,
+                    label = "Settings"
+                )
+            )
+        }
+
+        // Hand the generated package over to the orchestrator: this
+        // process dies when the hidden copy uninstalls the original
+        val pkg = Config.suManager
+        assertTrue("No hidden package recorded", pkg.length == 20 && pkg.startsWith("com."))
+        assertTrue(
+            "Handoff write failed",
+            Shell.cmd(
+                "echo $pkg > $HANDOFF_FILE",
+                "chmod 0644 $HANDOFF_FILE"
+            ).exec().isSuccess
+        )
+    }
+
+    @Test
+    fun setupAppRestore() {
+        runBlocking {
+            assertTrue(
+                "App restoration failed",
+                AppMigration.restoreApp(appContext)
+            )
+        }
     }
 }

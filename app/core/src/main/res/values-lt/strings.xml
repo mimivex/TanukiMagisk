@@ -2,7 +2,7 @@
 
     <!--Sections-->
     <string name="modules">Moduliai</string>
-    <string name="superuser">Supernaudotojas</string>
+    <string name="superuser">Superuser</string>
     <string name="logs">Žurnalas</string>
     <string name="settings">Nustatymai</string>
     <string name="install">Įdiegti</string>
@@ -16,15 +16,16 @@
     <string name="loading">Įkeliama…</string>
     <string name="update">Naujinti</string>
     <string name="not_available">Neįdiegta</string>
+    <string name="not_installed">Neįdiegta</string>
     <string name="hide">Slėpti</string>
     <string name="home_package">Paketas</string>
     <string name="home_app_title">Programėlė</string>
 
-    <string name="home_notice_content">Magisk siųskites TIK iš oficialiojo GitHub puslapio. Failai iš nežinomų šaltinių gali būti kenkėjiški!</string>
-    <string name="home_support_title">Palaikykite mus</string>
+    <string name="home_notice_content">Aktyviai nepalaikomas Magisk fork. Jei sumokėjote už šią programą, buvote apgauti: ji nemokama ir atvirojo kodo. Eksperimentinis rinkinys pateikiamas toks, koks yra, be jokių garantijų; naudokite savo rizika.</string>
+    <string name="home_support_title">Palaikykite originalius autorius</string>
     <string name="home_follow_title">Sekite mus</string>
     <string name="home_item_source">Pirminis kodas</string>
-    <string name="home_support_content">Magisk yra ir visada bus nemokamas, atvirojo kodo. Tačiau galite paaukoti pinigų, jei norite parodyti, kad jums rūpi.</string>
+    <string name="home_support_content">Magisk yra ir visada bus nemokamas, atvirojo kodo. Tai Magisk fork, kuris negaus aktyvaus palaikymo. Tačiau galite paaukoti pinigų, jei norite parodyti, kad jums rūpi. Aukos skiriamos originaliems Magisk autoriams.</string>
     <string name="home_installed_version">Įdiegta versija</string>
     <string name="home_latest_version">Naujausia versija</string>
     <string name="invalid_update_channel">Neteisingas naujinimų kanalas</string>
@@ -91,6 +92,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">Rodyti sistemos programėles</string>
     <string name="show_os_app">Rodyti OS programėles</string>
+    <string name="add_recommended">Pridėti rekomenduojamas</string>
     <string name="hide_filter_hint">Filtruoti pagal pavadinimą</string>
     <string name="hide_search">Ieškoti</string>
 
@@ -106,8 +108,6 @@
     <string name="module_state_restore">Atkurti</string>
     <string name="module_action_install_external">Įdiegti iš saugyklos</string>
     <string name="update_available">Prieinamas naujinimas</string>
-    <string name="suspend_text_riru">Modulis išjungtas, nes %1$s yra įjungtas</string>
-    <string name="suspend_text_zygisk">Modulis išjungtas, nes %1$s nėra įjungtas</string>
     <string name="zygisk_module_unloaded">Zygisk moduis neįkeltas dėl nesuderinamumo</string>
     <string name="module_empty">Modulių nėra</string>
     <string name="confirm_install">Įdiegti modulį %1$s?</string>
@@ -203,4 +203,62 @@
     <string name="install_unknown_denied">Suteikti prieigą prie įdiegimo iš nežinomų šaltinių</string>
     <string name="app_not_found">Nerasta programėlė, galinti atlikti šį veiksmą</string>
     <string name="reboot_apply_change">Paleiskite iš naujo, kad pritaikytumėte pakeitimus</string>
+    <string name="auto_response">Automatinis atsakymas</string>
+    <string name="patch_file_msg">Pasirinkite vaizdo failą (*.img) arba ODIN archyvą (*.tar)</string>
+    <string name="prompt">Klausti</string>
+    <string name="request_timeout">Atsakymo laukimas</string>
+    <string name="restore_app_confirmation">Šis veiksmas atkurs paslėptą programėlę į originalią būseną. Tikrai norite tai padaryti?</string>
+    <string name="select_patch_file">Pasirinkite ir taisykite failą</string>
+    <string name="settings_app_name_error">Netinkamas formatas</string>
+    <string name="settings_app_name_helper">Programėlė bus perpakuota su šiuo pavadinimu</string>
+    <string name="settings_app_name_hint">Naujas pavadinimas</string>
+    <string name="settings_hide_app_summary">Įdiegti įgaliotąją programėlę su atsitiktiniu paketo ID ir kitu pavadinimu</string>
+    <string name="settings_hide_app_title">Slėpti Magisk programėlę</string>
+    <string name="settings_restore_app_summary">Atkurti programėlę ir originalų APK</string>
+    <string name="settings_restore_app_title">Atkurti Magisk programėlę</string>
+    <string name="settings_su_adb">Tik ADB</string>
+    <string name="settings_su_app">Tik programėlės</string>
+    <string name="settings_su_app_adb">Programėlės ir ADB</string>
+    <string name="settings_su_disable">Išjungta</string>
+    <string name="settings_su_reauth_summary">Iš naujo prašyti supernaudotojo teisių po programėlių naujinimo</string>
+    <string name="settings_su_reauth_title">Pakartotinis autentifikavimas</string>
+    <string name="settings_su_request_10">10 sekundžių</string>
+    <string name="settings_su_request_15">15 sekundžių</string>
+    <string name="settings_su_request_20">20 sekundžių</string>
+    <string name="settings_su_request_30">30 sekundžių</string>
+    <string name="settings_su_request_45">45 sekundės</string>
+    <string name="settings_su_request_60">60 sekundžių</string>
+    <string name="settings_su_tapjack_summary">Supernaudotojo užklausos langas bus neaktyvus, kol jis yra užstotas kito lango</string>
+    <string name="settings_su_tapjack_title">Bakstelėjimų perėmimo apsauga</string>
+    <string name="su_request_title">Supernaudotojo užklausa</string>
+    <string name="superuser_access">Prieigos lygis</string>
+    <string name="tanuki_notice">Neoficialus Tanuki forko rinkinys</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_sulist_locked">MagiskHide negalima išjungti, kol įjungtas SuList.</string>
+    <string name="settings_magiskhide_summary">hidelist procesams Magisk pakeitimai atšaukiami</string>
+    <string name="settings_hidelist_config_title">Konfigūruoti HideList</string>
+    <string name="settings_hidelist_config_summary">Pasirinkite procesus, kuriuos įtraukti į hidelist</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_title">Taikyti SuList</string>
+    <string name="settings_sulist_summary">Tik sulist procesai gali gauti Magisk root prieigą</string>
+    <string name="settings_sulist_config_title">Konfigūruoti SuList</string>
+    <string name="settings_sulist_config_summary">Pasirinkite procesus, kuriuos įtraukti į sulist</string>
+    <string name="settings_sulist_enforced">SuList taikomas</string>
+    <string name="settings_sulist_error_magiskhide">Šiai funkcijai reikia įjungto MagiskHide</string>
+    <string name="sulist_empty_warning">SuList yra root baltasis sąrašas: tik sąraše esančios programos gali gauti Magisk root. Valdytojas ir sistemos komponentai visada išimami.</string>
+    <string name="zygisk_provider_missing">Nėra įdiegto Zygisk teikėjo. Nustatymuose įjunkite integruotą Zygisk arba įdiekite ZygiskNext (arba suderinamą teikėją) Zygisk moduliams. MagiskHide/SuList veikia be Zygisk.</string>
+    <string name="zygisk_provider_disabled">Zygisk teikėjas įdiegtas, bet išjungtas.</string>
+    <string name="zygisk_provider_not_injected">Zygisk teikėjas įdiegtas; injekcija neaptikta.</string>
+    <string name="settings_material_you">Dinaminės spalvos</string>
+    <string name="settings_material_you_summary">Pritaikyti spalvas prie ekrano fono</string>
+    <string name="forever">Visam laikui</string>
+    <string name="once">Kartą</string>
+    <string name="tenmin">10 min.</string>
+    <string name="twentymin">20 min.</string>
+    <string name="thirtymin">30 min.</string>
+    <string name="sixtymin">60 min.</string>
+    <string name="su_warning">Suteikia visišką prieigą prie jūsų įrenginio.\nAtsisakykite, jei nesate tikri!</string>
+    <string name="touch_filtered_warning">Kadangi programa uždengia Superuser užklausą, Magisk negali patvirtinti jūsų atsakymo.</string>
+    <string name="superuser_grant">Suteikti Superuser teises</string>
+    <string name="su_legacy_cmd">Įspėjimas: aptikta nepalaikoma komandų eilutė</string>
 </resources>

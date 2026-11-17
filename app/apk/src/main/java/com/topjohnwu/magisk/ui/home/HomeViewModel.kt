@@ -10,11 +10,14 @@ import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.isOlderVersion
+import com.topjohnwu.magisk.core.tanukiMinorOf
 import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.repository.NetworkService
+import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.utils.asFlow
 import com.topjohnwu.superuser.Shell
@@ -44,6 +47,7 @@ class HomeViewModel(
         val showUninstall: Boolean = false,
         // The update to show in the app install dialog, as one-shot event
         val showManagerInstall: UpdateInfo? = null,
+        val showHideRestore: Boolean = false,
         val envFixCode: Int = 0,
         val showLoading: Boolean = false,
         val magiskState: State = computeMagiskState(),
@@ -68,6 +72,11 @@ class HomeViewModel(
             Info.isRooted && Info.env.isUnsupported -> State.OUTDATED
             !Info.env.isActive -> State.INVALID
             Info.env.versionCode < BuildConfig.APP_VERSION_CODE -> State.OUTDATED
+            // Same versionCode, older fork revision in the daemon - the card
+            // offers the update and a direct install brings the daemon to the
+            // app's minor.
+            Info.env.versionCode == BuildConfig.APP_VERSION_CODE &&
+                Info.env.tanukiMinor < tanukiMinorOf(BuildConfig.APP_VERSION_NAME) -> State.OUTDATED
             else -> State.UP_TO_DATE
         }
 
@@ -102,11 +111,14 @@ class HomeViewModel(
         }
         Info.fetchUpdate(svc)?.apply {
             latestUpdate = this
-            val isDebug = Config.updateChannel == Config.Value.DEBUG_CHANNEL
+            val isCanary = Config.updateChannel == Config.Value.CANARY_CHANNEL
+            // A newer base code, or the same code under a newer fork revision
+            val isNewer = isOlderVersion(
+                BuildConfig.APP_VERSION_CODE, BuildConfig.APP_VERSION_NAME, versionCode, version)
             _uiState.update {
                 it.copy(
-                    appState = if (BuildConfig.APP_VERSION_CODE < versionCode) State.OUTDATED else State.UP_TO_DATE,
-                    managerRemoteVersion = "$version ($versionCode)" + if (isDebug) " (D)" else ""
+                    appState = if (isNewer) State.OUTDATED else State.UP_TO_DATE,
+                    managerRemoteVersion = "$version ($versionCode)" + if (isCanary) " (D)" else ""
                 )
             }
         } ?: run {
@@ -146,6 +158,14 @@ class HomeViewModel(
         _uiState.update { it.copy(showManagerInstall = null) }
     }
 
+    fun onHideRestorePressed() {
+        _uiState.update { it.copy(showHideRestore = true) }
+    }
+
+    fun onHideRestoreConsumed() {
+        _uiState.update { it.copy(showHideRestore = false) }
+    }
+
     fun onEnvFixConsumed() {
         _uiState.update { it.copy(envFixCode = 0) }
     }
@@ -157,6 +177,19 @@ class HomeViewModel(
         viewModelScope.launch {
             val success = withLoading { MagiskInstaller.Restore().exec() }
             showToast(if (success) CoreR.string.restore_done else CoreR.string.restore_fail)
+        }
+    }
+
+    fun hideApp(name: String) {
+        viewModelScope.launch {
+            withLoading { AppMigration.patchAndHide(AppContext, name) }
+        }
+    }
+
+    fun restoreApp() {
+        viewModelScope.launch {
+            val success = withLoading { AppMigration.restoreApp(AppContext) }
+            if (!success) showToast(CoreR.string.failure)
         }
     }
 

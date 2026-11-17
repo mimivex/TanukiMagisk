@@ -83,7 +83,6 @@ import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
 import com.topjohnwu.magisk.core.utils.UsbBlockDevice
 import com.topjohnwu.magisk.ui.component.ConfirmResult
 import com.topjohnwu.magisk.ui.component.MagiskDialog
-import com.topjohnwu.magisk.ui.component.MarkdownText
 import com.topjohnwu.magisk.ui.component.SettingsArrow
 import com.topjohnwu.magisk.ui.component.SettingsSwitch
 import com.topjohnwu.magisk.ui.component.rememberConfirmDialog
@@ -184,10 +183,6 @@ fun InstallDialog(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    if (installUiState.notes.isNotEmpty()) {
-                        MarkdownText(installUiState.notes)
-                    }
-
                     if (!installVm.skipOptions) {
                         InstallOptionsSection()
                     }

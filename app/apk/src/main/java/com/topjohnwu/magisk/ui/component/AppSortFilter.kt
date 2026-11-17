@@ -39,6 +39,8 @@ fun AppSortFilterActions(
     showOS: Boolean,
     onShowSystemChanged: (Boolean) -> Unit,
     onShowOSChanged: (Boolean) -> Unit,
+    // Only the deny screens pass this; stock callers keep the menu unchanged
+    onAddRecommended: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     var showSortMenu by remember { mutableStateOf(false) }
@@ -115,6 +117,17 @@ fun AppSortFilterActions(
                     showFilterMenu = false
                 }
             )
+            // Not a filter toggle: it seeds the mode's recommended packages and
+            // is idempotent, so pressing it again changes nothing.
+            onAddRecommended?.let { addRecommended ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(CoreR.string.add_recommended)) },
+                    onClick = {
+                        addRecommended()
+                        showFilterMenu = false
+                    }
+                )
+            }
         }
     }
 }

@@ -16,5 +16,10 @@
   public void d(**);
 }
 
+# Module WebUI JavaScript bridge
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
 -dontwarn org.junit.**
 -dontwarn org.apache.**

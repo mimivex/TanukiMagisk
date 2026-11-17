@@ -1,13 +1,21 @@
 # Artifacts
 out
 *.zip
+!tools/module-template/module-template.zip
 *.jks
 *.apk
 *.log
 
-# Local configs
+# Local configs and internal working notes
 /config.prop
 /notes.md
+/dev/
+
+# Local tooling and build residue
+/tools/futility
+/.superpowers/
+/app/dict.txt
+/native/src/generated/
 
 # Android Studio
 *.iml

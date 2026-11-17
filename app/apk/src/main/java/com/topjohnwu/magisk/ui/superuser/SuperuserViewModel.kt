@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
@@ -36,6 +37,9 @@ data class PolicyItem(
     val appName: String,
     val isSharedUid: Boolean,
     val policyValue: Int,
+    // Seconds-from-now a timed grant keeps; 0 is permanent.
+    // Carried through the UI so an edit never rewrites the row as expired.
+    val remain: Long,
     val notification: Boolean,
     val logging: Boolean,
 ) {
@@ -81,9 +85,11 @@ class SuperuserViewModel(
             val loaded = withContext(Dispatchers.IO) {
                 db.deleteOutdated()
                 db.delete(AppContext.applicationInfo.uid)
+                // A failed read is not an empty list
+                val fetched = db.fetchAll() ?: return@withContext null
                 val policies = ArrayList<PolicyItem>()
                 val pm = AppContext.packageManager
-                for (policy in db.fetchAll()) {
+                for (policy in fetched) {
                     val pkgs =
                         if (policy.uid == Process.SYSTEM_UID) arrayOf("android")
                         else pm.getPackagesForUid(PolicyDao.denormalizeUid(policy.uid))
@@ -100,6 +106,7 @@ class SuperuserViewModel(
                                 appName = info.applicationInfo?.getLabel(pm) ?: info.packageName,
                                 isSharedUid = info.sharedUserId != null,
                                 policyValue = policy.policy,
+                                remain = policy.remain,
                                 notification = policy.notification,
                                 logging = policy.logging,
                             )
@@ -118,6 +125,13 @@ class SuperuserViewModel(
                     { it.packageName }
                 ))
                 policies
+            }
+            if (loaded == null) {
+                // Keep the previous list and surface the failure
+                Timber.w("Superuser list read failed; keeping the previous list")
+                showToast(R.string.no_connection)
+                _uiState.update { it.copy(loading = false) }
+                return@withLock
             }
             // Publish on the main thread, where all edits are applied, so the update below
             // never races with them. Keep edits queued behind this reload so they don't revert.
@@ -166,9 +180,12 @@ class SuperuserViewModel(
             )
         }
         val item = updated ?: return null
+        // Keep the row's remain, or every edit made here would rewrite a
+        // timed grant as expired and ask for root again
         val policy = SuPolicy(
             uid = item.uid,
             policy = item.policyValue,
+            remain = item.remain,
             notification = item.notification,
             logging = item.logging,
         )

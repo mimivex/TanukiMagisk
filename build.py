@@ -5,7 +5,6 @@ import glob
 import os
 import re
 import shutil
-import ssl
 import stat
 import subprocess
 import sys
@@ -193,6 +192,7 @@ def build_cpp_src(targets: set[str]):
 
     if "magiskinit" in targets:
         cmds.append("B_PRELOAD=1")
+        cmds.append("B_HYOS=1")
 
     if "resetprop" in targets:
         cmds.append("B_PROP=1")
@@ -279,26 +279,9 @@ def dump_flags_native():
     native_gen_path.mkdir(mode=0o755, parents=True, exist_ok=True)
     write_if_diff(native_gen_path / "flags.h", flag_txt)
 
-    cert = b""
-    if "keyStore" in config:
-        ensure_jdk()
-        pem = cmd_out(
-            [
-                "keytool",
-                "-exportcert",
-                "-rfc",
-                "-keystore",
-                config["keyStore"],
-                "-storepass",
-                config["keyStorePass"],
-                "-alias",
-                config["keyAlias"],
-            ]
-        )
-        if pem:
-            cert = ssl.PEM_cert_to_DER_cert(pem)
-
-    cert_hex = ", ".join(f"0x{b:02x}" for b in cert)
+    # The keystore only signs the APK: the daemon does not pin a
+    # certificate, so debug and release managers both stay installable.
+    cert_hex = ""
     rust_flag_txt = f'pub const MAGISK_VERSION: &str = "{config["version"]}";\n'
     rust_flag_txt += f'pub const MAGISK_VER_CODE: i32 = {config["versionCode"]};\n'
     rust_flag_txt += f"pub const TRUSTED_CERT: &[u8] = &[{cert_hex}];\n"
@@ -376,6 +359,16 @@ def build_app():
     source = apk
     target = apk.parent / apk.name.replace("apk-", "app-")
     mv(source, target)
+    header(f"Output: {target}")
+
+
+def build_app_legacy():
+    header("* Building the legacy Magisk app")
+    apk = build_apk(":apk-legacy")
+
+    # Rename apk-variant.apk to app-variant.apk, like the Compose app
+    target = apk.parent / apk.name.replace("apk-", "app-")
+    mv(apk, target)
     header(f"Output: {target}")
 
 
@@ -484,6 +477,7 @@ def gen_ide():
             "B_BOOT=1",
             "B_POLICY=1",
             "B_PRELOAD=1",
+            "B_HYOS=1",
             "B_PROP=1",
             "B_CRT0=1",
             "compile_commands.json",
@@ -828,6 +822,10 @@ def parse_args():
 
     app_parser = subparsers.add_parser("app", help="build the Magisk app")
 
+    app_legacy_parser = subparsers.add_parser(
+        "app-legacy", help="build the legacy Magisk app"
+    )
+
     test_parser = subparsers.add_parser("test", help="build the test app")
 
     clean_parser = subparsers.add_parser("clean", help="cleanup")
@@ -890,6 +888,7 @@ def parse_args():
     rustup_parser.set_defaults(func=setup_rustup)
     gen_parser.set_defaults(func=gen_ide)
     app_parser.set_defaults(func=build_app)
+    app_legacy_parser.set_defaults(func=build_app_legacy)
     test_parser.set_defaults(func=build_test)
     emu_parser.set_defaults(func=setup_avd)
     patch_parser.set_defaults(func=patch)
