@@ -58,8 +58,8 @@ through every step and applies unchanged; start from there.<br>On a device with
 a recovery and a ramdisk you can also rename `magisk-*.apk` to `.zip` and
 flash that.
 
-[!NOTE]
-Installing over another root solution like Apatch or KernelSU works, but it is a migration: the old daemon, its manager and its settings have to be replaced or cleaned up along the way.
+> [!NOTE]
+> Installing over another root solution like Apatch or KernelSU works, but it is a migration: the old daemon, its manager and its settings have to be replaced or cleaned up along the way.
 
 ### Migrating from another Magisk
 
@@ -102,15 +102,15 @@ git submodule update --init
 
 Strings live in `app/core/src/main/res/values/strings.xml` and in the `app/apk` / `app/apk-legacy` modules; translations go in the matching `values-<lang>/strings.xml`.
 
-[!NOTE]
->Many translations in this fork were produced with AI. In any future upstream merge, translations supplied by users will be preferred for the Compose application.
+> [!NOTE]
+> Many translations in this fork were produced with AI. In any future upstream merge, translations supplied by users will be preferred for the Compose application.
 > Therefore I recommend [contributing to the official project translations](https://github.com/topjohnwu/Magisk#translation-contributions).<br>
 > String fixes and new localizations for the legacy application are welcome.
 
 ## Bug reports
 
-[!NOTE]
-A disclaimer is due here: Tanuki is **not actively supported** and is maintained only as my free time allows. As much as I would like to help, I cannot guarantee that I will ever be able to address any reported issue.
+> [!NOTE]
+> A disclaimer is due here: Tanuki is **not actively supported** and is maintained only as my free time allows. As much as I would like to help, I cannot guarantee that I will ever be able to address any reported issue.
 
 If you open an issue, it must come from a **debug build**, and you must first confirm the problem does not also happen on the same version of the [official Magisk](https://github.com/topjohnwu/Magisk); if it does, it belongs upstream, not here.
 
